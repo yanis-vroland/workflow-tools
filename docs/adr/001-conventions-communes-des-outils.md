@@ -1,6 +1,6 @@
 # ADR-001 : conventions communes des outils et stratégie de test des skills
 
-Statut : proposé
+Statut : accepté
 Date : 2026-10-09
 
 ## Contexte

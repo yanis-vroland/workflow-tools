@@ -1,6 +1,6 @@
 # Spec 002 : wf-doc-projet, documentation d'un projet existant
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin
