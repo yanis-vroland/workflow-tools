@@ -1,6 +1,6 @@
 # ADR-001 : conventions communes des outils et stratégie de test des skills
 
-Statut : accepté
+Statut : proposé
 Date : 2026-10-09
 
 ## Contexte
@@ -16,7 +16,7 @@ Ce dernier point est structurant : une skill est un prompt en Markdown, pas du c
 - Chaque outil écrit un fichier Markdown dans `docs/wf/<outil>.md` du projet cible, où `<outil>` est le nom sans le préfixe `wf-` (ex. `docs/wf/analyse-projet.md`).
 - Quand le livrable est trop volumineux pour un seul fichier, la spec de l'outil peut prévoir un dossier `docs/wf/<outil>/` avec un `index.md` comme point d'entrée. Les deux formats ne coexistent jamais pour un même outil.
 - Le dossier `docs/wf/` est créé s'il n'existe pas. Aucun autre fichier du projet cible n'est modifié.
-- L'en-tête du livrable indique l'outil, la date et le commit analysé (`git rev-parse --short HEAD` si le projet est un dépôt git).
+- L'en-tête du livrable indique l'outil, la date et le commit analysé (`git rev-parse --short HEAD` si le projet est un dépôt git), suivi de la mention « modifications non commitées » si le répertoire de travail n'est pas propre.
 - Si le livrable existe déjà, l'outil le relit et le met à jour : il conserve ce qui reste vrai, corrige ce qui a changé et met à jour la date. L'historique est porté par git.
 - Le livrable est rédigé en français.
 
@@ -35,9 +35,11 @@ Ce dernier point est structurant : une skill est un prompt en Markdown, pas du c
 ### Tests à deux niveaux
 
 1. **Tests structurels** (`tests/skills.sh`, bash, sans modèle) : pour chaque `skills/wf-*/SKILL.md`, frontmatter valide (`name` égal au nom du dossier, `description` non vide), et présence des consignes communes ci-dessus. Lancés en CI à chaque PR avec les autres tests de garde-fous.
-2. **Evals** (`evals/`, via `claude plugin eval`, natif dans Claude Code) : chaque outil lancé sur un projet fictif, **FieldOps** (`tests/fixtures/fieldops/`), avec des correcteurs vérifiant le livrable (emplacement, sections, absence d'invention, absence de secret). Les appels réseau y sont simulés pour garder des résultats reproductibles. Ils appellent un modèle : lancés à la main avant chaque PR d'outil, et en CI uniquement sur un label `evals`, pour maîtriser le coût.
+2. **Evals** (`evals/`, via la commande `claude plugin eval`, intégrée à Claude Code et vérifiée en version 2.1.291 ; un premier cas sur FieldOps sert d'essai avant d'écrire les autres) : chaque outil lancé sur un projet fictif, **FieldOps** (`tests/fixtures/fieldops/`), avec des correcteurs vérifiant le livrable (emplacement, sections, absence d'invention, absence de secret). Les appels réseau y sont simulés pour garder des résultats reproductibles. Ils appellent un modèle : lancés à la main avant chaque PR d'outil, et en CI uniquement sur un label `evals`, pour maîtriser le coût. En CI, ils utilisent le secret `CLAUDE_CODE_OAUTH_TOKEN` déjà configuré pour la revue IA.
 
-La fixture FieldOps est un petit projet web volontairement imparfait (dette, dépendance obsolète, test manquant, `.env` factice contenant un faux secret) pour donner prise aux outils de diagnostic.
+La fixture FieldOps est un petit projet web volontairement imparfait (dette, dépendance obsolète, test manquant) pour donner prise aux outils de diagnostic.
+
+Aucun fichier `.env*` autre que `.env.example` n'est commité dans la fixture, conformément aux interdits du CLAUDE.md. Pour vérifier qu'un outil ne lit pas un fichier d'environnement, l'eval copie la fixture dans un répertoire temporaire et y génère à l'exécution un fichier d'environnement contenant un faux secret reconnaissable, puis vérifie que ce marqueur n'apparaît pas dans le livrable.
 
 ## Conséquences
 

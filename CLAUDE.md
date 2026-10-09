@@ -2,7 +2,7 @@
 
 ## Projet
 
-Plugin Claude Code public : 16 outils de workflow (`wf-doc-projet`, `wf-analyse-projet`, `wf-chiffrage`…) pour le quotidien d'un chef de projet et développeur freelance web et mobile. Chaque outil est une skill lancée *dans* le projet cible, et écrit son livrable dans ce projet, jamais dans ce dépôt.
+Plugin Claude Code (public à partir de la v1) : 16 outils de workflow (`wf-doc-projet`, `wf-analyse-projet`, `wf-chiffrage`…) pour le quotidien d'un chef de projet et développeur freelance web et mobile. Chaque outil est une skill lancée *dans* le projet cible, et écrit son livrable dans ce projet, jamais dans ce dépôt.
 
 ## Stack et commandes
 
@@ -55,7 +55,7 @@ Plugin Claude Code public : 16 outils de workflow (`wf-doc-projet`, `wf-analyse-
 
 ## Confidentialité
 
-Dépôt public, mais outils utilisés sur des projets clients réels :
+Dépôt destiné à être public (privé jusqu'à la v1), mais outils utilisés sur des projets clients réels :
 - aucun livrable produit sur un vrai projet n'entre dans ce dépôt ;
 - exemples, démos et tests uniquement sur des données fictives (FieldOps) ou des dépôts publics ;
 - aucun nom de client ni d'employeur (Misyl, Kozykod, BOXBOXBOX…) dans le code, les docs ou les commits.
