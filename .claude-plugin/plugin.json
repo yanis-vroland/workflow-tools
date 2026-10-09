@@ -1,0 +1,8 @@
+{
+  "name": "workflow-tools",
+  "description": "Outils de workflow pour chef de projet et développeur freelance web et mobile : audit, documentation, cadrage, chiffrage, pilotage, livraison.",
+  "version": "0.0.0",
+  "author": { "name": "Yanis Vroland" },
+  "repository": "https://github.com/yanis-vroland/workflow-tools",
+  "license": "MIT"
+}

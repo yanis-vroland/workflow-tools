@@ -1,0 +1,7 @@
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# Configuration des IDE JetBrains (personnelle)
+.idea/
