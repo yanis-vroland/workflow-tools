@@ -1,6 +1,6 @@
 # Spec 001 : wf-analyse-projet, diagnostic d'un projet existant
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin
@@ -15,7 +15,7 @@ Le livrable s'adresse à moi (usage interne), pas au client. Il suit les convent
 - CA2 : Étant donné le livrable produit, alors il contient dans cet ordre les sections : Synthèse, Stack et dépendances, Architecture, Activité du dépôt, Qualité et tests, Sécurité, Dette et risques, Effort de reprise, Points non déterminés.
 - CA3 : Étant donné un projet dont une dépendance a au moins une version majeure de retard, alors la section « Stack et dépendances » la cite avec sa version installée et la dernière version publiée, obtenue en interrogeant le registre de paquets (npm, Packagist, PyPI, pub.dev…).
 - CA4 : Étant donné un registre de paquets injoignable, alors l'outil se replie sur les versions du lockfile, le signale dans « Points non déterminés » et produit tout de même le livrable.
-- CA5 : Étant donné un fichier source qu'aucun test ne couvre, alors la section « Qualité et tests » le cite. Un fichier source est réputé couvert si un fichier de test l'importe ou porte son nom (ex. `invoice.ts` et `invoice.test.ts`). Cette heuristique est approximative et le livrable le précise.
+- CA5 : Étant donné un fichier source qu'aucun test ne couvre, alors la section « Qualité et tests » le cite. Un fichier source est réputé couvert si un fichier de test l'importe ou porte son nom (ex. `invoice.ts` et `invoice.test.ts`). Cette heuristique est approximative : la section « Qualité et tests » le précise à chaque exécution.
 - CA6 : Étant donné un dépôt git, alors « Activité du dépôt » indique la date du premier et du dernier commit, le nombre de contributeurs, et les 10 fichiers les plus souvent modifiés sur les 12 derniers mois, avec leur nombre de commits.
 - CA7 : Étant donné un fichier présent à la fois dans ce top 10 et parmi les fichiers non couverts (CA5), alors il apparaît dans « Dette et risques ».
 - CA8 : Étant donné le livrable, alors chaque risque listé dans « Dette et risques » a un niveau (élevé, moyen, faible) et cite au moins un fichier du projet.
