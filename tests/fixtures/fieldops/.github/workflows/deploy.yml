@@ -1,0 +1,48 @@
+name: Tests et déploiement
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+  deploy-recette:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: recette
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construire et publier l'image
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login registry.example.invalid -u ci --password-stdin
+          docker build -t registry.example.invalid/fieldops:recette .
+          docker push registry.example.invalid/fieldops:recette
+      - name: Redémarrer le service
+        run: curl -fsS -X POST -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" https://deploy.example.invalid/hooks/fieldops-recette
+
+  deploy-production:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construire et publier l'image
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login registry.example.invalid -u ci --password-stdin
+          docker build -t registry.example.invalid/fieldops:${{ github.ref_name }} .
+          docker push registry.example.invalid/fieldops:${{ github.ref_name }}
+      - name: Redémarrer le service
+        run: curl -fsS -X POST -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" https://deploy.example.invalid/hooks/fieldops-production

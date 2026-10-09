@@ -1,0 +1,20 @@
+# Dépendances et builds
+node_modules/
+dist/
+coverage/
+
+# Variables d'environnement locales
+.env
+.env.*
+!.env.example
+
+# Application mobile
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.fvm/
+
+# Divers
+.DS_Store
+*.log
