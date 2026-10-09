@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-Contexte projet pour l'agent de code. Les sections marquées « À ADAPTER » sont propres à chaque projet.
-
 ## Projet
 
 Plugin Claude Code public : 16 outils de workflow (`wf-doc-projet`, `wf-analyse-projet`, `wf-chiffrage`…) pour le quotidien d'un chef de projet et développeur freelance web et mobile. Chaque outil est une skill lancée *dans* le projet cible, et écrit son livrable dans ce projet, jamais dans ce dépôt.
