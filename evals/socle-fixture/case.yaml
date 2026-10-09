@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: socle-fixture
+description: >-
+  Cas d'essai de la chaîne d'evals (ADR-001) : le scaffold reconstruit la fixture
+  FieldOps avec son historique git et son faux secret, et les graders lisent un
+  fichier écrit sous docs/wf/. Ne teste aucune skill.
+tags: [socle]
+runs: 1
+
+execution:
+  model: claude-haiku-4-5-20251001
+  max_turns: 10
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

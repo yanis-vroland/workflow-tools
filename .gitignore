@@ -5,3 +5,6 @@
 
 # Configuration des IDE JetBrains (personnelle)
 .idea/
+
+# Résultats locaux des evals (claude plugin eval)
+evals/results/

@@ -27,6 +27,7 @@ jobs:
         run: >-
           shellcheck .claude/hooks/*.sh .githooks/pre-commit .github/scripts/*.sh
           tests/hooks.sh tests/pre-commit.sh tests/verifier-revue-ia.sh tests/skills.sh
+          tests/fixtures/build-fieldops.sh evals/*/scaffold.sh
 
       - name: Tests des hooks de Claude Code
         run: bash tests/hooks.sh
