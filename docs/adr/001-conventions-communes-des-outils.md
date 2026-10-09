@@ -41,11 +41,63 @@ La fixture FieldOps est un petit projet web volontairement imparfait (dette, dé
 
 Aucun fichier `.env*` autre que `.env.example` n'est commité dans la fixture, conformément aux interdits du CLAUDE.md. Pour vérifier qu'un outil ne lit pas un fichier d'environnement, l'eval copie la fixture dans un répertoire temporaire et y génère à l'exécution un fichier d'environnement contenant un marqueur reconnaissable (ex. `FIELDOPS_FAUX_SECRET_7f3a`), volontairement sans rapport avec un vrai format de clé pour ne pas déclencher les scanners de secrets, puis vérifie que ce marqueur n'apparaît pas dans le livrable.
 
+## Amendement 1 : extension aux 16 outils
+
+Statut : proposé
+Date : 2026-10-09
+
+La rédaction des specs 003 à 016 a montré que plusieurs outils ne partent pas du code (brief client, notes de réunion), produisent des livrables qui s'accumulent, ou gagneraient à toucher au projet. Cet amendement complète la décision ci-dessus ; en cas de conflit, il prévaut.
+
+### Organisation des livrables selon leur nature
+
+- **Fichier unique mis à jour** (règle par défaut) : tous les outils, sauf les deux ci-dessous.
+- **Dossier, un fichier par occurrence** : `wf-compte-rendu` écrit `docs/wf/compte-rendu/AAAA-MM-JJ-<sujet>.md` pour chaque réunion, et maintient `docs/wf/compte-rendu/index.md` qui les liste.
+- **Fichier unique cumulatif** : `wf-release-notes` ajoute une section par version en tête de `docs/wf/release-notes.md`, sans réécrire les sections des versions précédentes.
+- Le découpage en dossier pour un livrable volumineux (spec 002, CA10) reste possible quand la spec le prévoit.
+
+### Saisies humaines
+
+- Quand un livrable contient des champs à remplir à la main (statuts de recette, checklist de passation, réponses aux questions de cadrage), une relance de l'outil conserve ces saisies telles quelles.
+
+### Écriture limitée à `docs/wf/` en v1
+
+- Aucun outil ne modifie un fichier hors de `docs/wf/`, ni n'exécute le projet, ses tests ou son installation, ni ne crée de branche ou de commit. Les productions qui toucheraient au projet (squelettes de tests, plan de montée de version, brouillon des fiches store) restent dans le livrable. Cette règle sera réexaminée après la v1.
+
+### Entrées hors du code
+
+- Un outil peut prendre en entrée des fichiers passés en argument (brief, notes, transcription), y compris hors du projet. Le livrable cite leur nom de fichier seul, jamais un chemin absolu, pour ne pas exposer l'arborescence de la machine.
+- Les outils dont l'entrée n'est pas le code (cadrage, chiffrage, tickets, compte rendu) produisent leur livrable même dans un répertoire sans code source.
+- Exceptions prévues par leur spec : `wf-compte-rendu` accepte aussi des notes collées dans la commande, et `wf-compte-rendu` comme `wf-rapport-avancement` peuvent poser des questions pendant l'exécution (date de réunion, doublon, période). Les autres outils ne prennent que des fichiers et ne posent pas de question.
+
+### Stack non couverte
+
+- Les outils qui décrivent un projet (`wf-onboarding`, `wf-passation`) produisent un livrable réduit, limité à ce qui ne dépend pas de la stack, et le signalent. Les outils qui exigent une stack connue (`wf-recette` faute de spec, `wf-publication-store`) n'écrivent aucun livrable et l'indiquent.
+
+### Dépendances entre outils
+
+- Un outil peut lire le livrable d'un autre outil dans `docs/wf/` si sa spec le prévoit. Il ne le modifie jamais. Les noms de fichiers et de sections des livrables cités par une autre spec deviennent un contrat : les changer impose de mettre à jour les specs qui les lisent.
+
+### Accès réseau étendu
+
+- En plus des registres de paquets et des avis de sécurité, un outil peut lire, si sa spec le prévoit, des documentations publiques : notes de version, guides de migration, calendriers de fin de support (endoflife.date), documentation officielle des stores.
+- `wf-audit-web` peut auditer une URL fournie en argument avec Lighthouse, s'il est déjà installé, sans l'installer. Sans URL ou sans Lighthouse, il audite le code seul.
+- Aucun outil ne se connecte à un service privé (outil de tickets, plateforme de transcription, compte de store) en v1.
+
+### Stacks couvertes en v1
+
+- Web JavaScript/TypeScript (npm, pnpm, yarn) et Flutter (pub). Les autres stacks sont détectées et signalées comme « non couvertes » sans analyse approfondie.
+
+### Fixtures
+
+- `tests/fixtures/fieldops/` : l'univers FieldOps, avec une application web JS/TS volontairement imparfaite, une application compagnon Flutter, et des specs internes à critères numérotés (dont une en brouillon) pour `wf-recette`.
+- `tests/fixtures/fieldops-brief/` : un projet pas encore démarré, contenant un brief client et des notes de réunion fictifs, pour les outils d'avant-vente et de pilotage.
+
 ## Conséquences
 
 - Positives : tous les outils se comportent de la même façon ; le livrable est facile à repérer, à ignorer dans git ou à supprimer ; les tests structurels sont rapides et gratuits ; les evals vérifient la qualité réelle.
 - Négatives : les evals ne sont pas déterministes (un correcteur modèle peut varier) et coûtent du quota ; ils ne bloquent donc pas chaque PR. Le contrôle par mutation ne s'applique qu'aux tests structurels.
-- Une fixture à maintenir, qui grandira avec les outils (projet mobile pour `wf-publication-store`, etc.).
+- Deux fixtures à maintenir (FieldOps web et Flutter, FieldOps brief), qui grandiront avec les outils.
+- Amendement 1 : en v1, les outils restent en lecture seule sur le projet, au prix d'un peu de travail manuel (copier les squelettes de tests, appliquer le plan de montée) ; en contrepartie, aucun risque d'altérer un projet client.
 
 ## Alternatives écartées
 
