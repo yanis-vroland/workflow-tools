@@ -26,13 +26,16 @@ jobs:
       - name: Syntaxe des hooks, des scripts et de leurs tests (shellcheck)
         run: >-
           shellcheck .claude/hooks/*.sh .githooks/pre-commit .github/scripts/*.sh
-          tests/hooks.sh tests/pre-commit.sh tests/verifier-revue-ia.sh
+          tests/hooks.sh tests/pre-commit.sh tests/verifier-revue-ia.sh tests/skills.sh
 
       - name: Tests des hooks de Claude Code
         run: bash tests/hooks.sh
 
       - name: Test de la vérification de la revue IA
         run: bash tests/verifier-revue-ia.sh
+
+      - name: Vérification structurelle des skills (ADR-001)
+        run: bash tests/skills.sh
 
       - name: Installation de gitleaks
         run: |
