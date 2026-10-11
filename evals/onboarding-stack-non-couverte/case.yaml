@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: onboarding-stack-non-couverte
+description: >-
+  Spec 003 (wf-onboarding). Projet fictif en Python, stack non couverte en v1
+  : guide réduit tiré du README, du Makefile, du Dockerfile et de la CI,
+  en-tête « stack Python non couverte en v1 » (CA18).
+tags: [wf-onboarding, spec-003, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

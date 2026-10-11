@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: onboarding-projet-minimal
+description: >-
+  Spec 003 (wf-onboarding). Petit projet TypeScript hors git, sans version de
+  Node.js, sans test, sans convention de contribution ni commande de
+  lancement, avec un terme métier sans définition (CA3, CA5, CA10, CA11, CA15,
+  CA19).
+tags: [wf-onboarding, spec-003, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

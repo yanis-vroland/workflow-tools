@@ -1,0 +1,8 @@
+---
+type: tool_used
+tool: Write
+input_match: 'scheduling\.ts'
+max: 0
+---
+
+CA1 : le fichier modifié par le scaffold n'est pas réécrit par l'outil.
