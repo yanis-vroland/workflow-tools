@@ -1,6 +1,6 @@
 # Spec 008 : wf-rapport-avancement, rapport d'avancement sur une période
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

@@ -1,6 +1,6 @@
 # Spec 005 : wf-chiffrage, estimation de la charge d'un besoin cadré
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

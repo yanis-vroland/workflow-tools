@@ -1,6 +1,6 @@
 # Spec 016 : wf-passation, dossier de passation en fin de mission
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

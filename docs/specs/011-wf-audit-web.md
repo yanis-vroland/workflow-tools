@@ -1,6 +1,6 @@
 # Spec 011 : wf-audit-web, audit performance, accessibilité et référencement d'un site
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

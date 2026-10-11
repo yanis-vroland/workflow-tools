@@ -1,6 +1,6 @@
 # Spec 003 : wf-onboarding, guide de prise en main pour un nouvel arrivant
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

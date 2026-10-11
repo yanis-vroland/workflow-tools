@@ -1,6 +1,6 @@
 # Spec 013 : wf-montee-version, plan de montée de version
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin
