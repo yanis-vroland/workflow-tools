@@ -42,7 +42,7 @@ jobs:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: >-
           claude plugin eval . --scaffold --trust-plugin --no-publish
-          --tag reseau --judge-model sonnet
+          --tag reseau --judge-model sonnet --ablation none
           --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)"
           --json "$RUNNER_TEMP/evals-reseau.json"
           --report "$RUNNER_TEMP/evals-reseau.html"
@@ -53,7 +53,7 @@ jobs:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: >-
           claude plugin eval . --scaffold --trust-plugin --no-publish
-          --tag hors-reseau --judge-model sonnet
+          --tag hors-reseau --judge-model sonnet --ablation none
           --allow-tools Write Bash
           --json "$RUNNER_TEMP/evals-hors-reseau.json"
           --report "$RUNNER_TEMP/evals-hors-reseau.html"

@@ -8,11 +8,11 @@ Les cas se lancent en deux passes, selon leur tag réseau (voir « Réseau ») :
 
 ```bash
 # Registres joignables (tag reseau)
-claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --tag reseau \
+claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag reseau \
   --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)"
 
 # Aucun réseau (tag hors-reseau)
-claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --tag hors-reseau \
+claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag hors-reseau \
   --allow-tools Write Bash
 ```
 
@@ -20,7 +20,9 @@ claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 - `--allow-tools Write Bash` : les outils déclarés dans `allowed_tools` doivent aussi être accordés au lancement.
 - `--no-publish` : toujours. Le rapport reste local, dans `evals/results/` (ignoré par git).
 - `--judge-model sonnet` : les correcteurs `llm` sont jugés par Sonnet (haiku par défaut, trop peu fiable).
-- `--case <nom>` pour un seul cas, `--runs 1` et `--ablation none` pour un essai rapide.
+- `--ablation none` : pas de bras sans plugin. Sans le plugin, `/wf-<outil>` n'est qu'une commande inconnue : ce bras doublerait le coût sans rien mesurer.
+- `--case <nom>` pour un seul cas, `--runs 1` pour un essai rapide.
+- Pas de correcteur `tool_used: Skill` : une skill lancée par sa commande (`/wf-<outil>`) ne passe pas par l'outil `Skill` (0 appel constaté en eval), la preuve du déclenchement repose sur le livrable.
 
 ## Réseau
 
