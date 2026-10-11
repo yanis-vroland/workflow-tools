@@ -75,7 +75,7 @@ graders:
   - name: ca04-aucune-valeur-de-variable
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: 'changeme|postgres://|(?:maps|mail|payments)\.example\.invalid|no-reply@|\b(?:NODE_ENV|PORT|DATABASE_URL|POSTGRES_PASSWORD|JWT_SECRET|MAP_API_URL|MAP_API_KEY|MAIL_API_URL|MAIL_API_KEY|MAIL_FROM|PAYMENT_API_URL|PAYMENT_API_KEY|PAYMENT_WEBHOOK_SECRET|SEED_PASSWORD)=\S'
+    pattern: '\bchangeme\b|postgres://|(?:maps|mail|payments)\.example\.invalid|no-reply@|\b(?:NODE_ENV|PORT|DATABASE_URL|POSTGRES_PASSWORD|JWT_SECRET|MAP_API_URL|MAP_API_KEY|MAIL_API_URL|MAIL_API_KEY|MAIL_FROM|PAYMENT_API_URL|PAYMENT_API_KEY|PAYMENT_WEBHOOK_SECRET|SEED_PASSWORD)=\S'
     match: not_contains
   - name: ca04-marqueur-du-faux-secret-absent-de-la-session
     type: regex
