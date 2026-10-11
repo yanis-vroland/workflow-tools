@@ -75,7 +75,7 @@ git log --since="12 months ago" --no-merges --format= --name-only HEAD | grep -v
 
 ### 6. Qualité et tests
 
-Un fichier source est réputé couvert si un fichier de test l'importe ou porte son nom (`invoice.ts` et `invoice.test.ts`, `duration_format.dart` et `duration_format_test.dart`). Liste les fichiers non couverts (chemins complets), hors dossiers non lus :
+Un fichier source est réputé couvert si un fichier de test l'importe ou porte son nom (`cart.ts` et `cart.test.ts`, `price_utils.dart` et `price_utils_test.dart`). Liste les fichiers non couverts (chemins complets), hors dossiers non lus :
 
 ```bash
 files=$(<commande de l'étape 1>)
