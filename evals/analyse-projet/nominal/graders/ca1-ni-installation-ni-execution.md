@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Bash
-input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:\bnpm (?:install|ci|i|test|run|start)\b|\byarn (?:install|test|run)\b|\bpnpm (?:install|i|test|run)\b|\bnpx |\bflutter (?:pub get|test|run|build)\b|\bdart (?:pub get|test|run)\b|\bdocker(?:-compose| compose)? (?:up|build|run)\b|(?<=[;&|(]\s*|\\n|:\s*")vitest\b)'
+input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?<=[;&|(]\s*|\\n\s*|:\s*"|\b(?:then|do)\s+)(?:npm (?:install|ci|i|test|run|start)\b|yarn (?:install|test|run)\b|pnpm (?:install|i|test|run)\b|npx |(?:fvm )?flutter (?:pub get|test|run|build)\b|dart (?:pub get|test|run)\b|docker(?:-compose| compose)? (?:up|build|run)\b|vitest\b)'
 min: 0
 max: 0
 ---
