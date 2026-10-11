@@ -197,7 +197,7 @@ graders:
   - name: ca13-readme-non-modifie-write
     type: tool_used
     tool: Write
-    input_match: 'README\.md'
+    input_match: '"file_path"\s*:\s*"[^"]*README\.md"'
     min: 0
     max: 0
   - name: ca13-readme-non-modifie-bash

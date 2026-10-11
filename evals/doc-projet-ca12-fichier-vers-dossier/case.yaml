@@ -43,7 +43,7 @@ graders:
   - name: ca12-ancien-fichier-non-reecrit
     type: tool_used
     tool: Write
-    input_match: 'docs/wf/doc-projet\.md'
+    input_match: '"file_path"\s*:\s*"[^"]*docs/wf/doc-projet\.md"'
     min: 0
     max: 0
   - name: ca01-aucune-ecriture-hors-docs-wf

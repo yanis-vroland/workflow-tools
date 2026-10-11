@@ -35,7 +35,7 @@ graders:
   - name: ca12-aucune-ecriture-dans-l-ancien-dossier
     type: tool_used
     tool: Write
-    input_match: 'docs/wf/doc-projet/'
+    input_match: '"file_path"\s*:\s*"[^"]*docs/wf/doc-projet/'
     min: 0
     max: 0
   - name: ca01-aucune-ecriture-hors-docs-wf
