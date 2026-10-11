@@ -2,6 +2,7 @@
 type: tool_used
 tool: Bash
 input_match: '"command": ?"(?:[^"]*(?:&&|\|\||;|\|) *)?(?:npm|npx|yarn|pnpm|flutter|fvm|dart|docker|docker-compose|make|node|tsx|vitest)\b'
+min: 0
 max: 0
 ---
 
