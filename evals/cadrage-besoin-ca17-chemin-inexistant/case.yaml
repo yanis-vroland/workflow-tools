@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: cadrage-besoin-ca17-chemin-inexistant
+description: >-
+  Spec 004, CA17 : seule source passée, un chemin inexistant ; l'outil nomme le
+  fichier en cause et n'écrit aucun livrable, sans se rabattre sur les autres
+  fichiers de la fixture FieldOps brief.
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

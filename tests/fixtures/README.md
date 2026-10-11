@@ -9,6 +9,19 @@ Projets fictifs sur lesquels les evals lancent les outils `wf-*` (ADR-001, secti
 | `build-fieldops-web.sh` | Variante « web seul » : `build-fieldops.sh` puis retrait de `mobile/` dans un commit rejouable ; le projet n'est plus un monorepo | 002 (CA9, CA12) |
 | `commit-livrable.sh` | Dépose et commite un livrable existant dans `docs/wf/` d'un FieldOps déjà construit | 002 (CA7, CA12) |
 | `fieldops-brief/` | Projet pas encore démarré : brief client, notes d'appel, notes de réunion, transcription. Ni code, ni git | avant-vente et pilotage (004 à 007) |
+| `build-pdf.py` | Python 3, bibliothèque standard seule (aucun paquet à installer). Génère un PDF à texte extractible (une page par fichier texte) ou un PDF sans texte, à la manière d'un document scanné (`--no-text`) | sources PDF (004-CA4, 004-CA17) |
+
+## Générer un PDF de test
+
+```bash
+python3 tests/fixtures/build-pdf.py <destination.pdf> <page1.txt> [<page2.txt> ...]
+python3 tests/fixtures/build-pdf.py --no-text <destination.pdf> <nombre de pages>
+```
+
+- Seule la bibliothèque standard de Python 3 est utilisée (`sys`) : rien à installer, en local comme en CI.
+- Première forme : une page par fichier texte, texte extractible (Helvetica, encodage WinAnsi), pour citer un numéro de page (004-CA4).
+- `--no-text` : pages composées uniquement de bandes grises, sans aucun texte extractible, à la manière d'un document scanné (004-CA17).
+- Les textes des pages sont fictifs et fournis par le scaffold de chaque cas (`evals/<cas>/donnees/`).
 
 ## Construire FieldOps avec son historique
 

@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: cadrage-besoin-ca19-coordonnees
+description: >-
+  Spec 004, CA19 : la source (notes de point hebdo de la fixture FieldOps brief)
+  contient une adresse e-mail et un numéro de téléphone fictifs ; le livrable n'en
+  contient aucun. Couvre aussi CA3 : source dans un sous-dossier, citée par son
+  nom de fichier seul.
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

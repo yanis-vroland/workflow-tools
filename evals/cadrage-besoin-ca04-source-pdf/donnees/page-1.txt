@@ -1,0 +1,10 @@
+Cahier des charges : planning des interventions
+Société Démo Thermique (société fictive)
+
+1. Contexte
+Deux dispatchers planifient 40 techniciens dans un tableur partagé.
+
+2. Besoins
+Planification des interventions par les dispatchers, avec affectation
+d'un technicien selon sa zone (indispensable).
+Suivi de l'état de chaque intervention : planifiée, en cours, terminée.

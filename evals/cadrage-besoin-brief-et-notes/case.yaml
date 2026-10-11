@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: cadrage-besoin-brief-et-notes
+description: >-
+  Spec 004, cas principal : wf-cadrage-besoin lancé sur la fixture FieldOps brief
+  (projet sans code ni git) avec le brief et les notes d'appel. Couvre CA1 à CA6,
+  CA8 à CA11, CA19 (adresse e-mail), CA21 et CA23.
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
