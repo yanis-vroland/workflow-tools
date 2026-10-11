@@ -15,7 +15,7 @@ Plugin Claude Code : des outils de workflow pour le quotidien d'un chef de proje
 
 ## Prérequis
 
-- Sources PDF de `wf-cadrage-besoin` : [poppler](https://poppler.freedesktop.org/) (`brew install poppler` sur macOS, paquet `poppler-utils` sous Debian ou Ubuntu). Claude Code s'en sert pour lire un PDF page par page ; sans lui, les PDF sont écartés.
+- Sources PDF de `wf-cadrage-besoin` : [poppler](https://poppler.freedesktop.org/) (`brew install poppler` sur macOS, paquet `poppler-utils` sous Debian ou Ubuntu). La skill en utilise `pdfinfo` (nombre de pages) et `pdftotext` (texte de chaque page), pour citer la page de chaque passage et repérer de façon déterministe un PDF sans texte extractible, comme un document scanné ; sans poppler, les PDF sont écartés.
 
 ## Fabrication
 
