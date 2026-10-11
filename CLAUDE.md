@@ -7,7 +7,7 @@ Plugin Claude Code (public à partir de la v1) : 16 outils de workflow (`wf-doc-
 ## Stack et commandes
 
 - Installer en local : `claude --plugin-dir .`
-- Tests des garde-fous : `bash tests/hooks.sh && bash tests/pre-commit.sh && bash tests/verifier-revue-ia.sh && bash tests/skills.sh`
+- Tests des garde-fous : `bash tests/hooks.sh && bash tests/pre-commit.sh && bash tests/verifier-revue-ia.sh && bash tests/skills.sh && bash tests/verifier-tags-evals.sh`
 
 ## Langue
 

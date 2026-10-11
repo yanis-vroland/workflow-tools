@@ -33,15 +33,30 @@ jobs:
       - name: Installation de Claude Code
         run: npm install --global "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
 
+      # Deux passes (evals/README.md, section Réseau) : le bac à sable de Bash ne
+      # joint que les domaines accordés par WebFetch(domain:…). Chaque cas porte
+      # exactement un des tags reseau / hors-reseau (verifier-tags-evals.sh).
       # --no-publish : le rapport ne quitte jamais la CI (confidentialité)
-      - name: Lancement des evals
+      - name: Evals avec registres joignables (tag reseau)
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: >-
           claude plugin eval . --scaffold --trust-plugin --no-publish
+          --tag reseau --judge-model sonnet --ablation none
+          --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)"
+          --json "$RUNNER_TEMP/evals-reseau.json"
+          --report "$RUNNER_TEMP/evals-reseau.html"
+
+      - name: Evals sans réseau (tag hors-reseau)
+        if: success() || failure()
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: >-
+          claude plugin eval . --scaffold --trust-plugin --no-publish
+          --tag hors-reseau --judge-model sonnet --ablation none
           --allow-tools Write Bash
-          --json "$RUNNER_TEMP/evals.json"
-          --report "$RUNNER_TEMP/evals.html"
+          --json "$RUNNER_TEMP/evals-hors-reseau.json"
+          --report "$RUNNER_TEMP/evals-hors-reseau.html"
 
       - name: Rapport
         if: always()
@@ -49,7 +64,7 @@ jobs:
         with:
           name: rapport-evals
           path: |
-            ${{ runner.temp }}/evals.json
-            ${{ runner.temp }}/evals.html
+            ${{ runner.temp }}/evals-*.json
+            ${{ runner.temp }}/evals-*.html
           if-no-files-found: ignore
           retention-days: 14
