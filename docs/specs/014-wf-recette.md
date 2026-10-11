@@ -1,6 +1,6 @@
 # Spec 014 : wf-recette, cahier de recette d'un projet
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

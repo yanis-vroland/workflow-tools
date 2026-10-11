@@ -1,6 +1,6 @@
 # Spec 007 : wf-compte-rendu, compte rendu de réunion
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

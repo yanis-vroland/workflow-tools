@@ -1,6 +1,6 @@
 # Spec 012 : wf-tests-manquants, tests à écrire en priorité
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

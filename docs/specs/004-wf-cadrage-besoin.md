@@ -1,6 +1,6 @@
 # Spec 004 : wf-cadrage-besoin, cadrage d'un besoin client
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

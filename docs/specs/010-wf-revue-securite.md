@@ -1,6 +1,6 @@
 # Spec 010 : wf-revue-securite, revue de sécurité du code et des dépendances
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

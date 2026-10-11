@@ -1,6 +1,6 @@
 # Spec 015 : wf-publication-store, préparation d'une publication sur les stores mobiles
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

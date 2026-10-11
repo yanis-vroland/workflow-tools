@@ -1,6 +1,6 @@
 # Spec 006 : wf-specs-tickets, découpage d'un besoin cadré en tickets
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin

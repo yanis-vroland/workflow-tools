@@ -1,6 +1,6 @@
 # Spec 009 : wf-release-notes, notes de version
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-09
 
 ## Besoin
