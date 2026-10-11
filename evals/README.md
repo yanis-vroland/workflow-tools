@@ -81,3 +81,22 @@ Tous les cas portent `ca14-aucune-commande-executee` : Bash ne sert qu'à `git r
 - `onboarding-projet-minimal` : projet TypeScript hors git sans commande d'installation, version, tests, conventions ni lancement (CA3, CA4, CA5, CA10, CA11, CA15, CA19) ;
 - `onboarding-conventions` : `CONTRIBUTING.md` (branches, commits), commitlint, hook husky, lint et format (CA9) ;
 - `onboarding-conteneurs-par-defaut` : conteneurs et voie native, README muet sur les deux : repli sur la voie par conteneurs (CA7).
+
+### wf-analyse-projet
+
+Dossier `analyse-projet/` (spec 001). Chaque correcteur porte dans son nom l'identifiant du critère d'acceptation qu'il vérifie (`ca3-…`) ; les correcteurs `…-temoin-…` vérifient que le scénario a bien été mis en place.
+
+| Dossier | Cas | Tag | Critères |
+|---|---|---|---|
+| `nominal/` | FieldOps, git, arbre propre, faux secret, registres joignables | `reseau` | CA1 à CA3, CA5 à CA11, CA13, CA17, CA19 |
+| `ca4-registre-injoignable/` | registres injoignables | `hors-reseau` | CA4 |
+| `ca12-relance/` | livrable précédent commité | `hors-reseau` | CA12 |
+| `ca13-arbre-modifie/` | modification non commitée | `hors-reseau` | CA13 |
+| `ca14-repertoire-vide/`, `ca14-sans-code-source/` | répertoire vide ; brief et notes sans code | `hors-reseau` | CA14 |
+| `ca15-hors-depot/` | copie de FieldOps sans git | `hors-reseau` | CA15 |
+| `ca16-historique-tronque/` | clone superficiel (5 commits) | `hors-reseau` | CA16 |
+| `ca18-projet-volumineux/` | FieldOps et 2 000 modules générés sous `src/legacy/` | `hors-reseau` | CA18 |
+
+CA4 : le registre est coupé par le bac à sable (passe `hors-reseau`, sans autorisation WebFetch). En complément, le scaffold écrit un `.npmrc` projet vers un registre injoignable (`127.0.0.1:9`), exclu par `.git/info/exclude` pour garder l'arbre propre. Le témoin `ca4-temoin-aucun-webfetch` échoue si le cas a été lancé avec une autorisation WebFetch, auquel cas le registre n'était pas injoignable et le cas ne prouve rien.
+
+Valeurs déterministes vérifiées : commit `5b26289` (dernier commit de `main` de la fixture), `c06ac92` (commit du livrable précédent, CA12), période `2026-08-26` à `2026-09-29` (CA16). Les valeurs qui dépendent du registre ou de la date d'exécution (dernière version publiée, nombre de commits sur 12 mois glissants) ne sont jamais figées.

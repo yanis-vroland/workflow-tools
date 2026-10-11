@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: analyse-projet-ca4-registre-injoignable
+description: >-
+  Spec 001, CA4 : registre de paquets injoignable. À lancer SANS autorisation
+  WebFetch(domain:…) : le bac à sable coupe alors le réseau des commandes Bash,
+  et un .npmrc projet redirige npm vers un registre injoignable (voir
+  scaffold.sh et evals/README.md).
+tags: [analyse-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

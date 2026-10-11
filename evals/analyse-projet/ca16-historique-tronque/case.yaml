@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: analyse-projet-ca16-clone-superficiel
+description: >-
+  Spec 001, CA16 : clone superficiel de FieldOps (5 derniers commits, du
+  2026-08-26 au 2026-09-29). « Points non déterminés » signale l'historique
+  tronqué et « Activité du dépôt » précise la période réellement couverte.
+tags: [analyse-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh
