@@ -43,7 +43,7 @@ Aucun fichier `.env*` autre que `.env.example` n'est commité dans la fixture, c
 
 ## Amendement 1 : extension aux 16 outils
 
-Statut : proposé
+Statut : accepté
 Date : 2026-10-09
 
 La rédaction des specs 003 à 016 a montré que plusieurs outils ne partent pas du code (brief client, notes de réunion), produisent des livrables qui s'accumulent, ou gagneraient à toucher au projet. Cet amendement complète la décision ci-dessus ; en cas de conflit, il prévaut.
