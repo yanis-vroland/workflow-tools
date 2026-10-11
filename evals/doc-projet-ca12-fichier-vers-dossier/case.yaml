@@ -1,0 +1,54 @@
+schema_version: "1.1"
+name: doc-projet-ca12-fichier-vers-dossier
+description: >-
+  Spec 002 (wf-doc-projet), CA12, cas limite. Livrable existant au format
+  fichier unique (docs/wf/doc-projet.md, commité), projet monorepo : la relance
+  produit le dossier docs/wf/doc-projet/ et supprime l'ancien fichier.
+tags: [wf-doc-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+# Limite de claude plugin eval : file_exists ne voit que les fichiers créés
+# pendant l'exécution. L'absence de l'ancien fichier, créé par le scaffold, ne
+# peut donc pas être vérifiée directement ; on vérifie qu'une commande de
+# suppression le vise et qu'il n'est pas réécrit.
+graders:
+  - name: ca12-index-cree
+    type: file_exists
+    path: "docs/wf/doc-projet/index.md"
+  - name: ca12-installation-cree
+    type: file_exists
+    path: "docs/wf/doc-projet/installation.md"
+  - name: ca12-configuration-cree
+    type: file_exists
+    path: "docs/wf/doc-projet/configuration.md"
+  - name: ca12-fonctionnalites-cree
+    type: file_exists
+    path: "docs/wf/doc-projet/fonctionnalites.md"
+  - name: ca12-structure-cree
+    type: file_exists
+    path: "docs/wf/doc-projet/structure.md"
+  - name: ca12-ancien-fichier-supprime
+    type: tool_used
+    tool: Bash
+    input_match: '\b(?:rm|unlink|mv)\b[^"]*docs/wf/doc-projet\.md'
+  - name: ca12-ancien-fichier-non-reecrit
+    type: tool_used
+    tool: Write
+    input_match: 'docs/wf/doc-projet\.md'
+    min: 0
+    max: 0
+  - name: ca01-aucune-ecriture-hors-docs-wf
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/)'
+    min: 0
+    max: 0

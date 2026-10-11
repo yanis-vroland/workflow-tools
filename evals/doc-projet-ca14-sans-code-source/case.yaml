@@ -1,0 +1,41 @@
+schema_version: "1.1"
+name: doc-projet-ca14-sans-code-source
+description: >-
+  Spec 002 (wf-doc-projet), CA14, cas limite. Répertoire sans code source
+  (fixture FieldOps brief : brief client et notes, ni code ni git) : l'outil
+  l'indique et n'écrit aucun livrable.
+tags: [wf-doc-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca14-aucun-livrable
+    type: file_exists
+    path: "docs/wf/**"
+    exists: false
+  - name: ca14-aucune-ecriture
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: ca14-message-indique-l-absence-de-code
+    type: regex
+    target: last_message
+    pattern: 'aucun (?:fichier de )?code|pas de code|sans code|aucune source|pas de source'
+    flags: i
+  - name: ca14-message-selon-le-correcteur
+    type: llm
+    focus: last_message
+    criteria: >-
+      PASS si la réponse indique que le répertoire ne contient pas de code
+      source (seulement des documents) et qu'aucune documentation n'a été
+      produite. FAIL si elle annonce avoir produit une documentation, ou si elle
+      ne dit pas pourquoi elle n'en produit pas.

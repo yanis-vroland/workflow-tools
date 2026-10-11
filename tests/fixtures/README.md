@@ -6,6 +6,8 @@ Projets fictifs sur lesquels les evals lancent les outils `wf-*` (ADR-001, secti
 |---|---|---|
 | `fieldops/` | Monorepo FieldOps volontairement imparfait : API et back-office web JS/TS à la racine, application compagnon Flutter dans `mobile/`, specs internes dans `docs/specs/` | outils de diagnostic et de documentation (001 à 003, 008 à 016) |
 | `build-fieldops.sh` | Copie `fieldops/` et y construit un historique git déterministe | outils qui lisent l'historique (001, 008, 009, 012, 014, 016) |
+| `build-fieldops-web.sh` | Variante « web seul » : `build-fieldops.sh` puis retrait de `mobile/` dans un commit rejouable ; le projet n'est plus un monorepo | 002 (CA9, CA12) |
+| `commit-livrable.sh` | Dépose et commite un livrable existant dans `docs/wf/` d'un FieldOps déjà construit | 002 (CA7, CA12) |
 | `fieldops-brief/` | Projet pas encore démarré : brief client, notes d'appel, notes de réunion, transcription. Ni code, ni git | avant-vente et pilotage (004 à 007) |
 
 ## Construire FieldOps avec son historique

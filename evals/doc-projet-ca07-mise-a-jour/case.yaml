@@ -1,0 +1,69 @@
+schema_version: "1.1"
+name: doc-projet-ca07-mise-a-jour
+description: >-
+  Spec 002 (wf-doc-projet), CA7. FieldOps web seul avec un livrable
+  docs/wf/doc-projet.md déjà commité : la relance le met à jour au lieu de le
+  dupliquer, conserve la section encore exacte et corrige la section périmée.
+tags: [wf-doc-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  # Aucun autre livrable : ni nouveau fichier sous docs/wf/ (autre que la
+  # réécriture éventuelle de doc-projet.md), ni dossier docs/wf/doc-projet/
+  - name: ca07-aucun-autre-livrable-cree
+    type: regex
+    target: files
+    pattern: '^(?:.*/)?docs/wf/(?!doc-projet\.md$).+$'
+    flags: m
+    match: not_contains
+  - name: ca07-pas-de-dossier
+    type: file_exists
+    path: "docs/wf/doc-projet/**"
+    exists: false
+  - name: ca07-une-seule-section-presentation
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '(?:^|\n)#{1,6} [^\n]*Présentation'
+    match: "count:1"
+  # Phrase de l'ancien livrable, toujours exacte (src/db/schema.sql)
+  - name: ca07-section-exacte-conservee
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: "Trois rôles d'utilisateur sont définis par la contrainte"
+    flags: i
+  # « npm run serve » n'existe pas dans package.json
+  - name: ca07-section-perimee-corrigee
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: 'npm run serve'
+    match: not_contains
+  - name: ca07-installation-commande-reelle
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '\n#{1,6} [^\n]*Installation et lancement[^\n]*\n(?:(?!\n#{1,6} [^\n]*Configuration)[\s\S])*?npm run dev\b'
+  # 903dded : HEAD du scaffold (commit du livrable), rejouable ; l'ancien en-tête
+  # citait 35377d4 et le 2026-10-02
+  - name: ca07-en-tete-commit-mis-a-jour
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '^(?:[^\n]*\n){0,15}[^\n]*\b903dded'
+  - name: ca07-en-tete-ancienne-date-retiree
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '^(?:[^\n]*\n){0,15}[^\n]*(?:2026-10-02|35377d4)'
+    match: not_contains
+  - name: ca01-aucune-ecriture-hors-docs-wf
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/)'
+    min: 0
+    max: 0

@@ -1,0 +1,43 @@
+schema_version: "1.1"
+name: doc-projet-ca08-modifications-non-commitees
+description: >-
+  Spec 002 (wf-doc-projet), CA8. FieldOps web seul avec une modification non
+  commitée dans src/domain/scheduling.ts : l'en-tête du livrable indique l'outil,
+  la date, le commit, puis la mention « modifications non commitées ».
+tags: [wf-doc-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca08-livrable-cree
+    type: file_exists
+    path: "docs/wf/doc-projet.md"
+  # 35377d4 : HEAD de tests/fixtures/build-fieldops-web.sh, identique avec --dirty
+  - name: ca08-en-tete-outil-date-commit
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '^(?=(?:[^\n]*\n){0,15}[^\n]*wf-doc-projet)(?=(?:[^\n]*\n){0,15}[^\n]*\b35377d4)(?=(?:[^\n]*\n){0,15}[^\n]*(?:\d{4}-\d{2}-\d{2}|\d{1,2}(?:er)? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre) \d{4}|\d{2}/\d{2}/\d{4}))'
+  - name: ca08-mention-modifications-non-commitees-apres-le-commit
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '^(?:[^\n]*\n){0,15}?[^\n]*\b35377d4[\s\S]*?modifications non commitées'
+    flags: i
+  - name: ca08-mention-dans-l-en-tete
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '^(?:[^\n]*\n){0,15}[^\n]*modifications non commitées'
+    flags: i
+  - name: ca01-aucune-ecriture-hors-docs-wf
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/)'
+    min: 0
+    max: 0
