@@ -123,7 +123,7 @@ Autre voie : <installation par conteneurs ou native>, définie par `<fichier>`.
 - Aucun des deux : écris qu'aucun livrable de `wf-doc-projet` n'est présent et suggère de lancer `/wf-doc-projet`, sans aucun lien vers un fichier doc-projet.
 Tu peux ajouter d'autres documents existants du dépôt (README, specs…), avec leur chemin.
 
-**Points non déterminés** : liste à puces (jamais numérotée) de tout ce qui n'a pas pu être établi : versions, tests, lancement, conventions, écarts entre README et configuration, contradictions entre fichiers, sections non établies. S'il n'y a rien : « - Aucun. »
+**Points non déterminés** : liste à puces (jamais numérotée) de tout ce qui n'a pas pu être établi : versions, tests, lancement, conventions, écarts entre README et configuration, contradictions entre fichiers, sections non établies. N'y mets jamais ce que la CI, les tests ou le lint ne couvrent pas (c'est un jugement de qualité, hors périmètre) : seulement ce que le guide n'a pas pu établir. S'il n'y a rien : « - Aucun. »
 
 ## Stack non couverte
 
