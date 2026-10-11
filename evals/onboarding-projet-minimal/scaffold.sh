@@ -2,6 +2,7 @@
 # Petit projet TypeScript fictif, hors git, qui cumule des cas limites de la
 # spec 003 :
 #   - CA3  : aucune version de Node.js fixée (ni .nvmrc, ni engines, ni Dockerfile) ;
+#   - CA4  : aucune commande d'installation dans les fichiers (le README n'en donne pas) ;
 #   - CA5  : aucune commande de test (ni script test, ni fichier de test) ;
 #   - CA10 : aucune convention de contribution (ni CONTRIBUTING.md, ni lint,
 #            ni format, ni hook, ni CI, ni modèle de PR) ;
