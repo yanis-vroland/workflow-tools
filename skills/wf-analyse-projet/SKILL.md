@@ -42,7 +42,7 @@ Stacks couvertes : web JavaScript/TypeScript (npm, pnpm, yarn) et Flutter (pub).
 
 ### 3. Volume et périmètre de lecture
 
-Si le projet compte plus de 300 fichiers source, compte-les par dossier parent direct (`<commande de l'étape 1> | sed 's|/[^/]*$||' | sort | uniq -c | sort -rn`) : un dossier qui en contient directement plus de 100 n'est pas lu (sauf les fichiers du top 10 de l'étape 5) et est noté comme non lu. Ils ne sont pris en compte dans aucune conclusion (couverture, sécurité, dette, architecture) ; ils sont listés dans « Points non déterminés ».
+Si le projet compte plus de 300 fichiers source, compte-les par dossier parent direct (`<commande de l'étape 1> | sed 's|/[^/]*$||' | sort | uniq -c | sort -rn`) : un dossier qui en contient directement plus de 100 n'est pas lu (sauf les fichiers du top 10 de l'étape 5) et est noté comme non lu. Ils ne sont pris en compte dans aucune conclusion (couverture, sécurité, dette, architecture) ; ils sont listés dans « Points non déterminés », et nulle part ailleurs : ni risque (même « non analysé »), ni niveau, ni estimation d'effort ne porte sur eux.
 
 Lis ensuite les manifestes, lockfiles, configurations (CI, Docker, `.env.example`), points d'entrée, routes, services et tests.
 
