@@ -103,6 +103,10 @@ flowchart LR
 - `installation.md` (`# Installation et lancement`), `configuration.md` (`# Configuration`), `fonctionnalites.md` (`# Fonctionnalités`), `structure.md` (`# Structure du code`).
 - Dans un monorepo, chacun de ces quatre fichiers contient une sous-section `##` par application, nommée par son rôle, sa techno et son dossier, ex. `## Application web : site public Next.js (web/)`, `## Application mobile Flutter (app/)`.
 
+### Mise à jour
+
+Si un livrable existe déjà, garde mot pour mot ce qui reste exact, corrige ce qui ne l'est plus, et décris uniquement l'état actuel : aucune trace de l'ancienne version (pas de « la version précédente citait… », pas de journal des modifications).
+
 ### Changement de format
 
 Si l'ancien livrable est dans l'autre format, n'écris jamais à son emplacement. Écris le nouveau format, puis supprime l'ancien par une commande shell, pour que les deux ne coexistent pas :
