@@ -170,4 +170,14 @@ check 1 "Répertoire inexistant : échec" "" "$work/inexistant"
 
 check 0 "Skills du plugin conformes" "" "$root/skills"
 
+# --- Tests structurels propres à chaque skill (tests/skills/wf-<outil>.sh) ----
+
+for test_file in "$root"/tests/skills/*.sh; do
+  [ -e "$test_file" ] || continue
+  if ! bash "$test_file"; then
+    echo "ÉCHEC  ${test_file#"$root"/}"
+    fail=1
+  fi
+done
+
 exit $fail
