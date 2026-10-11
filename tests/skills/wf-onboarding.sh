@@ -67,24 +67,49 @@ sections=(
   "Pour aller plus loin"
   "Points non déterminés"
 )
-# Position (en caractères) de la première occurrence de chaque titre dans le corps
-previous=-1
+# Titres « ## » du bloc modèle du livrable (```markdown … ```) seulement : une
+# mention d'une section ailleurs dans la skill ne doit pas fausser l'ordre.
+model=$(awk '/^```markdown$/ { in_block = 1; next } in_block && /^```$/ { exit } in_block' <<<"$body")
+titles=()
+while IFS= read -r line; do
+  titles+=("${line#\#\# }")
+done < <(grep -E '^## ' <<<"$model")
 order_ok=1
-for section in "${sections[@]}"; do
-  prefix=${body%%"$section"*}
-  if [ "$prefix" = "$body" ]; then
-    ko "CA2 section « $section » citée"
-    order_ok=0
-    continue
-  fi
-  position=${#prefix}
-  if [ "$position" -le "$previous" ]; then
-    ko "CA2 section « $section » citée après la précédente"
-    order_ok=0
-  fi
-  previous=$position
-done
+if [ -z "$model" ]; then
+  ko "CA2 bloc modèle du livrable (\`\`\`markdown) présent"
+  order_ok=0
+elif [ "${titles[*]}" != "${sections[*]}" ]; then
+  ko "CA2 titres ## du modèle (attendu : ${sections[*]} ; obtenu : ${titles[*]})"
+  order_ok=0
+fi
 [ "$order_ok" -eq 1 ] && ok "CA2 les neuf sections, dans l'ordre"
+
+# --- Aucune valeur propre à la fixture FieldOps -----------------------------------
+# Les exemples de la skill restent génériques : sinon les evals sur FieldOps
+# mesureraient la recopie d'un exemple, pas le comportement (surapprentissage).
+
+fieldops_values=(
+  "FieldOps"
+  "src/api/server.ts"
+  "mobile/pubspec.yaml"
+  "Application web"
+  "Application mobile"
+  "Intervention"
+  "Technician"
+  "WorkOrder"
+  "db:seed"
+  "API_URL"
+  "10.0.2.2"
+  "fvm, Docker"
+)
+leak_ok=1
+for value in "${fieldops_values[@]}"; do
+  if grep -qF -- "$value" <<<"$body"; then
+    ko "aucune valeur de FieldOps dans la skill (« $value » présent)"
+    leak_ok=0
+  fi
+done
+[ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
 
 # --- Mentions fixes imposées par la spec ----------------------------------------
 
