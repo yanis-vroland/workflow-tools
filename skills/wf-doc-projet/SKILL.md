@@ -67,7 +67,7 @@ Lis les manifestes, fichiers de verrouillage, README, `Makefile`, `Dockerfile`, 
 - **Fonctionnalités** : ce que fait le projet, tiré des routes, pages, écrans et modules métier, avec les fichiers cités. Pas de référence exhaustive d'API.
 - **Structure du code** : arborescence des dossiers principaux et rôle de chacun.
 - **Points non déterminés** :
-  - chaque écart entre un README et le code, décrit factuellement en citant les deux fichiers, sans modifier le README. Exemple : « `README.md` indique `npm run start:dev`, mais `package.json` ne définit pas de script `start:dev`. » ;
+  - chaque écart entre un README et le code, décrit factuellement en citant les deux fichiers, sans modifier le README. Exemple : « `README.md` indique `make run`, mais le projet ne contient pas de `Makefile`. » ;
   - tout ce qui n'a pas pu être établi (dont l'absence de commande de lancement) ;
   - sinon : « Aucun point relevé. »
 
@@ -86,8 +86,8 @@ Lis les manifestes, fichiers de verrouillage, README, `Makefile`, `Dockerfile`, 
 
 ```mermaid
 flowchart LR
-  web[Back-office] --> api[API]
-  api --> db[(Base de données)]
+  client[Client] --> serveur[Serveur]
+  serveur --> db[(Base de données)]
 ```
 
 ## Installation et lancement
@@ -101,7 +101,7 @@ flowchart LR
 
 - `index.md` : titre et en-tête comme ci-dessus, puis `## Présentation`, `## Stack technique`, `## Architecture` (schéma Mermaid de toutes les applications), `## Points non déterminés`, et enfin `## Autres fichiers` avec les liens relatifs `[Installation et lancement](installation.md)`, `[Configuration](configuration.md)`, `[Fonctionnalités](fonctionnalites.md)`, `[Structure du code](structure.md)`.
 - `installation.md` (`# Installation et lancement`), `configuration.md` (`# Configuration`), `fonctionnalites.md` (`# Fonctionnalités`), `structure.md` (`# Structure du code`).
-- Dans un monorepo, chacun de ces quatre fichiers contient une sous-section `##` par application, nommée par son rôle, sa techno et son dossier, ex. `## Application web : API et back-office (racine)`, `## Application mobile Flutter (mobile/)`.
+- Dans un monorepo, chacun de ces quatre fichiers contient une sous-section `##` par application, nommée par son rôle, sa techno et son dossier, ex. `## Application web : site public Next.js (web/)`, `## Application mobile Flutter (app/)`.
 
 ### Changement de format
 
