@@ -32,7 +32,8 @@ Arguments de la commande (vide si aucun) : $ARGUMENTS
 4. Écarte, en notant la raison pour chacune :
    - un chemin qui n'existe pas (« fichier introuvable ») ;
    - une extension autre que `.md`, `.markdown`, `.txt` ou `.pdf` (ex. `.docx`, `.eml`) : « format non pris en charge, à convertir en Markdown, texte ou PDF ». N'ouvre pas ce fichier et n'en exploite rien ;
-   - un PDF sans texte extractible (étape 2).
+   - un PDF sans texte extractible (étape 2) ;
+   - un PDF illisible parce que poppler n'est pas installé : indique d'installer poppler (`brew install poppler` ou `poppler-utils`), sans rien déduire du nom du fichier.
 5. Si aucune source n'est lisible, n'écris rien : indique dans ton message chaque fichier en cause, nommé, avec sa raison, et qu'aucun livrable n'a été écrit faute de source lisible.
 
 ## Étape 2 : lire les sources
