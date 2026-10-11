@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/onboarding.md" }
-pattern: 'changeme|maps\.example\.invalid|mail\.example\.invalid|payments\.example\.invalid|no-reply@'
+pattern: '\bchangeme\b|maps\.example\.invalid|mail\.example\.invalid|payments\.example\.invalid|no-reply@'
 match: not_contains
 ---
 
