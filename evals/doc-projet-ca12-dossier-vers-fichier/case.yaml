@@ -27,7 +27,7 @@ graders:
   - name: ca12-ancien-dossier-supprime
     type: tool_used
     tool: Bash
-    input_match: '\b(?:rm|unlink|mv)\b[^"]*docs/wf/doc-projet/?\*?(?:\\?"|\s|$)'
+    input_match: '\b(?:rm|unlink|mv)\b[^"]*docs/wf/doc-projet/?\*?(?:\\?"|[\s;&|)]|$)'
   - name: ca12-aucun-fichier-cree-dans-l-ancien-dossier
     type: file_exists
     path: "docs/wf/doc-projet/**"
