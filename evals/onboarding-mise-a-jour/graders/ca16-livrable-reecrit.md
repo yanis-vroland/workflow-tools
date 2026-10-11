@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Write
-input_match: 'docs/wf/onboarding\.md'
+input_match: '"file_path"\s*:\s*"[^"]*docs/wf/onboarding\.md"'
 min: 1
 ---
 

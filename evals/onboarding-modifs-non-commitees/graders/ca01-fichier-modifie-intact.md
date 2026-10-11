@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Write
-input_match: 'scheduling\.ts'
+input_match: '"file_path"\s*:\s*"[^"]*scheduling\.ts"'
 max: 0
 ---
 

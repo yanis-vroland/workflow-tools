@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Write
-input_match: 'doc-projet'
+input_match: '"file_path"\s*:\s*"[^"]*docs/wf/doc-projet'
 max: 0
 ---
 

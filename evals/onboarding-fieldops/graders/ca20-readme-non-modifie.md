@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Write
-input_match: 'README\.md'
+input_match: '"file_path"\s*:\s*"[^"]*README\.md"'
 max: 0
 ---
 
