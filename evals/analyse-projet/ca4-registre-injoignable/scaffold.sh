@@ -6,9 +6,14 @@
 # des variables EVAL_* (npm_config_registry est donc impossible). Le réseau est
 # coupé par le bac à sable de Claude Code : ce cas se lance SANS autorisation
 # WebFetch(domain:…), ce qui interdit tout accès réseau aux commandes Bash
-# (voir evals/README.md). En complément, un .npmrc projet redirige npm vers un
-# registre injoignable, au cas où le cas serait lancé avec ces autorisations ;
-# il est exclu par .git/info/exclude pour garder l'arbre de travail propre.
+# (voir evals/README.md). Le témoin ca4-temoin-echec-reseau vérifie dans la
+# trace que l'interrogation du registre a bien échoué.
+#
+# Le .npmrc projet ne concerne pas la commande de la skill (curl l'ignore) : il
+# redirige vers un registre injoignable un modèle qui interrogerait npm par
+# `npm view` ou `npm outdated`, y compris si le cas était lancé par erreur avec
+# des autorisations réseau. Il est exclu par .git/info/exclude pour garder
+# l'arbre de travail propre.
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")/../../.." && pwd)"

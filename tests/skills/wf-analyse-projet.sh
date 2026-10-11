@@ -35,10 +35,28 @@ mentions=(
   "CA1|docs/wf/analyse-projet.md"
   "CA15|hors git"
   "CA15|non applicable"
-  "CA8|élevé"
-  "CA8|moyen"
-  "CA8|faible"
+  "CA8|**élevé**"
+  "CA8|**moyen**"
+  "CA8|**faible**"
   "CA5|approximati"
+  "CA20|sous-dossier"
+  "CA20|--is-inside-work-tree"
+)
+
+# Valeurs propres à la fixture FieldOps (tests/fixtures/), interdites dans la
+# skill : un exemple qui reprend les paquets, versions ou chemins de la fixture
+# souffle la réponse attendue aux evals (surapprentissage).
+fixture_values=(
+  "react"
+  "express"
+  "17.0.2"
+  "0.13.6"
+  "interventions"
+  "invoice"
+  "scheduling"
+  "mobile/"
+  "5b26289"
+  "FieldOps"
 )
 
 # sections_in_order <fichier> : vrai si les neuf sections y figurent dans l'ordre
@@ -80,6 +98,13 @@ check_skill() {
     fragment=${entry#*|}
     if ! grep -qF -- "$fragment" "$all"; then
       echo "ERREUR  $ca : « $fragment » absent de la skill"
+      errors=$((errors + 1))
+    fi
+  done
+
+  for fragment in "${fixture_values[@]}"; do
+    if grep -qiwF -- "$fragment" "$all"; then
+      echo "ERREUR  surapprentissage : « $fragment » (valeur de la fixture FieldOps) dans la skill"
       errors=$((errors + 1))
     fi
   done
@@ -128,7 +153,12 @@ Ce qui n'a pas pu être établi est marqué « non déterminé ».
 Si le répertoire de travail n'est pas propre, ajoute « modifications non commitées » dans l'en-tête.
 Ne recopie aucune adresse e-mail de contributeur.
 Hors dépôt git, l'en-tête indique « hors git » et l'activité « non applicable ».
-Niveaux de risque : élevé, moyen, faible. L'heuristique de couverture est approximative.
+Niveaux de risque, sous la forme du modèle :
+- **élevé** : description (`chemin`).
+- **moyen** : description (`chemin`).
+- **faible** : description (`chemin`).
+L'heuristique de couverture est approximative.
+Lancé dans un sous-dossier d'un dépôt (git rev-parse --is-inside-work-tree), l'en-tête mentionne le sous-dossier.
 
 ## Synthèse
 ## Stack et dépendances
@@ -163,6 +193,10 @@ for entry in "${mentions[@]}"; do
     "$(fake "$case_name" "$(fake_body | grep -vF -- "$fragment")")"
 done
 
+expect 1 "Auto-test : surapprentissage, valeur de la fixture refusée" "react" \
+  "$(fake fixture "$(fake_body)
+- \`react\` : installée 17.0.2 (\`package-lock.json\`).")"
+
 expect 1 "Auto-test : CA2, section manquante refusée" "CA2" \
   "$(fake sans-section "$(fake_body | grep -vF 'Effort de reprise')")"
 expect 1 "Auto-test : CA2, sections dans le désordre refusées" "CA2" \
@@ -177,11 +211,20 @@ expect 0 "Auto-test : CA2, sections dans un modèle annexe acceptées" "" "$d"
 
 real="$root/skills/$skill_name"
 if output=$(check_skill "$real" 2>&1); then
-  echo "OK     $skill_name : skill conforme à la spec 001 (CA1, CA2, CA5, CA8, CA15) et à l'ADR-001"
+  echo "OK     $skill_name : skill conforme à la spec 001 (CA1, CA2, CA5, CA8, CA15, CA20), sans valeur de la fixture, et à l'ADR-001"
 else
   echo "ÉCHEC  $skill_name : skill non conforme"
   # shellcheck disable=SC2001
   sed 's/^/         /' <<<"$output"
+  fail=1
+fi
+
+# --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------------
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "ÉCHEC  node introuvable : correcteurs des evals non vérifiés (tests/correcteurs/wf-analyse-projet.mjs)"
+  fail=1
+elif ! node "$root/tests/correcteurs/wf-analyse-projet.mjs"; then
   fail=1
 fi
 
