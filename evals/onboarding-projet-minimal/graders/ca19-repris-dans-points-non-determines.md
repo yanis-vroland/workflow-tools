@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/onboarding.md" }
-pattern: '\n##? [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n##? )[\s\S])*?lancement|lancer'
+pattern: '\n##? [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n##? )[\s\S])*?(?:lancement|lancer)'
 flags: "i"
 match: contains
 ---
