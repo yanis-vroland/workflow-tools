@@ -85,12 +85,17 @@ else
   fail=1
 fi
 
-contract "CA4 : identifiant de besoin" 'B01'
-for priority in 'indispensable' 'important' 'souhaitable' 'non précisée'; do
-  contract "CA5 : priorité « $priority »" "$priority"
-done
+# CA4 et CA5 : ligne de besoin du modèle, avec son identifiant et l'échelle de
+# priorité complète (un mot isolé ailleurs dans SKILL.md ne suffit pas)
+contract "CA4, CA5 : modèle de besoin (identifiant, échelle de priorité)" \
+  'B01 : <libellé>. Priorité : <indispensable | important | souhaitable | non précisée>.'
 contract "CA11 : identifiant de question" 'Q01'
 contract "CA11 : champ de réponse à remplir" 'Réponse :'
 contract "CA12 : source d'une réponse saisie" 'réponse saisie à la question'
+contract "CA2 : section vide présente avec « Aucun élément. »" 'Aucun élément.'
+contract "CA15 : source introuvable conservée dans l'en-tête" '(introuvable)'
+# CA17 : extractibilité d'un PDF testée de façon déterministe, page par page
+contract "CA17 : nombre de pages d'un PDF (pdfinfo)" 'pdfinfo'
+contract "CA17 : texte d'une page de PDF (pdftotext)" 'pdftotext -f'
 
 exit $fail

@@ -1,9 +1,10 @@
 schema_version: "1.1"
 name: cadrage-besoin-ca17-pdf-scanne
 description: >-
-  Spec 004, CA17 : seule source passée, un PDF fictif sans texte extractible (pages
-  composées uniquement de formes, comme un document scanné) ; l'outil nomme le
-  fichier en cause et n'écrit aucun livrable.
+  Spec 004, CA17 : seule source passée, un PDF fictif sans texte extractible (texte
+  lisible à l'œil mais dessiné en formes, comme un document scanné) ; l'outil
+  nomme le fichier en cause, ne reprend rien de ce texte et n'écrit aucun
+  livrable.
 tags: [wf-cadrage-besoin, hors-reseau]
 runs: 1
 

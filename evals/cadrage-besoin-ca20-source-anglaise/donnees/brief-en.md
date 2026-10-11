@@ -9,9 +9,9 @@ Our 25 technicians are scheduled in a shared spreadsheet by a single dispatcher.
 
 ## Requirements
 
-1. Dispatchers schedule jobs and assign them to a technician by area (must have).
+1. Dispatchers schedule jobs and assign them to a technician by area (essential).
 2. Technicians record a job report that is emailed to the customer.
-3. Monthly dashboard for management (nice to have).
+3. Monthly dashboard for management (optional).
 
 ## Constraints
 

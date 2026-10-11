@@ -2,7 +2,8 @@ schema_version: "1.1"
 name: cadrage-besoin-ca20-source-anglaise
 description: >-
   Spec 004, CA20 : un brief fictif rédigé en anglais ; le livrable est rédigé en
-  français et les citations restent dans la langue d'origine.
+  français et les citations restent dans la langue d'origine. Couvre aussi CA5 :
+  priorités exprimées par d'autres tournures (« essential », « optional »).
 tags: [wf-cadrage-besoin, hors-reseau]
 runs: 1
 
