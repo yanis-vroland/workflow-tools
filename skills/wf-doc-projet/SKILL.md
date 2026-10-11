@@ -9,10 +9,10 @@ Tu documentes le projet du répertoire courant (sa racine) pour l'équipe ou le 
 
 ## Règles absolues
 
-- **Écriture** : tu n'écris que dans `docs/wf/` du projet (créé s'il n'existe pas), avec l'outil Write, un appel par fichier du livrable. Aucun autre fichier n'est créé ni modifié : ni README, ni documentation existante, ni fichier temporaire. Tu n'exécutes pas le projet, ni son installation, ni ses tests, et tu ne crées ni branche ni commit.
-- **Secrets** : ne lis aucun fichier d'environnement `.env*`, sauf `.env.example` : ni avec Read, ni avec `cat`, `grep`, `head`, `source`… Ne lance jamais de recherche sur la racine entière : cible les dossiers de code (`src/`, `lib/`, `app/`, `mobile/lib/`…) ou des fichiers précis, pour qu'aucun `.env*` ne soit parcouru.
+- **Écriture** : tu n'écris que dans `docs/wf/` du projet (créé s'il n'existe pas), avec l'outil Write, un appel par fichier du livrable. Aucun autre fichier n'est créé ni modifié : ni README, ni documentation existante, ni fichier temporaire. Bash ne sert qu'à lire et lister, et à supprimer l'ancien format (étape 6) : aucune redirection vers un fichier (`>`, `>>`, sauf vers `/dev/null`), ni `sed -i`, `tee`, `mv`, `cp`, `touch`. Tu n'exécutes pas le projet, ni son installation (`npm install`, `flutter pub get`…), ni ses tests, et tu ne crées ni branche ni commit.
+- **Secrets** : ne lis aucun fichier d'environnement `.env*`, sauf `.env.example` : ni avec Read, ni avec `cat`, `grep`, `head`, `source`… Lister les noms de fichiers, `.env*` compris (étape 1), est permis ; en lire le contenu ne l'est pas. Ne lance jamais de recherche de contenu sur la racine entière : cible les dossiers de code (`src/`, `lib/`, `app/`, `<app>/lib/`…) ou des fichiers précis, pour qu'aucun `.env*` ne soit parcouru.
 - **Honnêteté** : toute affirmation s'appuie sur un fichier lu, dont le chemin est cité entre accents graves. Ce qui n'a pas pu être établi est écrit « non déterminé », jamais deviné. Aucune commande, variable ou fonctionnalité n'est inventée.
-- **Aucune valeur** de variable d'environnement, ni valeur par défaut tirée du code, ni URL de connexion, ni mot de passe. Pas d'adresse e-mail de contributeur ni d'aucune autre adresse e-mail.
+- **Aucune valeur** de variable d'environnement, ni valeur par défaut tirée du code, ni URL ou adresse, même locale (`http://localhost:<port>`, adresse d'émulateur…), ni mot de passe. Pas d'adresse e-mail de contributeur ni d'aucune autre adresse e-mail.
 - **Aucun jugement de qualité** (cela relève de `wf-analyse-projet`) : pas de dette, de risque, de faille, de vulnérabilité, de version obsolète ou en fin de support, de « à corriger », « à améliorer », « mauvaise pratique », « non sécurisé », ni de note ou de score (« 7/10 »). Ces mots sont proscrits du livrable, même en passant. Une version se cite telle que déclarée, sans commentaire.
 - Les dates s'écrivent au format `AAAA-MM-JJ`.
 
@@ -39,9 +39,9 @@ Avant toute écriture, relève :
 
 ## Étape 3 : choisir le format
 
-- **Monorepo** : plusieurs applications dans des dossiers distincts, chacune avec son manifeste (ex. `package.json` à la racine et `mobile/pubspec.yaml`), ou un manifeste d'espaces de travail (`workspaces` de `package.json`, `pnpm-workspace.yaml`, `melos.yaml`, `turbo.json`, `nx.json`). Ignore `node_modules/`, les dossiers de build et `docs/wf/`.
+- **Monorepo** : plusieurs applications dans des dossiers distincts, chacune avec son manifeste (ex. `apps/web/package.json` et `apps/mobile/pubspec.yaml`), ou un manifeste d'espaces de travail (`workspaces` de `package.json`, `pnpm-workspace.yaml`, `melos.yaml`, `turbo.json`, `nx.json`). Ignore `node_modules/`, les dossiers de build et `docs/wf/`.
 - Monorepo → **format dossier** `docs/wf/doc-projet/`.
-- Sinon → **fichier unique** `docs/wf/doc-projet.md`, d'au plus 500 lignes, toutes lignes comprises (en-tête et lignes vides, comme `wc -l`). Si la documentation ne tient pas en 500 lignes, passe au format dossier.
+- Sinon → **fichier unique** `docs/wf/doc-projet.md`, d'au plus 500 lignes, toutes lignes comprises (en-tête et lignes vides, comme `wc -l`). Estime la longueur **avant d'écrire** : si la documentation ne tiendra pas en 500 lignes, choisis d'emblée le format dossier.
 
 ## Étape 4 : relire le livrable existant
 
@@ -63,7 +63,7 @@ Lis les manifestes, fichiers de verrouillage, README, `Makefile`, `Dockerfile`, 
   - la commande d'installation des dépendances de l'outil désigné par le manifeste et le fichier de verrouillage (`npm install`, `pnpm install`, `yarn install`, `flutter pub get`) ;
   - les commandes d'un README seulement si elles existent bien dans le projet (script, cible ou fichier présent).
   - Sans manifeste, `Makefile` ni commande vérifiable : écris « Aucune commande d'installation ou de lancement identifiée dans le projet : non déterminé », cite les fichiers cherchés, et **n'écris aucune commande**, même à titre d'exemple.
-- **Configuration** : **tous** les noms de variables de `.env.example`, plus ceux lus dans le code (`process.env.X`, `import.meta.env.X`, `String.fromEnvironment('X')`, `os.environ`…), avec le fichier qui les utilise et leur rôle s'il est établi. Jamais de valeur.
+- **Configuration** : **tous** les noms de variables de `.env.example`, plus ceux lus dans le code (`process.env.X`, `import.meta.env.X`, `String.fromEnvironment('X')`, `os.environ`…), avec le fichier qui les utilise et leur rôle s'il est établi. Jamais de valeur. Dans un monorepo, traite chaque application : son `.env.example`, les variables lues dans son code et celles passées à son lancement (`--dart-define=X`…), chacune rangée sous l'application qui l'utilise.
 - **Fonctionnalités** : ce que fait le projet, tiré des routes, pages, écrans et modules métier, avec les fichiers cités. Pas de référence exhaustive d'API.
 - **Structure du code** : arborescence des dossiers principaux et rôle de chacun.
 - **Points non déterminés** :
@@ -112,11 +112,17 @@ Si un livrable existe déjà, garde mot pour mot ce qui reste exact, corrige ce 
 Si l'ancien livrable est dans l'autre format, n'écris jamais à son emplacement. Écris le nouveau format, puis supprime l'ancien par une commande shell, pour que les deux ne coexistent pas :
 
 - ancien fichier unique : `rm docs/wf/doc-projet.md` ;
-- ancien dossier : `rm -r docs/wf/doc-projet`.
+- ancien dossier : supprime **seulement les cinq fichiers connus**, puis le dossier s'il est vide :
+
+  ```bash
+  rm -f docs/wf/doc-projet/index.md docs/wf/doc-projet/installation.md docs/wf/doc-projet/configuration.md docs/wf/doc-projet/fonctionnalites.md docs/wf/doc-projet/structure.md && rmdir docs/wf/doc-projet
+  ```
+
+  Jamais de suppression récursive : un fichier ajouté à la main dans ce dossier reste en place. Si `rmdir` échoue, liste les fichiers restants (`ls -A docs/wf/doc-projet`) et cite-les dans le message final.
 
 ## Étape 7 : vérifier
 
-- Fichier unique : `wc -l docs/wf/doc-projet.md` donne au plus 500 ; sinon, passe au format dossier (étape 6).
+- Fichier unique : `wc -l docs/wf/doc-projet.md` donne au plus 500. Sinon, écris le format dossier (étape 6), puis supprime le fichier unique déjà écrit : `rm docs/wf/doc-projet.md`.
 - Cherche dans le livrable le vocabulaire proscrit et les valeurs :
 
   ```bash
@@ -126,4 +132,4 @@ Si l'ancien livrable est dans l'autre format, n'écris jamais à son emplacement
   Réécris tout passage trouvé (avec Write) ; une valeur indispensable dans une commande devient un paramètre `<…>`.
 - Les huit sections sont présentes, dans l'ordre, et l'en-tête figure dans les premières lignes.
 
-Termine par un message court : chemin du livrable, format retenu et pourquoi, nombre de lignes, et points non déterminés relevés.
+Termine par un message court : chemin du livrable, format retenu et pourquoi, nombre de lignes, points non déterminés relevés et, le cas échéant, les fichiers restés dans l'ancien dossier `docs/wf/doc-projet/`.
