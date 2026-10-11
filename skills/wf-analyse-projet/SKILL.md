@@ -28,8 +28,8 @@ Liste les fichiers source (noms seulement) :
   | grep -vE '(^|/)(node_modules|vendor|build|dist|\.dart_tool|docs/wf)/|\.d\.ts$|\.g\.dart$' | sort -u
 ```
 
-- Répertoire vide : réponds « Le répertoire est vide : aucun livrable n'a été écrit. » et arrête-toi.
-- Aucun fichier source : réponds « Le répertoire ne contient aucun code source : aucun livrable n'a été écrit. » et arrête-toi.
+- Répertoire vide (`ls -A` ne liste rien, ou seulement `.git`) : réponds « Le répertoire est vide : aucun livrable n'a été écrit. » et arrête-toi.
+- Sinon, aucun fichier source : réponds « Le répertoire ne contient aucun code source : aucun livrable n'a été écrit. » et arrête-toi.
 
 Stacks couvertes : web JavaScript/TypeScript (npm, pnpm, yarn) et Flutter (pub). Une autre stack est détectée et signalée « non couverte », sans analyse approfondie. Repère chaque application (manifeste `package.json`, `pubspec.yaml`… dans des dossiers distincts) : un monorepo en contient plusieurs.
 
