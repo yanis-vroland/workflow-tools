@@ -43,6 +43,9 @@ jobs:
       - name: Tags réseau des cas d'eval
         run: bash tests/verifier-tags-evals.sh && bash .github/scripts/verifier-tags-evals.sh evals
 
+      - name: Relance des evals en échec
+        run: bash tests/evals-avec-relance.sh
+
       - name: Installation de gitleaks
         run: |
           archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
