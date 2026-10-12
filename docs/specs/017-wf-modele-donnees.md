@@ -1,6 +1,6 @@
 # Spec 017 : wf-modele-donnees, modèle de données et schéma de base
 
-Statut : brouillon
+Statut : validée
 Date : 2026-10-12
 
 ## Besoin
