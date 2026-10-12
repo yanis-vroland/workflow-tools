@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: cadrage-besoin-ca04-source-pdf
+description: >-
+  Spec 004, CA4 (source PDF citée avec son numéro de page), CA5 et CA9 sur un
+  cahier des charges PDF fictif de deux pages, généré par le scaffold dans un
+  répertoire sans code.
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

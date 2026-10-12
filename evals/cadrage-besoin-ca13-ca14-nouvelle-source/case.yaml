@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: cadrage-besoin-ca13-ca14-nouvelle-source
+description: >-
+  Spec 004, CA13 et CA14 : relance avec une nouvelle source, un e-mail fictif du
+  client enregistré en fichier, qui répond à Q01 et Q03 mais pas à Q05, sur un
+  livrable existant dont les identifiants B03 et Q02 ont été retirés. Couvre
+  aussi CA19 (adresse e-mail et téléphone de l'e-mail).
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

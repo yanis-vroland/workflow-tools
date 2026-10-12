@@ -13,6 +13,10 @@ Plugin Claude Code : des outils de workflow pour le quotidien d'un chef de proje
 | Pilotage | `wf-compte-rendu`, `wf-rapport-avancement`, `wf-release-notes` |
 | Qualité et livraison | `wf-revue-securite`, `wf-audit-web`, `wf-tests-manquants`, `wf-montee-version`, `wf-recette`, `wf-publication-store`, `wf-passation` |
 
+## Prérequis
+
+- Sources PDF de `wf-cadrage-besoin` : [poppler](https://poppler.freedesktop.org/) (`brew install poppler` sur macOS, paquet `poppler-utils` sous Debian ou Ubuntu). La skill en utilise `pdfinfo` (nombre de pages) et `pdftotext` (texte de chaque page), pour citer la page de chaque passage et repérer de façon déterministe un PDF sans texte extractible, comme un document scanné ; sans poppler, les PDF sont écartés.
+
 ## Fabrication
 
 Ce dépôt est construit avec [agentic-dev-workflow](https://github.com/yanis-vroland/agentic-dev-workflow) : spec validée avant le code, tests d'abord, revue IA en CI, merge humain.

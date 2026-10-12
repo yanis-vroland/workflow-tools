@@ -1,0 +1,21 @@
+schema_version: "1.1"
+name: cadrage-besoin-ca14-ca15-dernier-identifiant-retire
+description: >-
+  Spec 004, CA14 et CA15 : relance sans argument sur un livrable existant dont
+  les plus grands identifiants (B05, B06, Q05, Q06) ont été retirés, ce que
+  porte la ligne « Derniers identifiants attribués » de l'en-tête ; un nouvel
+  élément ne doit pas les réutiliser. L'en-tête liste aussi une source déjà
+  marquée « (introuvable) » dont un fichier de même nom existe ailleurs dans le
+  projet : elle n'est retrouvée que par son chemin enregistré, reste dans
+  l'en-tête et est de nouveau signalée.
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

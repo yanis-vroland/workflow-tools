@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: cadrage-besoin-ca02-sections-vides
+description: >-
+  Spec 004, CA2 : un brief fictif très court, sans exclusion ni contrainte ; le
+  livrable contient quand même les neuf sections, dans l'ordre, et une section
+  vide porte « Aucun élément. ».
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

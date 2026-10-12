@@ -110,3 +110,20 @@ CA20 : le répertoire de la session est imposé par `claude plugin eval` et le s
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
 
 Valeurs déterministes vérifiées : commit `5b26289` (dernier commit de `main` de la fixture), `c06ac92` (commit du livrable précédent, CA12), période `2026-08-26` à `2026-09-29` (CA16). Les valeurs qui dépendent du registre ou de la date d'exécution (dernière version publiée, nombre de commits sur 12 mois glissants) ne sont jamais figées.
+### wf-cadrage-besoin
+
+Spec 004, tous les cas tagués `hors-reseau`. Chaque grader porte dans son nom le critère d'acceptation vérifié (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour, sans quoi les vérifications d'absence réussiraient sans rien prouver. Les données propres à un cas sont dans son dossier `donnees/`.
+
+- `cadrage-besoin-brief-et-notes` : cas principal sur FieldOps brief (CA1 à CA6, CA8 à CA11, CA19, CA21, CA23) ;
+- `cadrage-besoin-ca02-sections-vides` : brief très court, les neuf sections présentes même vides, « Aucun élément. » (CA2) ;
+- `cadrage-besoin-ca04-source-pdf` : source PDF citée avec sa page (CA4, CA5, CA9) ;
+- `cadrage-besoin-ca07-plateformes-absentes` : brief sans plateforme cible (CA7) ;
+- `cadrage-besoin-ca12-ca14-ca15-relance-sans-argument` : relance sans argument, réponse saisie à la main, identifiants retirés, source devenue introuvable conservée dans l'en-tête (CA12, CA14, CA15) ;
+- `cadrage-besoin-ca13-ca14-nouvelle-source` : relance avec un e-mail de réponse du client (CA13, CA14, CA19) ;
+- `cadrage-besoin-ca14-ca15-dernier-identifiant-retire` : plus grands identifiants retirés, portés par la ligne « Derniers identifiants attribués » ; source déjà introuvable, retrouvée par son seul chemin enregistré (CA14, CA15) ;
+- `cadrage-besoin-ca16-sans-argument`, `cadrage-besoin-ca17-chemin-inexistant`, `cadrage-besoin-ca17-format-docx`, `cadrage-besoin-ca17-pdf-scanne`, `cadrage-besoin-ca18-texte-saisi` : erreurs d'entrée (CA16 à CA18) ; le PDF « scanné » montre à l'œil un texte non extractible, qui ne doit pas être repris ;
+- `cadrage-besoin-adr001-fichier-env-ecarte` : un fichier `.env*` passé en argument (même en `.md`) est écarté sans être ouvert (ADR-001) ;
+- `cadrage-besoin-ca19-coordonnees` : coordonnées, identifiant et mot de passe dans la source ; source dans un sous-dossier, listée par son chemin relatif dans l'en-tête, aucun chemin absolu (CA19, CA3) ;
+- `cadrage-besoin-ca03-source-hors-projet` : source hors du projet, créée par le scaffold dans le répertoire parent et passée en `../briefs-externes/brief-externe.md`, gardée en relatif dans l'en-tête, aucun chemin absolu (CA3). Le bac à sable de l'eval n'autorise la lecture que sous ce parent (`home/`, la session tournant dans `home/cwd`) ; la conversion d'un argument absolu en chemin relatif n'est pas testable par une eval, le chemin absolu de la session n'étant pas connu à l'avance ;
+- `cadrage-besoin-ca20-source-anglaise` : source en anglais, priorités « essential » et « optional » (CA20, CA5) ;
+- `cadrage-besoin-ca22-projet-avec-code` : projet cible avec code et git, aucun fichier de `src/` ni `mobile/` lu (CA22, CA3, faux secret de l'ADR-001).

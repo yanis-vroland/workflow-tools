@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: cadrage-besoin-ca12-ca14-ca15-relance-sans-argument
+description: >-
+  Spec 004, CA12, CA14 et CA15 : relance sans argument sur un livrable existant
+  dont la réponse à Q03 a été saisie à la main, dont les identifiants B03 et Q02
+  ont été retirés, et dont l'en-tête liste une source devenue introuvable
+  (compte-rendu-visio.md).
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
