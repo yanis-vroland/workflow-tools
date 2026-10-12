@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: onboarding-mise-a-jour
+description: >-
+  Spec 003 (wf-onboarding). FieldOps avec un guide docs/wf/onboarding.md déjà
+  présent : relance, mise à jour sans doublon, date et faits périmés corrigés,
+  faits vrais conservés (CA16).
+tags: [wf-onboarding, spec-003, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

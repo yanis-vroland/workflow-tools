@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: onboarding-conteneurs-par-defaut
+description: >-
+  Spec 003 (wf-onboarding). Petit projet JavaScript hors git, installable par
+  conteneurs (docker-compose.yml) ou nativement (package.json), dont le README
+  ne décrit aucune voie : la voie par conteneurs est la voie principale, la
+  voie native tient en une ligne (CA7, repli).
+tags: [wf-onboarding, spec-003, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
