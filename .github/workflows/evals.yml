@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: 22
 
-      # Lecture des PDF page par page par Claude Code (sources PDF de wf-cadrage-besoin)
+      # pdftotext et pdfinfo : lecture des sources PDF de wf-cadrage-besoin, page par page
       - name: Installation de poppler
         run: sudo apt-get update && sudo apt-get install --yes poppler-utils
 
