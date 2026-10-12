@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: onboarding-modifs-non-commitees
+description: >-
+  Spec 003 (wf-onboarding). FieldOps avec une modification non commitée
+  (scaffold --dirty) : l'en-tête du guide porte la mention « modifications non
+  commitées » (CA15).
+tags: [wf-onboarding, spec-003, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

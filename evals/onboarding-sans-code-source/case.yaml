@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: onboarding-sans-code-source
+description: >-
+  Spec 003 (wf-onboarding). Répertoire sans code source (fixture FieldOps
+  brief) : l'outil l'indique et n'écrit aucun livrable (CA17).
+tags: [wf-onboarding, spec-003, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,9 @@
+---
+type: regex
+target: { source: file, path: "docs/wf/onboarding.md" }
+pattern: '\n##? [^\n]*Avant de commencer[^\n]*\n(?:(?!\n##? )[\s\S])*?(?<=\n)(?=[^\n]*PostgreSQL)(?=[^\n]*\b15\b)(?=[^\n]*(?:README\.md|docker-compose\.yml))'
+flags: "i"
+match: contains
+---
+
+CA3 : « Avant de commencer » donne PostgreSQL 15 avec sa source (`README.md` ou `docker-compose.yml`).

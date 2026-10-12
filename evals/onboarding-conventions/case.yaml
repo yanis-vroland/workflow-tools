@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: onboarding-conventions
+description: >-
+  Spec 003 (wf-onboarding). Petit projet TypeScript hors git avec
+  CONTRIBUTING.md (nommage des branches, format des commits), configuration
+  commitlint, hook husky, lint et format : « Contribuer » reprend chaque
+  convention avec son fichier (CA9).
+tags: [wf-onboarding, spec-003, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: onboarding-fieldops
+description: >-
+  Spec 003 (wf-onboarding) sur la fixture FieldOps complète : monorepo web
+  JS/TS et Flutter, arbre de travail propre, faux fichier d'environnement, pas
+  de livrable wf-doc-projet. Couvre CA1 à CA9, CA11, CA12 (doc-projet absente),
+  CA13 à CA15, CA20 à CA22.
+tags: [wf-onboarding, spec-003, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
