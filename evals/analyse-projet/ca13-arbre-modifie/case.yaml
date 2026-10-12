@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: analyse-projet-ca13-modifications-non-commitees
+description: >-
+  Spec 001, CA13 : répertoire de travail non propre (modification non commitée
+  dans src/domain/scheduling.ts). L'en-tête porte le commit suivi de la mention
+  « modifications non commitées ».
+tags: [analyse-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

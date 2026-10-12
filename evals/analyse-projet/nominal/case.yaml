@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: analyse-projet-nominal
+description: >-
+  Spec 001, cas nominal sur FieldOps (monorepo web et Flutter, historique git,
+  faux secret dans le fichier d'environnement local). Couvre CA1 à CA3, CA5 à
+  CA11, CA13 (arbre propre), CA17 et CA19. Nécessite l'accès aux registres npm
+  et pub.dev (voir evals/README.md).
+tags: [analyse-projet, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

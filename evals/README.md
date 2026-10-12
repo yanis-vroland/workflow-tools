@@ -82,6 +82,34 @@ Tous les cas portent `ca14-aucune-commande-executee` : Bash ne sert qu'à `git r
 - `onboarding-conventions` : `CONTRIBUTING.md` (branches, commits), commitlint, hook husky, lint et format (CA9) ;
 - `onboarding-conteneurs-par-defaut` : conteneurs et voie native, README muet sur les deux : repli sur la voie par conteneurs (CA7).
 
+### wf-analyse-projet
+
+Dossier `analyse-projet/` (spec 001). Chaque correcteur porte dans son nom l'identifiant du critère d'acceptation qu'il vérifie (`ca3-…`) ; les correcteurs `…-temoin-…` vérifient que le scénario a bien été mis en place.
+
+| Dossier | Cas | Tag | Critères |
+|---|---|---|---|
+| `nominal/` | FieldOps, git, arbre propre, faux secret, registres joignables | `reseau` | CA1 à CA3, CA5 à CA11, CA13, CA17, CA19 |
+| `ca4-registre-injoignable/` | registres injoignables | `hors-reseau` | CA4 |
+| `ca12-relance/` | livrable précédent commité | `hors-reseau` | CA12 |
+| `ca13-arbre-modifie/` | modification non commitée | `hors-reseau` | CA13 |
+| `ca14-repertoire-vide/`, `ca14-sans-code-source/` | répertoire vide ; brief et notes sans code | `hors-reseau` | CA14 |
+| `ca15-hors-depot/` | copie de FieldOps sans git | `hors-reseau` | CA15 |
+| `ca15-depot-parent-non-suivi/` | FieldOps sous un dépôt git parent, avec commits, qui ne le suit pas | `hors-reseau` | CA15 (frontière de CA20) |
+| `ca16-historique-tronque/` | clone superficiel (5 commits) | `hors-reseau` | CA16 |
+| `ca18-projet-volumineux/` | FieldOps et 2 000 modules générés sous `src/legacy/` | `hors-reseau` | CA18 |
+| `ca20-sous-dossier/` | FieldOps dans un sous-dossier d'un dépôt git, commits plus récents hors du sous-dossier | `hors-reseau` | CA20 |
+
+CA4 : le registre est coupé par le bac à sable (passe `hors-reseau`, sans autorisation WebFetch). Le témoin `ca4-temoin-echec-reseau` exige dans la trace la sortie d'une interrogation échouée (`<paquet> injoignable (curl <code>)`, ou `curl: (<code>)`) : sans elle, le registre n'a pas été constaté injoignable et le cas ne prouve rien. Le scaffold écrit aussi un `.npmrc` projet vers un registre injoignable (`127.0.0.1:9`), exclu par `.git/info/exclude` pour garder l'arbre propre : la commande de la skill (`curl`) l'ignore, il ne vise qu'un modèle qui passerait par `npm view` ou `npm outdated`.
+
+CA15 et CA20 : seul un sous-dossier effectivement suivi par un dépôt qui a des commits relève de CA20. `claude plugin eval` crée lui-même un dépôt git vide dans le dossier parent de la session : `ca15-hors-depot` couvre donc aussi le dépôt parent sans commit, et `ca15-depot-parent-non-suivi` le dépôt parent avec commits qui ne suit pas le projet (même montage `core.worktree` que CA20).
+
+CA20 : le répertoire de la session est imposé par `claude plugin eval` et le scaffold n'écrit rien au-dessus. Le dépôt est donc construit avec `core.worktree` : répertoire git dans le répertoire de la session, racine de travail dans son parent, dont la session est le sous-dossier (`git rev-parse --show-prefix` non vide). Seul ce sous-dossier est extrait (`sparse-checkout`). L'historique de FieldOps y est réécrit, suivi de 12 commits plus récents dans `plateforme/` (hors du sous-dossier, une cinquième autrice) : dernier commit du dépôt 2026-10-06, du sous-dossier 2026-09-29. Les hash dépendent du nom du répertoire de la session et ne sont pas figés.
+
+## Correcteurs
+
+Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
+
+Valeurs déterministes vérifiées : commit `5b26289` (dernier commit de `main` de la fixture), `c06ac92` (commit du livrable précédent, CA12), période `2026-08-26` à `2026-09-29` (CA16). Les valeurs qui dépendent du registre ou de la date d'exécution (dernière version publiée, nombre de commits sur 12 mois glissants) ne sont jamais figées.
 ### wf-cadrage-besoin
 
 Spec 004, tous les cas tagués `hors-reseau`. Chaque grader porte dans son nom le critère d'acceptation vérifié (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour, sans quoi les vérifications d'absence réussiraient sans rien prouver. Les données propres à un cas sont dans son dossier `donnees/`.

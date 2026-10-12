@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: analyse-projet-ca14-repertoire-vide
+description: >-
+  Spec 001, CA14 : répertoire de travail vide. L'outil l'indique et n'écrit
+  aucun livrable.
+tags: [analyse-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]

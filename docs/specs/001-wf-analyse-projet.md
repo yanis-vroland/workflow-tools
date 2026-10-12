@@ -30,10 +30,11 @@ Le livrable s'adresse à moi (usage interne), pas au client. Il suit les convent
 - CA17 : Étant donné un monorepo (plusieurs applications), alors « Architecture » décrit chaque application dans une sous-section, et la synthèse reste globale.
 - CA18 : Étant donné une partie du code que l'outil n'a pas lue (projet volumineux), alors « Points non déterminés » liste les dossiers non lus, et aucune conclusion ne porte sur eux.
 - CA19 : Étant donné une information impossible à établir à partir des fichiers (ex. hébergement), alors elle figure dans « Points non déterminés » et n'est affirmée nulle part ailleurs.
+- CA20 : Étant donné un projet situé dans un sous-dossier d'un dépôt git, quand je lance l'outil à la racine de ce sous-dossier, alors le projet est traité comme un dépôt git : l'en-tête indique le commit du dépôt et le sous-dossier analysé, et l'inventaire des fichiers comme « Activité du dépôt » ne portent que sur ce sous-dossier.
 
 ## Cas limites et erreurs
 
-Couverts par CA4 et CA14 à CA19.
+Couverts par CA4 et CA14 à CA20.
 
 ## Hors périmètre
 

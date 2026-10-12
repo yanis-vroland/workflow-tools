@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: analyse-projet-ca12-relance
+description: >-
+  Spec 001, CA12 : un livrable docs/wf/analyse-projet.md est déjà présent et
+  commité (en-tête du 2026-10-01, commit 5b26289). La relance le met à jour
+  (date et commit d'en-tête) au lieu de le dupliquer.
+tags: [analyse-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

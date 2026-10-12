@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: analyse-projet-ca20-sous-dossier
+description: >-
+  Spec 001, CA20 : FieldOps est un sous-dossier d'un dépôt git plus large,
+  dont les commits les plus récents et le fichier le plus modifié sont hors de
+  ce sous-dossier. L'en-tête porte le commit du dépôt et mentionne le
+  sous-dossier ; l'activité ne porte que sur le sous-dossier.
+tags: [analyse-projet, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh
