@@ -94,7 +94,7 @@ La rédaction des specs 003 à 016 a montré que plusieurs outils ne partent pas
 
 ## Amendement 2 : fichiers non Markdown et encadrés « À décider »
 
-Statut : proposé
+Statut : accepté
 Date : 2026-10-12
 
 Deux outils s'ajoutent aux 16 : `wf-modele-donnees` (spec 017), qui passe d'une analyse à un modèle de données puis à un schéma de base, et `wf-exploitation` (spec 018), guide d'exploitation tiré du code. Le premier livre des fichiers directement utilisables par le développeur (schéma, migration, requêtes), que la règle « un fichier Markdown » ne permet pas, et il a besoin de faire trancher des choix au chef de projet. Cet amendement complète la décision et l'amendement 1 ; en cas de conflit, il prévaut.
