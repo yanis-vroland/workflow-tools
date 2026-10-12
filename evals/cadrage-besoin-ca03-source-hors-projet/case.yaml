@@ -1,10 +1,12 @@
 schema_version: "1.1"
 name: cadrage-besoin-ca03-source-hors-projet
 description: >-
-  Spec 004, CA3 (ADR-001, amendement 1) : la source est hors du projet et passée
-  par un chemin absolu ; l'en-tête « Sources lues » la désigne par son chemin
-  relatif à la racine du projet (../…), et aucun chemin absolu n'apparaît dans
-  le livrable.
+  Spec 004, CA3 (ADR-001, amendement 1) : la source est hors du projet, passée
+  par le chemin relatif ../briefs-externes/brief-externe.md ; l'en-tête « Sources
+  lues » garde ce chemin relatif, la source est citée ailleurs par son nom seul,
+  et aucun chemin absolu n'apparaît dans le livrable. La conversion d'un argument
+  absolu n'est pas testable ici : le chemin absolu de la session n'est pas connu
+  à l'avance.
 tags: [wf-cadrage-besoin, hors-reseau]
 runs: 1
 
