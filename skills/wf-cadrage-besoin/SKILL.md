@@ -19,7 +19,7 @@ Arguments de la commande (vide si aucun) : $ARGUMENTS
 - **Honnêteté** : toute affirmation s'appuie sur une source citée. Une information absente de toutes les sources n'est jamais affirmée ni devinée : elle est « non déterminé » ou fait l'objet d'une question. Ne propose ni solution technique, ni architecture, ni chiffrage.
 - **Données personnelles** : aucune adresse e-mail, aucun numéro de téléphone, aucun identifiant ni mot de passe dans le livrable, même dans une citation (coupe ou remplace par « […] »). Par précaution, ne reprends aucun nom de personne figurant dans les sources : désigne chacune par son rôle tel que la source le donne.
 - **Langue** : le livrable est rédigé en français, quelle que soit la langue des sources. Les citations restent dans leur langue d'origine, entre « », sans traduction à leur place.
-- **Désignation des sources** : dans la ligne « Sources lues » de l'en-tête, chaque source garde son chemin tel que donné (relatif au projet, ou absolu si elle est hors du projet). Partout ailleurs dans le livrable, une source est désignée par son nom de fichier seul (`brief.md`), sans répertoire.
+- **Désignation des sources** : dans la ligne « Sources lues » de l'en-tête, chaque source est désignée par son chemin relatif à la racine du projet, y compris si elle est hors du projet (`../briefs/brief.md`) ; jamais par un chemin absolu, qui exposerait l'arborescence de la machine. Un argument absolu est converti en chemin relatif à la racine du projet (répertoire courant), par exemple avec `python3 -c 'import os, sys; print(os.path.relpath(sys.argv[1]))' "<chemin>"`. Partout ailleurs dans le livrable, une source est désignée par son nom de fichier seul (`brief.md`), sans répertoire.
 
 ## Étape 1 : déterminer les sources
 
@@ -29,7 +29,7 @@ Arguments de la commande (vide si aucun) : $ARGUMENTS
      `/wf-cadrage-besoin <fichier> [<fichier>…]` (brief, cahier des charges, notes ; Markdown `.md`, texte `.txt` ou PDF à texte extractible), lancée à la racine du projet.
    - **Au moins un argument est un fichier existant** (`test -f`) : tous les arguments sont des chemins de fichiers ; ceux qui n'existent pas sont « fichier introuvable ».
    - **Aucun argument n'est un fichier existant** : si aucun ne ressemble à un chemin (ni `/`, ni extension de fichier), c'est un texte saisi : réponds que seules des sources sous forme de fichier (Markdown, texte ou PDF) sont acceptées, que le texte saisi n'est pas pris comme source, rappelle la syntaxe ci-dessus, et arrête-toi sans rien écrire. Sinon, chaque argument est un chemin, introuvable.
-3. Liste des sources à lire : les arguments, plus, en cas de relance, les sources de la ligne « Sources lues » de l'en-tête (y compris celles marquées « (introuvable) »). Une source de l'en-tête est cherchée à son chemin enregistré uniquement, sans aucune recherche ailleurs dans le projet : si ce fichier n'existe pas, elle est introuvable. Un argument qui porte le même nom de fichier qu'une source de l'en-tête la remplace, avec son nouveau chemin.
+3. Liste des sources à lire : les arguments, plus, en cas de relance, les sources de la ligne « Sources lues » de l'en-tête (y compris celles marquées « (introuvable) »). Une source de l'en-tête est cherchée à son chemin relatif enregistré, depuis la racine du projet, uniquement, sans aucune recherche ailleurs dans le projet : si ce fichier n'existe pas, elle est introuvable. Un argument qui porte le même nom de fichier qu'une source de l'en-tête la remplace, avec son nouveau chemin (relatif).
 4. Écarte, en notant la raison pour chacune :
    - un nom de fichier d'environnement (`.env*`, voir les règles permanentes), sans l'ouvrir ;
    - un chemin qui n'existe pas (« fichier introuvable ») ;
@@ -71,7 +71,7 @@ Crée `docs/wf/` si besoin (`mkdir -p docs/wf`), puis écris le livrable avec Wr
 - Outil : wf-cadrage-besoin
 - Date : <AAAA-MM-JJ>
 - Commit analysé : <hash court | non déterminé (le projet n'est pas un dépôt git)>[, modifications non commitées]
-- Sources lues : <chemin tel que donné>, <chemin tel que donné>[ (introuvable)]
+- Sources lues : <chemin relatif à la racine du projet>, <chemin relatif>[ (introuvable)]
 - Derniers identifiants attribués : B<nn>, Q<nn>
 
 ## Synthèse
