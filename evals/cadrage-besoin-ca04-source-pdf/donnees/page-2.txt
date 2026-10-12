@@ -1,0 +1,6 @@
+3. Pilotage
+Export mensuel des interventions au format CSV pour la direction
+(souhaitable).
+
+4. Hors périmètre
+La gestion des stocks de pièces détachées n'est pas concernée.
