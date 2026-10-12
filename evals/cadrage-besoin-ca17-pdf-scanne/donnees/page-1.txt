@@ -1,0 +1,10 @@
+Cahier des charges : club Kaplamar
+Société fictive, document de test
+
+1. Contexte
+Le club Kaplamar gère douze terrains de padel
+et les réservations par téléphone.
+
+2. Besoins
+Réservation des terrains de padel en ligne
+par les adhérents (indispensable).
