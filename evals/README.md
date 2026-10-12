@@ -94,11 +94,14 @@ Dossier `analyse-projet/` (spec 001). Chaque correcteur porte dans son nom l'ide
 | `ca13-arbre-modifie/` | modification non commitée | `hors-reseau` | CA13 |
 | `ca14-repertoire-vide/`, `ca14-sans-code-source/` | répertoire vide ; brief et notes sans code | `hors-reseau` | CA14 |
 | `ca15-hors-depot/` | copie de FieldOps sans git | `hors-reseau` | CA15 |
+| `ca15-depot-parent-non-suivi/` | FieldOps sous un dépôt git parent, avec commits, qui ne le suit pas | `hors-reseau` | CA15 (frontière de CA20) |
 | `ca16-historique-tronque/` | clone superficiel (5 commits) | `hors-reseau` | CA16 |
 | `ca18-projet-volumineux/` | FieldOps et 2 000 modules générés sous `src/legacy/` | `hors-reseau` | CA18 |
 | `ca20-sous-dossier/` | FieldOps dans un sous-dossier d'un dépôt git, commits plus récents hors du sous-dossier | `hors-reseau` | CA20 |
 
 CA4 : le registre est coupé par le bac à sable (passe `hors-reseau`, sans autorisation WebFetch). Le témoin `ca4-temoin-echec-reseau` exige dans la trace la sortie d'une interrogation échouée (`<paquet> injoignable (curl <code>)`, ou `curl: (<code>)`) : sans elle, le registre n'a pas été constaté injoignable et le cas ne prouve rien. Le scaffold écrit aussi un `.npmrc` projet vers un registre injoignable (`127.0.0.1:9`), exclu par `.git/info/exclude` pour garder l'arbre propre : la commande de la skill (`curl`) l'ignore, il ne vise qu'un modèle qui passerait par `npm view` ou `npm outdated`.
+
+CA15 et CA20 : seul un sous-dossier effectivement suivi par un dépôt qui a des commits relève de CA20. `claude plugin eval` crée lui-même un dépôt git vide dans le dossier parent de la session : `ca15-hors-depot` couvre donc aussi le dépôt parent sans commit, et `ca15-depot-parent-non-suivi` le dépôt parent avec commits qui ne suit pas le projet (même montage `core.worktree` que CA20).
 
 CA20 : le répertoire de la session est imposé par `claude plugin eval` et le scaffold n'écrit rien au-dessus. Le dépôt est donc construit avec `core.worktree` : répertoire git dans le répertoire de la session, racine de travail dans son parent, dont la session est le sous-dossier (`git rev-parse --show-prefix` non vide). Seul ce sous-dossier est extrait (`sparse-checkout`). L'historique de FieldOps y est réécrit, suivi de 12 commits plus récents dans `plateforme/` (hors du sous-dossier, une cinquième autrice) : dernier commit du dépôt 2026-10-06, du sous-dossier 2026-09-29. Les hash dépendent du nom du répertoire de la session et ne sont pas figés.
 
