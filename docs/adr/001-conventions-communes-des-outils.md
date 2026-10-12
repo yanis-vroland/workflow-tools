@@ -92,12 +92,54 @@ La rédaction des specs 003 à 016 a montré que plusieurs outils ne partent pas
 - `tests/fixtures/fieldops/` : l'univers FieldOps, avec une application web JS/TS volontairement imparfaite, une application compagnon Flutter, et des specs internes à critères numérotés (dont une en brouillon) pour `wf-recette`.
 - `tests/fixtures/fieldops-brief/` : un projet pas encore démarré, contenant un brief client et des notes de réunion fictifs, pour les outils d'avant-vente et de pilotage.
 
+## Amendement 2 : fichiers non Markdown et encadrés « À décider »
+
+Statut : accepté
+Date : 2026-10-12
+
+Deux outils s'ajoutent aux 16 : `wf-modele-donnees` (spec 017), qui passe d'une analyse à un modèle de données puis à un schéma de base, et `wf-exploitation` (spec 018), guide d'exploitation tiré du code. Le premier livre des fichiers directement utilisables par le développeur (schéma, migration, requêtes), que la règle « un fichier Markdown » ne permet pas, et il a besoin de faire trancher des choix au chef de projet. Cet amendement complète la décision et l'amendement 1 ; en cas de conflit, il prévaut.
+
+### Fichiers non Markdown dans un livrable en dossier
+
+- Quand sa spec le prévoit, un outil dont le livrable est un dossier `docs/wf/<outil>/` peut y écrire des fichiers non Markdown (ex. `.sql`, `.prisma`, `.ts`, `.dart`), à côté de l'`index.md`.
+- L'`index.md` reste le point d'entrée : il porte l'en-tête commun (outil, date, commit) et liste chaque fichier du dossier avec son rôle.
+- Chaque fichier non Markdown commence, si son format admet les commentaires, par un commentaire qui nomme l'outil et renvoie à l'`index.md`.
+- Les règles d'honnêteté s'appliquent à ces fichiers comme au Markdown : aucun secret, et des données de test uniquement fictives.
+- Ces fichiers restent dans `docs/wf/` (amendement 1) : le développeur les copie lui-même dans le projet. Si un fichier du dossier n'a plus lieu d'être à la relance, l'outil le signale dans l'`index.md` au lieu de le supprimer.
+
+### Aucune exécution
+
+- Les fichiers produits (migrations, requêtes, données de test, scripts) sont écrits, jamais exécutés, y compris dans une base de données jetable. L'exécution dans un environnement isolé, qui permettrait de prouver qu'un schéma ou une migration fonctionne, sera réexaminée après la v1, avec la règle d'écriture limitée à `docs/wf/`.
+
+### Encadrés « À décider »
+
+Un encadré « À décider » présente un choix que l'outil ne peut pas trancher seul. Il se distingue d'une question au client (format `Qnn` de la spec 004), qui demande un fait : l'encadré propose des options identifiées, chacune avec ses conséquences.
+
+- Chaque encadré a un identifiant unique et stable (`D01`, `D02`…), jamais réattribué après retrait, un titre, le contexte qui rend le choix nécessaire avec sa source, au moins deux options avec leurs conséquences, et un champ « Décision : » vide à remplir à la main.
+- L'outil ne remplit jamais le champ « Décision : ». Une option ne peut être recommandée que si la spec de l'outil le prévoit, et la recommandation est alors justifiée par une source.
+- À la relance, le champ « Décision : » est conservé tel quel (amendement 1, saisies humaines). Une décision saisie est appliquée dans le reste du livrable, citée comme source (« décision saisie en `Dnn` »). Si les options ou le contexte ont changé depuis, l'outil conserve la décision et le signale au lieu de l'effacer.
+- La convention sert d'abord à `wf-modele-donnees`, puis à `wf-passation` et à de futurs outils, dès que leur spec le prévoit.
+
+Exemple sur FieldOps :
+
+```markdown
+> **D01 — Retrait d'un technicien**
+>
+> Contexte : les interventions référencent un technicien (`interventions.technician_id`, source : `src/db/schema.sql`) ; le brief ne dit pas ce qu'il advient d'un technicien qui quitte l'entreprise.
+>
+> - **Option 1 : suppression définitive.** Conséquence : ses interventions passées perdent leur technicien, ou doivent être supprimées avec lui.
+> - **Option 2 : désactivation** (champ `active_until`). Conséquence : l'historique est conservé ; chaque liste de techniciens doit filtrer les inactifs.
+>
+> Décision :
+```
+
 ## Conséquences
 
 - Positives : tous les outils se comportent de la même façon ; le livrable est facile à repérer, à ignorer dans git ou à supprimer ; les tests structurels sont rapides et gratuits ; les evals vérifient la qualité réelle.
 - Négatives : les evals ne sont pas déterministes (un correcteur modèle peut varier) et coûtent du quota ; ils ne bloquent donc pas chaque PR. Le contrôle par mutation ne s'applique qu'aux tests structurels.
 - Deux fixtures à maintenir (FieldOps web et Flutter, FieldOps brief), qui grandiront avec les outils.
 - Amendement 1 : en v1, les outils restent en lecture seule sur le projet, au prix d'un peu de travail manuel (copier les squelettes de tests, appliquer le plan de montée) ; en contrepartie, aucun risque d'altérer un projet client.
+- Amendement 2 : le développeur reçoit des fichiers prêts à copier, mais non éprouvés tant que rien n'est exécuté ; le livrable doit le dire. Les encadrés « À décider » ajoutent un format de saisie humaine que les tests structurels et les evals des outils concernés devront couvrir.
 
 ## Alternatives écartées
 
