@@ -91,7 +91,7 @@ rm -r "$build"
   g status --short >&2
   exit 1
 }
-[ -f src/api/routes/interventions.ts ] && [ ! -e "$parent/plateforme" ] || {
+if [ ! -f src/api/routes/interventions.ts ] || [ -e "$parent/plateforme" ]; then
   echo "Erreur interne : extraction partielle incorrecte." >&2
   exit 1
-}
+fi
