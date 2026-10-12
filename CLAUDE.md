@@ -2,7 +2,7 @@
 
 ## Projet
 
-Plugin Claude Code (public à partir de la v1) : 16 outils de workflow (`wf-doc-projet`, `wf-analyse-projet`, `wf-chiffrage`…) pour le quotidien d'un chef de projet et développeur freelance web et mobile. Chaque outil est une skill lancée *dans* le projet cible, et écrit son livrable dans ce projet, jamais dans ce dépôt.
+Plugin Claude Code (public à partir de la v1) : 18 outils de workflow (`wf-doc-projet`, `wf-analyse-projet`, `wf-chiffrage`…) pour le quotidien d'un chef de projet et développeur freelance web et mobile. Chaque outil est une skill lancée *dans* le projet cible, et écrit son livrable dans ce projet, jamais dans ce dépôt.
 
 ## Stack et commandes
 

@@ -9,9 +9,9 @@ Plugin Claude Code : des outils de workflow pour le quotidien d'un chef de proje
 | Famille | Outils |
 | --- | --- |
 | Comprendre un projet existant | `wf-analyse-projet`, `wf-doc-projet`, `wf-onboarding` |
-| Avant-vente et cadrage | `wf-cadrage-besoin`, `wf-chiffrage`, `wf-specs-tickets` |
+| Avant-vente et cadrage | `wf-cadrage-besoin`, `wf-chiffrage`, `wf-specs-tickets`, `wf-modele-donnees` |
 | Pilotage | `wf-compte-rendu`, `wf-rapport-avancement`, `wf-release-notes` |
-| Qualité et livraison | `wf-revue-securite`, `wf-audit-web`, `wf-tests-manquants`, `wf-montee-version`, `wf-recette`, `wf-publication-store`, `wf-passation` |
+| Qualité et livraison | `wf-revue-securite`, `wf-audit-web`, `wf-tests-manquants`, `wf-montee-version`, `wf-recette`, `wf-publication-store`, `wf-passation`, `wf-exploitation` |
 
 ## Prérequis
 
