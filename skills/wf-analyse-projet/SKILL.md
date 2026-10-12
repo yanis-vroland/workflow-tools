@@ -21,11 +21,11 @@ Tu produis un diagnostic interne d'un projet existant, lancé à sa racine (le r
 ### 1. Contexte git
 
 ```bash
-git rev-parse --is-inside-work-tree 2>/dev/null   # true : dans git
-git rev-parse --show-prefix                        # vide : racine du dépôt ; sinon, sous-dossier analysé
+if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ] && git rev-parse -q --verify HEAD >/dev/null && [ -n "$(git ls-files -- . | head -1)" ]; then echo "dans git"; git rev-parse --show-prefix; else echo "hors git"; fi
 ```
 
-- Le projet est dans git si la première commande affiche `true`, qu'il soit la racine du dépôt ou un de ses sous-dossiers ; sinon il est « hors git ».
+- Le projet est dans git si les trois conditions sont réunies : le dossier est dans l'arbre d'un dépôt, ce dépôt a au moins un commit, et il suit des fichiers du dossier courant. La racine du dépôt comme un sous-dossier suivi conviennent. Sinon il est « hors git », même sous un dépôt parent (dépôt sans commit, ou qui ne suit pas ce dossier, comme un dossier personnel versionné) : n'utilise alors aucune commande git, ni pour l'en-tête ni pour l'activité.
+- Préfixe affiché (dans git) : vide pour la racine du dépôt, sinon le sous-dossier analysé.
 - Sous-dossier (préfixe non vide) : le commit analysé reste celui du dépôt, l'en-tête mentionne le sous-dossier, et toute commande git porte sur le seul dossier courant (`-- .`) : fichiers, historique, contributeurs. Ne cite rien du reste du dépôt.
 
 ### 2. Inventaire et arrêt si pas de code
@@ -33,7 +33,7 @@ git rev-parse --show-prefix                        # vide : racine du dépôt ; 
 Liste les fichiers source (noms seulement, relatifs au dossier courant) :
 
 ```bash
-{ if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ]; then git ls-files --cached --others --exclude-standard -- .; else find . -type f -not -path './.git/*' | sed 's|^\./||'; fi; } \
+{ if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ] && git rev-parse -q --verify HEAD >/dev/null && [ -n "$(git ls-files -- . | head -1)" ]; then git ls-files --cached --others --exclude-standard -- .; else find . -type f -not -path './.git/*' | sed 's|^\./||'; fi; } \
   | grep -iE '\.(ts|tsx|js|jsx|mjs|cjs|vue|svelte|astro|html?|css|scss|sass|less|dart|php|py|rb|go|java|kt|kts|scala|groovy|swift|m|mm|c|h|cc|cpp|hpp|cs|fs|rs|ex|exs|erl|clj|lua|pl|r|sh|bash|sql)$' \
   | grep -vE '(^|/)(node_modules|vendor|build|dist|\.dart_tool|docs/wf)/|\.d\.ts$|\.g\.dart$|\.min\.(js|css)$' | sort -u
 ```
