@@ -4,7 +4,7 @@ description: >-
   Spec 004, CA19 : la source (notes de point hebdo de la fixture FieldOps brief)
   contient une adresse e-mail, un numéro de téléphone, un identifiant et un mot de
   passe fictifs ; le livrable n'en contient aucun. Couvre aussi CA3 : source dans
-  un sous-dossier, listée dans l'en-tête par son chemin tel que donné, citée
+  un sous-dossier, listée dans l'en-tête par son chemin relatif, citée
   ailleurs par son nom de fichier seul.
 tags: [wf-cadrage-besoin, hors-reseau]
 runs: 1
