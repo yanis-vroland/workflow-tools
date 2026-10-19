@@ -124,4 +124,4 @@ Les références `NNN-CAn` renvoient aux specs `docs/specs/` de ce dépôt.
 
 - Pas d'image de plus de 200 Ko ni d'icône réelle : la fixture ne contient aucun binaire (011-CA10 non déclenché).
 - Les versions intermédiaires des points chauds sont des troncatures du fichier final : elles ne compilent pas toutes, ce qui est sans effet pour les outils qui ne lisent que l'historique.
-- Aucun fichier `.env*` versionné : les CA qui le supposent (010-CA16, 008-CA18) demandent une fixture dédiée.
+- Aucun fichier `.env*` versionné dans la fixture : les CA qui le supposent le créent dans le scaffold de leur cas (010-CA16 : `.env.staging` suivi par git, dans `evals/revue-securite-ca08-ca16-base-injoignable/`) ou demandent une fixture dédiée (008-CA18).
