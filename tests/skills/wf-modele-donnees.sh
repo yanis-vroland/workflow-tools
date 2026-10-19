@@ -9,9 +9,7 @@
 # est vérifié par les evals evals/modele-donnees-*/.
 #
 # Livraison en trois PR (spec 017, « Construction et evals ») : cette version
-# couvre les CA communs et les niveaux A et B. Le niveau C n'est pas encore
-# livré : la skill doit l'annoncer « non disponible dans cette version », et ne
-# rien prétendre en produire.
+# couvre les CA communs et les trois niveaux A, B et C.
 set -u
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -83,9 +81,9 @@ cite "CA2 sources en chemin relatif à la racine du projet" "chemin relatif à l
 cite "CA2 commit hors dépôt git" "non déterminé (le projet n'est pas un dépôt git)"
 cite "CA2 mention « modifications non commitées »" "modifications non commitées"
 
-# --- CA3 : sections dans l'ordre (niveaux A et B) ---------------------------------
-# Le modèle montre toutes les sections ; celles du niveau B y sont annoncées
-# comme propres à ce niveau.
+# --- CA3 : sections dans l'ordre (niveaux A, B et C) ------------------------------
+# Le modèle montre toutes les sections ; celles des niveaux B et C y sont
+# annoncées comme propres à leur niveau.
 
 sections=(
   "Synthèse"
@@ -97,6 +95,7 @@ sections=(
   "Revue du modèle"
   "Schéma physique"
   "Preuve par les cas d'usage"
+  "Évolution"
   "Points non déterminés"
 )
 titles=()
@@ -108,7 +107,7 @@ if [ -z "$model" ]; then
 elif [ "${titles[*]}" != "${sections[*]}" ]; then
   ko "CA3 titres ## du modèle (attendu : ${sections[*]} ; obtenu : ${titles[*]})"
 else
-  ok "CA3 les dix sections des niveaux A et B, dans l'ordre"
+  ok "CA3 les onze sections des niveaux A, B et C, dans l'ordre"
 fi
 
 # --- CA4 à CA9 : contenu du modèle -------------------------------------------
@@ -228,15 +227,30 @@ cite "CA25 sqflite" "onCreate"
 cite "CA36 ORM non couvert" "non couvert"
 cite "CA36 exemple d'ORM non couvert" "Sequelize"
 
-# --- Niveau pas encore livré (PR du niveau B) ---------------------------------
+# --- Niveau C : évolution d'un schéma existant ----------------------------------
 
-cite "niveau C annoncé non disponible" "non disponible dans cette version"
-if grep -qE "^## +Évolution" <<<"$model"; then
-  ko "niveau B : pas de section « Évolution » dans le modèle (présente)"
-else
-  ok "niveau B : pas de section « Évolution » dans le modèle"
-fi
-absent "niveau B : aucune migration de niveau C annoncée" "migration-sqflite.dart"
+cite "CA26 en-tête : niveau C" "C (évolution)"
+cite "CA26 schémas détectés avec leur ORM et leur outil de migration" "| Schéma | Base ou ORM | Outil de migration |"
+cite "CA26 outil de migration absent" "aucun"
+cite "CA26 migration par défaut" "migration.sql"
+cite "CA27 colonne ajoutée" "ajoutée"
+cite "CA27 colonne renommée" "renommée"
+cite "CA27 colonne supprimée" "supprimée"
+cite "CA28 valeur par défaut avant la contrainte" "valeur par défaut"
+cite "CA28 reprise des lignes existantes" "reprise"
+cite "CA28 contrainte imposée après remplissage" "SET NOT NULL"
+cite "CA29 renommage plutôt que suppression et recréation" "RENAME COLUMN"
+cite "CA30 suppression soumise à une décision saisie" "confirmée par une décision saisie"
+cite "CA31 impacts sur le code" "Impacts sur le code"
+cite "CA32 montée de version sqflite" "onUpgrade"
+cite "CA32 fichier de migration sqflite" "migration-sqflite.dart"
+cite "CA32 fichier de migration Drift" "migration-drift.dart"
+cite "CA34 --niveau c sans schéma détecté" "aucun schéma détecté"
+cite "CA36 au niveau C, différences et impacts sans migration" "aucun fichier de migration"
+
+# --- Plus aucun niveau annoncé non disponible ----------------------------------
+
+absent "les trois niveaux sont livrés" "non disponible dans cette version"
 
 # --- Aucune valeur propre à la fixture ni aux données des cas -----------------
 # Les exemples de la skill restent génériques : sinon les evals mesureraient la

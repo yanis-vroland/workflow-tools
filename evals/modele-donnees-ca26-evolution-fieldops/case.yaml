@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: modele-donnees-ca26-evolution-fieldops
+description: >-
+  Spec 017, cas principal du niveau C : wf-modele-donnees lancé sur la fixture
+  FieldOps (schéma PostgreSQL src/db/schema.sql, base sqflite de
+  mobile/lib/db/local_db.dart, faux fichier d'environnement) avec les notes
+  d'appel de FieldOps brief, passées par un chemin relatif hors du projet.
+  Couvre CA26, CA27, CA31, CA1 à CA3, CA15, CA16, CA38.
+tags: [wf-modele-donnees, spec-017, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1800
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
