@@ -246,15 +246,22 @@ Spec 010, lancée par `/wf-revue-securite` (tag `wf-revue-securite` pour ne lanc
 
 ### wf-modele-donnees
 
-Spec 017, lancée par `/wf-modele-donnees`, tous les cas `hors-reseau` (tags `wf-modele-donnees` et `spec-017`). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour. Les données propres à un cas sont dans son dossier `donnees/`. Livraison en trois PR (niveau A, puis B, puis C) : cette version couvre le niveau A et les CA communs.
+Spec 017, lancée par `/wf-modele-donnees`, tous les cas `hors-reseau` (tags `wf-modele-donnees` et `spec-017`). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour. Les données propres à un cas sont dans son dossier `donnees/`. Livraison en trois PR (niveau A, puis B, puis C) : cette version couvre les CA communs et les niveaux A et B.
 
 | Cas | Projet de départ | CA |
 |---|---|---|
 | `modele-donnees-ca17-brief-niveau-a` | FieldOps brief, brief et notes d'appel en argument | CA17, CA1 à CA9, CA12 à CA15 |
 | `modele-donnees-ca18-cadrage-sans-argument` | FieldOps brief et `docs/wf/cadrage-besoin.md` (contrat de la spec 004), sans argument | CA18, CA1, CA2, CA4 |
-| `modele-donnees-ca10-ca11-relance-niveau-a` | FieldOps brief et livrable de niveau A : réponse à Q01 et décision D01 saisies, question bloquante Q03 vide, identifiants retirés | CA10, CA11, CA1 |
+| `modele-donnees-ca10-ca11-relance-niveau-a` | FieldOps brief et livrable de niveau A : réponse à Q01 et décision D01 saisies, question bloquante Q03 vide, identifiants retirés | CA10, CA11, CA20, CA1 |
 | `modele-donnees-ca33-sans-argument` | FieldOps brief, ni argument, ni cadrage, ni livrable | CA33 (cas limite) |
 | `modele-donnees-ca34-niveau-invalide` | FieldOps brief, `--niveau z` | CA34 (cas limite, valeur invalide) |
 | `modele-donnees-ca35-ca38-sources-ecartees` | FieldOps brief, fichier introuvable et `.docx` en argument, fichier d'environnement avec chaîne de connexion et faux secret | CA35, CA38 (cas limites) |
+| `modele-donnees-ca19-niveau-b-postgresql` | FieldOps brief, livrable de niveau A rempli (Q01, Q03, D01) et ancienne `migration.sql` sans objet, aucun ORM | CA19, CA3, CA10, CA13 à CA16, CA22 à CA24, CA37 |
+| `modele-donnees-ca21-niveau-b-force` | livrable de niveau A du cas de relance (Q03 vide), `--niveau b` | CA21, CA10 |
+| `modele-donnees-ca25-prisma` | projet web dépendant de Prisma, sans schéma, livrable de niveau A rempli | CA25, CA1, CA15, CA16 |
 
-Non couverts par une eval à ce stade : CA16 (aucun fichier non Markdown au niveau A) et CA37 (aucun fichier à signaler avant les niveaux B et C), couverts par les tests structurels et repris avec les niveaux suivants.
+Les cas `ca21` et `ca25` reprennent le livrable de niveau A d'un autre cas (`donnees/` du cas de relance ou du cas `ca19`) : le modifier change aussi ces cas.
+
+Les vérifications croisées entre fichiers (index justifiés par une requête, données de test qui respectent le schéma et rendent une ligne à chaque requête) sont confiées à un juge `llm` sur la trace, qui contient le contenu de chaque appel Write : aucun fichier n'est exécuté (ADR-001, amendement 2), le juge raisonne sur le texte.
+
+Non couverts par une eval : CA25 pour TypeORM, Drift et sqflite (un seul ORM, Prisma, est joué ; les formats des quatre sont vérifiés par les tests structurels), CA36 (ORM non couvert, tests structurels seulement).
