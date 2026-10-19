@@ -8,11 +8,10 @@ focus: { source: file, path: "docs/wf/chiffrage.md" }
 1. une requête SQL construite par concaténation dans la route de détail des interventions, fichier le plus modifié et non testé (`src/api/routes/interventions.ts`) ;
 2. le build `release` de l'application mobile signé avec la configuration `debug` (`mobile/android/app/build.gradle`).
 
-Dans la section « Risques » du livrable :
+Vérifie dans le livrable :
 
-- chacun des deux risques élevés est repris ;
-- chacun cite le livrable d'analyse (`analyse-projet.md`) comme source ;
-- chacun indique les tâches `Cnn` qu'il affecte (des tâches qui existent dans les tableaux) ou « aucune tâche affectée » ;
-- le risque de signature mobile n'affecte aucune des évolutions (toutes sur le back-office web) : il porte la mention « aucune tâche affectée », sauf si une tâche du livrable porte réellement sur `mobile/`.
+- les deux risques élevés figurent dans « Risques », chacun en citant `analyse-projet.md` comme source ;
+- le risque SQL cite au moins une tâche `Cnn`, et au moins une des tâches qu'il cite est une tâche des tableaux dont la colonne « Commentaire » nomme le fichier `src/api/routes/interventions.ts` (les évolutions demandées touchent la liste des interventions, servie par ce fichier) ;
+- le risque de signature mobile porte « aucune tâche affectée » (aucune évolution ne touche `mobile/`), sauf si une tâche du livrable porte réellement sur `mobile/`.
 
-Échoue si l'un de ces points est faux.
+Échoue si l'un de ces points est faux, en particulier si le risque SQL porte « aucune tâche affectée » ou ne cite que des tâches sans rapport avec `src/api/routes/interventions.ts`.

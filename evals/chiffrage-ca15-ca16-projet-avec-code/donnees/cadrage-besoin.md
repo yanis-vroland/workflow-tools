@@ -2,7 +2,7 @@
 
 - Outil : wf-cadrage-besoin
 - Date : 2026-10-10
-- Commit analysé : 2fc99c0
+- Commit analysé : 921f57c
 - Sources lues : demande-evolutions.md
 - Derniers identifiants attribués : B03, Q02
 

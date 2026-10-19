@@ -104,12 +104,18 @@ if [ "$count" -ge 2 ]; then
 else
   ko "CA4 tableau dans « Détail par lot » et « Activités transverses » ($count occurrence(s) dans le modèle)"
 fi
-cite "CA4 identifiant de tâche C01" "C01"
+# shellcheck disable=SC2016 # accents graves littéraux
+cite "CA4 format des identifiants de tâches" 'identifiants de tâches `C01`, `C02`…, sur deux chiffres'
 
 # --- CA5, CA6, CA7 : règles d'estimation ------------------------------------------
 
-cite "CA5 pas de 0,5 jour" "0,5"
-cite "CA6 plafond de 5 jours" "5 jours"
+cite "CA5 règle du pas de 0,5 jour" "par pas de 0,5 jour"
+cite "CA5 estimation haute au moins égale à la basse" \
+  "l'estimation haute est toujours supérieure ou égale à l'estimation basse"
+cite "CA6 règle du plafond de 5 jours" \
+  "aucune tâche n'a une estimation haute supérieure à 5 jours"
+cite "CA7 règle de l'écart à justifier" \
+  "quand l'estimation haute est au moins le double de l'estimation basse"
 
 # --- CA8 : totaux -----------------------------------------------------------------
 
@@ -175,5 +181,89 @@ for value in "${fieldops_values[@]}"; do
   fi
 done
 [ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
+
+# --- Aucune valeur des données des cas d'eval (extraction automatique) ------------
+# Dates, hash, noms de fichiers et identifiants tirés des données, graders et
+# prompts des cas evals/chiffrage-*/ : aucun ne doit figurer dans la skill
+# (frontmatter compris), sauf les noms contractuels de la spec.
+
+skill_text=$(cat "$skill")
+allowed_names=(
+  "docs/wf/chiffrage.md" "docs/wf/cadrage-besoin.md" "docs/wf/analyse-projet.md"
+  "chiffrage.md" "cadrage-besoin.md" "analyse-projet.md" ".env.example" "docs/wf/"
+)
+# Les extensions seules (`.ts`) et les commandes /wf-* sont génériques : écartées
+# à l'extraction.
+case_files=()
+while IFS= read -r f; do
+  case_files+=("$f")
+done < <(find "$root"/evals/chiffrage-* -type f \( -path '*/donnees/*' -o -path '*/graders/*' -o -name prompt.md \) | sort)
+
+values=()
+if [ "${#case_files[@]}" -gt 0 ]; then
+  # Dates et hash de commit (au moins une lettre et un chiffre)
+  while IFS= read -r v; do values+=("$v"); done < <(
+    grep -ohE '\b20[0-9]{2}-[0-9]{2}-[0-9]{2}\b' "${case_files[@]}" | sort -u
+  )
+  while IFS= read -r v; do values+=("$v"); done < <(
+    grep -ohE '\b[0-9a-f]{7,40}\b' "${case_files[@]}" | grep -E '[a-f]' | grep -E '[0-9]' | sort -u
+  )
+  # Noms de fichiers et chemins (entre accents graves ou nus)
+  while IFS= read -r v; do values+=("$v"); done < <(
+    {
+      # shellcheck disable=SC2016 # accents graves littéraux
+      grep -ohE '`[^` ]*[./][^` ]*`' "${case_files[@]}" | tr -d '`'
+      grep -ohE '[A-Za-z0-9_./-]*[A-Za-z0-9_-]+\.(md|txt|pdf|ts|tsx|js|dart|sql|json|yaml|yml|gradle|vtt)\b' "${case_files[@]}"
+    } | grep -E '[A-Za-z]' | grep -vE '^\.[a-z]+$|^/wf-' | sort -u
+  )
+fi
+leak_ok=1
+for value in "${values[@]}"; do
+  skip=0
+  for a in "${allowed_names[@]}"; do
+    [ "$value" = "$a" ] && skip=1
+  done
+  [ "$skip" -eq 1 ] && continue
+  # Valeur entière seulement : « besoin.md » ne doit pas trouver « cadrage-besoin.md »
+  escaped=$(sed 's/[][\.*^$+?(){}|/]/\\&/g' <<<"$value")
+  if grep -qE -- "(^|[^A-Za-z0-9_./-])${escaped}" <<<"$skill_text"; then
+    ko "aucune valeur des cas d'eval dans la skill (« $value » présent)"
+    leak_ok=0
+  fi
+done
+# Identifiants Bnn, Qnn, Cnn et Hn : seuls les formats génériques sont permis
+# shellcheck disable=SC2016 # accents graves littéraux
+ids=$(sed -e 's/`B01`, `B02`…//g' -e 's/`Q01`, `Q02`…//g' -e 's/`C01`, `C02`…//g' -e 's/`H1`, `H2`…//g' <<<"$skill_text" |
+  grep -oE '\b([BQC][0-9]{2}|H[0-9]+)\b' | sort -u | tr '\n' ' ')
+if [ -n "$ids" ]; then
+  ko "aucun identifiant concret dans la skill, seulement « \`C01\`, \`C02\`… » et ses équivalents (présents : $ids)"
+  leak_ok=0
+fi
+[ "$leak_ok" -eq 1 ] && ok "aucune valeur des cas d'eval dans la skill (${#values[@]} valeurs extraites)"
+if [ "${#values[@]}" -lt 20 ]; then
+  ko "extraction des valeurs des cas d'eval (${#values[@]} valeurs seulement, extraction cassée ?)"
+fi
+
+# --- Injection shell par l'argument ----------------------------------------------
+# L'argument est un texte libre : il ne passe jamais dans une commande Bash entre
+# guillemets doubles. L'existence se vérifie avec Glob ou Read ; les commandes
+# poppler reçoivent le chemin entre apostrophes après « -- », une fois l'argument
+# validé.
+
+if grep -qE -- 'test -f' <<<"$body"; then
+  ko "aucune vérification d'existence par Bash (test -f présent)"
+else
+  ok "aucune vérification d'existence par Bash"
+fi
+if grep -qE -- '(pdfinfo|pdftotext)[^`]*"' <<<"$body"; then
+  ko "aucun chemin entre guillemets doubles dans pdfinfo ou pdftotext"
+else
+  ok "aucun chemin entre guillemets doubles dans pdfinfo ou pdftotext"
+fi
+cite "injection : pdfinfo avec -- et apostrophes" "pdfinfo -- '<fichier>'"
+cite "injection : pdftotext avec -- et apostrophes" "pdftotext -f N -l N -- '<fichier>' -"
+cite "injection : argument à caractère spécial refusé sans rien exécuter" \
+  "est refusé sans rien exécuter"
+cite "injection : somme limitée aux chiffres, points et signes plus" '^[0-9.+]+$'
 
 exit $fail
