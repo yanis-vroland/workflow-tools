@@ -1,0 +1,59 @@
+schema_version: "1.1"
+name: tests-manquants-ca17-tout-couvert
+description: >-
+  Spec 012 (wf-tests-manquants), CA17 : projet TypeScript dont l'unique module
+  est couvert par un test Vitest qui déclenche chacune de ses branches. Les
+  sections concernées l'indiquent, aucune entrée n'est inventée.
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/tests-manquants.md"
+  - name: ca17-temoin-sections-presentes
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[\s\S]*\n## [^\n]*Cas manquants dans le code test[ée][\s\S]*\n## [^\n]*Squelettes de tests'
+  - name: ca17-aucune-entree-de-test-manquant
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?(?:\n### |\bM\d+\b|Priorit[ée]\s*:)'
+    match: not_contains
+  - name: ca17-aucun-cas-a-verifier
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Cas manquants dans le code test[ée][^\n]*\n(?:(?!\n## )[\s\S])*?à vérifier'
+    match: not_contains
+  - name: ca17-aucun-squelette
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?\x60\x60\x60'
+    match: not_contains
+  - name: ca17-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/tests-manquants.md" }
+    criteria: >-
+      Le projet contient un seul module, src/discount.ts (applyDiscount),
+      testé par src/discount.test.ts, dont les tests déclenchent toutes les
+      branches (montant nominal, taux négatif, taux supérieur à 1). PASS si
+      « Tests manquants » indique qu'aucun fichier source n'est sans test,
+      « Cas manquants dans le code testé » qu'aucun cas manquant n'a été
+      identifié, « Squelettes de tests » qu'il n'y a aucun squelette à
+      proposer, et si aucune entrée, aucun cas ni aucun test n'est inventé.
+      FAIL sinon.
+  - name: ca07-aucun-lanceur-ni-installation
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs|\benv|\btime|\bsudo|\bexec)\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
+    min: 0
+    max: 0

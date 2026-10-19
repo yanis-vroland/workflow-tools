@@ -1,0 +1,100 @@
+schema_version: "1.1"
+name: tests-manquants-ca05-rapports-couverture
+description: >-
+  Spec 012 (wf-tests-manquants), CA5 : FieldOps complet avec deux rapports de
+  couverture déjà présents (coverage/coverage-summary.json pour le web,
+  mobile/coverage/lcov.info pour Flutter), datés du 2026-09-15, antérieurs au
+  dernier commit (2026-10-01). Couvre aussi CA4 (integration_test déclaré) et
+  CA7 (aucune mesure de couverture).
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/tests-manquants.md"
+  - name: ca01-aucune-ecriture-hors-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/tests-manquants\.md")'
+    min: 0
+    max: 0
+
+  # --- CA5 : rapports exploités, chemin, date, antériorité ------------------------
+  - name: ca05-rapport-web-cite
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Couverture actuelle[^\n]*\n(?:(?!\n## )[\s\S])*?coverage/coverage-summary\.json'
+  - name: ca05-rapport-flutter-cite
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Couverture actuelle[^\n]*\n(?:(?!\n## )[\s\S])*?mobile/coverage/lcov\.info'
+  - name: ca05-date-de-modification
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Couverture actuelle[^\n]*\n(?:(?!\n## )[\s\S])*?(?:2026-09-15|15/09/2026|15 septembre 2026)'
+  - name: ca05-anteriorite-signalee
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Couverture actuelle[^\n]*\n(?:(?!\n## )[\s\S])*?(?:ant[ée]rieur|plus ancien|avant le dernier commit)'
+    flags: i
+  - name: ca05-rapports-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/tests-manquants.md" }
+    criteria: >-
+      Le projet contient deux rapports de couverture produits le 2026-09-15,
+      avant le dernier commit (2026-10-01) : coverage/coverage-summary.json
+      (web : src/domain/invoice.ts, 18 lignes couvertes sur 22, soit 81,82 %,
+      branches 62,5 %) et mobile/coverage/lcov.info (Flutter :
+      lib/utils/duration_format.dart, 7 lignes sur 8). PASS si « Couverture
+      actuelle » (1) cite chaque rapport avec son chemin et sa date de
+      modification, (2) signale que chacun est antérieur au dernier commit
+      (donc possiblement périmé), (3) reprend des chiffres tirés de ces
+      rapports, sans en inventer, et (4) ne présente pas la couverture de ces
+      applications comme une simple estimation par l'heuristique des noms de
+      fichiers. FAIL sinon.
+
+  # --- CA4 : integration_test déclaré ---------------------------------------------
+  - name: ca04-integration-test-et-pubspec
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Outillage de test[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)(?=[^\n]*\bintegration_test\b)(?=[^\n]*pubspec\.yaml)'
+  - name: ca04-comptage-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/tests-manquants.md" }
+    criteria: >-
+      Application Flutter (mobile/) : mobile/pubspec.yaml déclare flutter_test
+      et integration_test ; mobile/test/ contient 1 fichier *_test.dart et
+      mobile/integration_test/ en contient 1 (app_test.dart). PASS si
+      « Outillage de test » cite flutter_test et integration_test d'après
+      mobile/pubspec.yaml, la commande flutter test (fvm flutter test
+      accepté), et ces deux nombres de fichiers. FAIL sinon.
+
+  # --- CA7 : ni exécution des tests, ni mesure de couverture ----------------------
+  - name: ca07-aucun-lanceur-ni-couverture
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs|\benv|\btime|\bsudo|\bexec)\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
+    min: 0
+    max: 0
+  - name: ca07-aucune-ecriture-ni-execution-bash
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    min: 0
+    max: 0
+  - name: ca07-rapports-non-reecrits
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*coverage/'
+    min: 0
+    max: 0

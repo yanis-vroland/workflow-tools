@@ -1,0 +1,83 @@
+schema_version: "1.1"
+name: tests-manquants-ca20-relance
+description: >-
+  Spec 012 (wf-tests-manquants), CA20 : relance sur un livrable existant. M1 et
+  M3 restent valables et gardent leur identifiant, M2 (test écrit depuis) est
+  retiré, M2 et M4 (déjà retiré, dernier identifiant attribué) ne sont jamais
+  réattribués, les nouvelles entrées commencent à M5. Aucun doublon.
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca20-livrable-reecrit
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*docs/wf/tests-manquants\.md"'
+    min: 1
+  - name: ca20-aucun-doublon
+    type: regex
+    target: files
+    pattern: 'tests-manquants|^docs/'
+    flags: im
+    match: not_contains
+  - name: ca20-date-mise-a-jour
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '^(?:[^\n]*\n){0,10}[^\n]*Date : 2026-10-02'
+    match: not_contains
+  - name: ca20-m1-conserve
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M1\b[^\n]*src/api/routes/interventions\.ts'
+  - name: ca20-m3-conserve
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M3\b[^\n]*mobile/lib/screens/intervention_list_screen\.dart'
+  - name: ca20-scheduling-retire
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/domain/scheduling\.ts'
+    match: not_contains
+  - name: ca20-m2-jamais-reattribue
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M2\b'
+    match: not_contains
+  - name: ca20-m4-jamais-reattribue
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M4\b'
+    match: not_contains
+  - name: ca20-nouvelles-entrees-a-partir-de-m5
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M5\b'
+  - name: ca20-dernier-identifiant-a-jour
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: 'Dernier identifiant attribu[ée] : M(?:[5-9]|[1-9]\d+)\b'
+  - name: ca20-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/tests-manquants.md" }
+    criteria: >-
+      Livrable mis à jour. L'exécution précédente listait M1
+      (src/api/routes/interventions.ts), M3
+      (mobile/lib/screens/intervention_list_screen.dart) et M2
+      (src/domain/scheduling.ts), avec « Dernier identifiant attribué : M4 ».
+      Depuis, src/domain/scheduling.test.ts a été écrit. PASS si toutes les
+      affirmations suivantes sont vraies : (1) M1 et M3 portent toujours les
+      mêmes fichiers ; (2) src/domain/scheduling.ts n'est plus une entrée de
+      « Tests manquants » ; (3) ni M2 ni M4 n'est attribué à une entrée ;
+      (4) chaque nouvelle entrée a un identifiant supérieur ou égal à M5,
+      sans doublon ; (5) la ligne « Dernier identifiant attribué » donne le
+      plus grand identifiant attribué ; (6) le livrable est un document unique,
+      sans section dupliquée. FAIL sinon.

@@ -1,0 +1,41 @@
+schema_version: "1.1"
+name: tests-manquants-ca22-sans-code-source
+description: >-
+  Spec 012 (wf-tests-manquants), CA22 : répertoire sans code source (fixture
+  FieldOps brief : documents seuls, ni code ni git). L'outil l'indique et
+  n'écrit aucun livrable.
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca22-aucun-livrable
+    type: file_exists
+    path: "docs/wf/**"
+    exists: false
+  - name: ca22-aucune-ecriture
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: ca22-message-sans-code-source
+    type: regex
+    target: last_message
+    pattern: 'aucun (?:fichier de )?code|pas de code|sans code|code source'
+    flags: i
+  - name: ca22-message-selon-le-correcteur
+    type: llm
+    focus: last_message
+    criteria: >-
+      PASS si la réponse indique que le répertoire ne contient pas de code
+      source (seulement des documents) et qu'aucun livrable n'a été écrit.
+      FAIL si elle annonce avoir produit une liste de tests manquants, ou ne
+      dit pas pourquoi elle n'en produit pas.

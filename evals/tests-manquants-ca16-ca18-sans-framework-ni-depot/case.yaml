@@ -1,0 +1,117 @@
+schema_version: "1.1"
+name: tests-manquants-ca16-ca18-sans-framework-ni-depot
+description: >-
+  Spec 012 (wf-tests-manquants), CA16 et CA18 : projet TypeScript (Vite,
+  React) sans framework ni fichier de test, hors dépôt git. L'outillage
+  l'indique et suggère Vitest, aucun squelette n'est produit, aucune entrée n'a
+  la priorité haute, l'absence de git est signalée. Couvre aussi CA6 et CA12.
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/tests-manquants.md"
+
+  # --- CA16 : aucun framework, suggestion à valider, aucun squelette --------------
+  - name: ca16-aucun-framework-indique
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Outillage de test[^\n]*\n(?:(?!\n## )[\s\S])*?aucun (?:framework|outil) de test'
+    flags: i
+  - name: ca16-vitest-suggere
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Outillage de test[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)(?=[^\n]*\bVitest\b)(?=[^\n]*(?:suggestion|à valider))'
+    flags: i
+  - name: ca16-aucun-squelette
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?\x60\x60\x60'
+    match: not_contains
+  - name: ca16-temoin-section-squelettes
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests'
+  - name: ca16-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/tests-manquants.md" }
+    criteria: >-
+      Le projet (Vite, React, TypeScript) ne déclare aucun framework de test
+      dans package.json et ne contient aucun fichier de test. PASS si
+      « Outillage de test » l'indique, propose Vitest (le plus courant pour un
+      projet Vite) en le présentant explicitement comme une suggestion à
+      valider, sans l'affirmer installé ni inventer une commande de lancement
+      existante, et si « Squelettes de tests » ne contient aucun squelette (en
+      expliquant pourquoi). FAIL sinon.
+
+  # --- CA18 : hors git, critère de fréquence non appliqué ----------------------------
+  - name: ca18-aucune-priorite-haute
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?Priorit[ée][^\n]*\bhaute\b'
+    flags: i
+    match: not_contains
+  - name: ca18-temoin-entree-moyenne
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/quote\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bmoyenne\b'
+    flags: i
+  - name: ca18-points-non-determines-git
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n## )[\s\S])*?\bgit\b'
+    flags: i
+  - name: ca18-en-tete-hors-git
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '^(?:[^\n]*\n){0,10}[^\n]*hors git'
+    flags: i
+  - name: ca18-aucun-historique-interroge
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?\bgit\s+(?:log|shortlog|blame)\b'
+    min: 0
+    max: 0
+  - name: ca18-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/tests-manquants.md" }
+    criteria: >-
+      Le projet n'est pas un dépôt git. PASS si aucune entrée de « Tests
+      manquants » n'a la priorité haute, si aucune justification ne s'appuie
+      sur une fréquence de modification ou un nombre de commits, si
+      src/quote.ts (fonction exportée estimateQuote avec if, levée d'exception
+      et ternaire) est en priorité moyenne et src/format.ts (formatEuros, sans
+      branche) en priorité faible, et si « Points non déterminés » signale que
+      le critère de fréquence de modification n'a pas pu être appliqué faute
+      de dépôt git. FAIL sinon.
+
+  # --- CA12 : fichier de types seuls exclu ----------------------------------------
+  - name: ca12-types-exclu
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*(?:src/types\.ts|vite\.config\.ts)'
+    match: not_contains
+
+  # --- CA7 : rien n'est installé ni lancé ---------------------------------------------
+  - name: ca07-aucun-lanceur-ni-installation
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs|\benv|\btime|\bsudo|\bexec)\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
+    min: 0
+    max: 0
+  - name: ca01-aucune-ecriture-hors-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/tests-manquants\.md")'
+    min: 0
+    max: 0

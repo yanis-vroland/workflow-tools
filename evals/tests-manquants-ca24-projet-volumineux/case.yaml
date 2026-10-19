@@ -1,0 +1,47 @@
+schema_version: "1.1"
+name: tests-manquants-ca24-projet-volumineux
+description: >-
+  Spec 012 (wf-tests-manquants), CA24 : FieldOps augmenté de src/legacy/ (2 000
+  modules générés, sans test, avec branches conditionnelles). « Points non
+  déterminés » liste les dossiers non lus, et aucune conclusion ne porte sur
+  eux (aucune entrée, aucun cas, aucun squelette).
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/tests-manquants.md"
+  - name: ca24-dossiers-non-lus-listes
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n## )[\s\S])*?src/legacy'
+  - name: ca24-aucune-entree-sur-les-dossiers-non-lus
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*(?:Tests manquants|Cas manquants dans le code test[ée]|Squelettes de tests)[^\n]*\n(?:(?!\n## )[\s\S])*?src/legacy'
+    match: not_contains
+  - name: ca24-temoin-reste-du-projet-analyse
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/routes/interventions\.ts'
+  - name: ca24-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/tests-manquants.md" }
+    criteria: >-
+      Le dossier src/legacy/ (2 000 modules générés, répartis dans billing,
+      routing, reports et sync) n'a pas pu être lu en entier. PASS si « Points
+      non déterminés » liste les dossiers non lus, et si aucune autre section
+      ne tire de conclusion sur leur contenu (fichiers non couverts, priorité,
+      cas manquants, squelettes, nombre de fichiers exclus) au-delà du constat
+      qu'ils n'ont pas été lus. FAIL si les dossiers non lus ne sont pas
+      listés, ou si une section affirme quelque chose sur leur contenu.

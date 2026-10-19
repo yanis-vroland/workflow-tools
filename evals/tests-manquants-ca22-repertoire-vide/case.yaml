@@ -1,0 +1,48 @@
+schema_version: "1.1"
+name: tests-manquants-ca22-repertoire-vide
+description: >-
+  Spec 012 (wf-tests-manquants), CA22 : répertoire vide. L'outil l'indique et
+  n'écrit aucun livrable.
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca22-aucun-livrable
+    type: file_exists
+    path: "docs/wf/**"
+    exists: false
+  - name: ca22-aucune-ecriture
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: ca22-aucun-fichier-cree
+    type: regex
+    target: files
+    pattern: '^docs/'
+    flags: m
+    match: not_contains
+  # Témoin positif : sans lui, les correcteurs d'absence réussiraient même si la
+  # skill ne s'était pas déclenchée.
+  - name: ca22-message-repertoire-vide
+    type: regex
+    target: last_message
+    pattern: 'r[ée]pertoire (?:est )?vide|aucun code|code source'
+    flags: i
+  - name: ca22-message-selon-le-correcteur
+    type: llm
+    focus: last_message
+    criteria: >-
+      PASS si la réponse indique que le répertoire est vide (ou sans code
+      source) et qu'aucun livrable n'a été écrit. FAIL si elle annonce avoir
+      produit une liste de tests manquants, ou ne dit pas pourquoi elle n'en
+      produit pas.
