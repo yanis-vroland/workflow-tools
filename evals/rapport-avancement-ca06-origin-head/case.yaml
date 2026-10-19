@@ -27,7 +27,8 @@ graders:
   - name: ca06-branche-principale-en-tete
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bprincipale\b(?:(?!\n##? [^\n]*Synth)[\s\S])*?\n##? [^\n]*Synth'
+    # Valeur après « : » (le libellé « Branche principale » contient le mot)
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?[:=]\s*`?(?:origin/)?principale\b'
     match: contains
   - name: ca06-origin-head-consulte
     type: tool_used
