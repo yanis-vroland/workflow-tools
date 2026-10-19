@@ -220,6 +220,10 @@ fieldops_values=(
   "pluck"
   "react"
   "19.2.0"
+  "purge"
+  "MAP_API_KEY_EXPIRES_AT"
+  "2027-03-31"
+  "PRODUCTION_DATABASE_URL"
   "apps/web"
 )
 leak_ok=1

@@ -29,7 +29,7 @@ mkdir -p docs/wf
 cat >docs/wf/revue-securite.md <<'MD'
 # Revue de sécurité de FieldOps
 
-Outil : wf-revue-securite · Date : 2026-10-05 · Commit : 5b26289
+Outil : wf-revue-securite · Date : 2026-10-05 · Commit : 2fc99c0
 
 > Usage interne : ce document décrit des failles potentiellement non corrigées. Ne pas le diffuser hors de l'équipe.
 

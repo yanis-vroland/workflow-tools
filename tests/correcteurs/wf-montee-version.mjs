@@ -349,7 +349,7 @@ const nominalParts = {
   Vérifications: verifications,
   "Points non déterminés": "- Dernière version stable de Flutter : non déterminé (source injoignable).",
 };
-const nominalHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 5765af5";
+const nominalHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 6223ee5";
 
 // sampleCase <cas> <livrable conforme> <[nom du correcteur, livrable fautif]…>
 function sampleCase(c, good, mutations) {
@@ -387,7 +387,7 @@ sampleCase(nominal, nominalDoc, [
   ["ca16-verifications.md", livrable(nominalHeader, swap(nominalParts, "Vérifications", "`flutter analyze`, ", ""))],
   ["ca21-sans-chiffrage.md", livrable(nominalHeader, swap(nominalParts, "Synthèse", "**élevé**", "**élevé** (environ 5 jours)"))],
   ["ca27-sous-sections-par-application.md", livrable(nominalHeader, swap(nominalParts, "Inventaire des versions", "### Application Flutter", "Application Flutter"))],
-  ["adr001-en-tete-outil-date-commit.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 5b26289", nominalParts)],
+  ["adr001-en-tete-outil-date-commit.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 2fc99c0", nominalParts)],
   ["adr001-arbre-propre-sans-mention.md", livrable(`${nominalHeader} · modifications non commitées`, nominalParts)],
   ["adr001-aucune-adresse-email.md", livrable(nominalHeader, swap(nominalParts, "Points non déterminés", "- Dernière", "- Contributrice lea.marchetti@example.invalid.\n- Dernière"))],
   ["ca25-secret-absent-du-livrable.md", livrable(nominalHeader, swap(nominalParts, "Points non déterminés", "- Dernière", "- Valeur FIELDOPS_FAUX_SECRET_7f3a.\n- Dernière"))],
@@ -405,7 +405,7 @@ const offlineParts = {
   Vérifications: verifications,
   "Points non déterminés": "- Registre npm et pub.dev injoignables : versions installées tirées du lockfile (`package-lock.json`, `mobile/pubspec.lock`), dernières versions non déterminées.",
 };
-const offlineHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 5b26289";
+const offlineHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 2fc99c0";
 const offlineDoc = livrable(offlineHeader, offlineParts);
 const c07 = "montee-version-ca07-registre-injoignable";
 sampleCase(c07, offlineDoc, [
@@ -429,10 +429,10 @@ const argParts = {
 - Ruptures à traiter : R1
 - Vérification avant l'étape suivante : \`npm test\``,
 };
-const argHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 5b26289 · Argument : `react-dom 19`";
+const argHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 2fc99c0 · Argument : `react-dom 19`";
 const argDoc = livrable(argHeader, argParts);
 sampleCase(c08, argDoc, [
-  ["ca24-argument-en-tete.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 5b26289", argParts)],
+  ["ca24-argument-en-tete.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 2fc99c0", argParts)],
   ["ca08-aucune-autre-cible.md", livrable(argHeader, swap(argParts, "Cibles retenues", "registre npm).", "registre npm).\n2. Node.js 18 → 24."))],
   ["ca08-aucune-autre-commande.md", livrable(argHeader, swap(argParts, "Plan de montée", "react-dom@19.2.0`", "react-dom@19.2.0 express@5.1.0`"))],
   ["ca09-version-visee-resolue.md", livrable(argHeader, { ...argParts, "Cibles retenues": "1. `react-dom` 17.0.2 → 19 (version précise non déterminée)." })],
@@ -450,12 +450,12 @@ const reachedParts = {
   "Ruptures et impacts": "Aucune rupture.",
   "Plan de montée": "Le plan ne contient aucune étape : la cible est déjà à la version visée.",
 };
-const reachedHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 5b26289 · Argument : `express 4.18.2`";
+const reachedHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 2fc99c0 · Argument : `express 4.18.2`";
 sampleCase(c18, livrable(reachedHeader, reachedParts), [
   ["ca18-plan-sans-etape.md", livrable(reachedHeader, { ...reachedParts, "Plan de montée": "### Étape 1 : express\n\n- Commandes : `npm install express@4.18.2`" })],
   ["ca18-plan-sans-etape.md", livrable(reachedHeader, { ...reachedParts, "Plan de montée": "1. Rien à faire." })],
   ["ca08-cible-express-seule.md", livrable(reachedHeader, swap(reachedParts, "Cibles retenues", "atteinte.", "atteinte.\n2. `react` 17.0.2 → 19.2.0."))],
-  ["ca24-argument-en-tete.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 5b26289", reachedParts)],
+  ["ca24-argument-en-tete.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 2fc99c0", reachedParts)],
 ]);
 
 // Projet mixte sans lockfile
@@ -518,12 +518,12 @@ sampleCase(c27, livrable(pnpmHeader, pnpmParts), [
 
 // Relance
 const c23 = "montee-version-ca23-relance";
-const relaunchHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 655b970";
+const relaunchHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 7863f6e";
 const relaunchDoc = livrable(relaunchHeader, offlineParts);
 sampleCase(c23, relaunchDoc, [
   ["ca23-une-seule-synthese.md", `${relaunchDoc}\n${relaunchDoc}`],
   ["ca23-version-perimee-retiree.md", livrable(relaunchHeader, swap(offlineParts, "Points non déterminés", "- Registre", "- Ancienne version 16.14.0.\n- Registre"))],
-  ["ca23-date-mise-a-jour.md", livrable("Outil : wf-montee-version · Date : 2026-01-15 · Commit : 655b970", offlineParts)],
+  ["ca23-date-mise-a-jour.md", livrable("Outil : wf-montee-version · Date : 2026-01-15 · Commit : 7863f6e", offlineParts)],
   ["ca23-en-tete-commit-actualise.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 0000000", offlineParts)],
   ["ca23-version-actuelle-du-lockfile.md", livrable(relaunchHeader, swap(offlineParts, "Inventaire des versions", "| `react` | `^17.0.2` | 17.0.2 |", "| `react` | `^16.14.0` | 16.14.0 |"))],
 ]);
