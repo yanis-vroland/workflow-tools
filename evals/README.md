@@ -196,6 +196,31 @@ Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` me
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
+### wf-montee-version
+
+Spec 013, lancée par `/wf-montee-version [argument]` (tags `wf-montee-version` et `spec-013`). Chaque correcteur porte dans son nom le critère qu'il vérifie (`ca14-…`) ; les motifs sont compilés et vérifiés sur des exemples positifs et négatifs, et sur des livrables d'exemple, par `tests/correcteurs/wf-montee-version.mjs` (lancé par `tests/skills.sh`).
+
+| Cas | Projet de départ | Tag | CA |
+|---|---|---|---|
+| `montee-version-ca10-fieldops-sans-argument` | FieldOps complet, faux secret, `docs/wf/revue-securite.md` commité (S3 : express 4.18.2, corrigé en 4.19.2) | `reseau` | CA1 à CA6, CA10 à CA16, CA20, CA21, CA25, CA27 (une sous-section par application) |
+| `montee-version-ca07-registre-injoignable` | FieldOps complet, réseau coupé, `.npmrc` vers un registre injoignable | `hors-reseau` | CA7, CA4 à CA6 (repli), CA11 (livrable de sécurité absent), CA12 (non vérifiée), CA16, CA20, CA25 |
+| `montee-version-ca08-cible-react-dom` | FieldOps complet, argument `react-dom 19` | `reseau` | CA8, CA9 (version partielle résolue), CA12 à CA15, CA24 |
+| `montee-version-ca09-paquet-absent` | FieldOps complet, argument `lodash 4` | `reseau` | CA9 (paquet absent, aucun livrable) |
+| `montee-version-ca09-version-inexistante` | FieldOps complet, argument `react 99.0.0` | `reseau` | CA9 (version inexistante, aucun livrable) |
+| `montee-version-ca18-cible-deja-atteinte` | FieldOps complet, argument `express 4.18.2` | `reseau` | CA18, CA8, CA24 |
+| `montee-version-ca19-ca22-projet-mixte-sans-lockfile` | projet fictif hors git : JS/TS sans lockfile ni script, PHP (`composer.json`) | `reseau` | CA19, CA17, CA22, CA13 (`_.pluck`, deux occurrences) |
+| `montee-version-ca27-monorepo-pnpm` | monorepo pnpm fictif, react 17.0.2 (`apps/web`) et 18.2.0 (`apps/admin`), `.node-version` | `reseau` | CA27, CA3, CA4, CA15 (pnpm), CA16 |
+| `montee-version-ca23-relance` | FieldOps et ancien livrable commité, périmé (react 16.14.0) | `hors-reseau` | CA23 |
+| `montee-version-ca26-sans-manifeste` | FieldOps brief (documents seuls) | `hors-reseau` | CA26 |
+
+Tous les cas portent `ca20-ni-installation-ni-execution`, `ca20-ni-branche-ni-commit`, `ca01-aucune-modification-par-bash` et `ca01-curl-sans-ecriture` (motifs repris de `evals/analyse-projet/`).
+
+Réseau : la passe `reseau` n'autorise que `registry.npmjs.org` et `pub.dev`. endoflife.date, les versions publiées de Flutter (`storage.googleapis.com`) et les notes de version hors pub.dev y sont donc injoignables : les correcteurs acceptent alors « non déterminé » (dernière LTS, dernière stable, fin de support) et « non vérifiée » (ruptures), et `ca12-sources-effectivement-consultees` vérifie qu'aucune URL n'est donnée comme source sans avoir été consultée. Les valeurs publiques ne sont jamais figées : dernière version « 18 ou plus » pour react, date de fin de support de Node.js 18 (2025-04-30) acceptée seulement si endoflife.date a répondu.
+
+Hash attendus dans les en-têtes, rejouables : `5765af5` (FieldOps et livrable de sécurité), `5b26289` (FieldOps seul), `822183b` (monorepo pnpm), `655b970` (relance). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `adr001-en-tete-…`, `ca24-argument-en-tete` et `ca23-en-tete-commit-actualise`.
+
+Limites : CA28 (impacts partiels d'un projet volumineux) et les variantes `.fvm/fvm_config.json` (CA5), yarn (CA15) et pub sans lockfile (CA19) ne sont vérifiés que par les tests structurels. `file_exists` ne voyant que les fichiers créés pendant l'exécution, la relance (CA23) est vérifiée par la réécriture observée (`Write`) et le contenu du livrable.
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
