@@ -182,6 +182,31 @@ absent "Aucun champ auteur demandé à git (%an)" "%an"
 absent "Aucun champ auteur demandé à git (%ae)" "%ae"
 absent "Aucun appel à git shortlog" "git shortlog"
 
+# --- Injection shell : aucune valeur insérée entre guillemets doubles --------------
+# Les valeurs <…> viennent du projet ou de l'utilisateur : entre guillemets
+# doubles, $(…) ou une apostrophe inverse seraient interprétés. Les commandes
+# git de la skill (blocs bash et spans `git …`) ne mettent donc jamais un
+# <placeholder> entre guillemets doubles, et citent toujours <branche> entre
+# apostrophes.
+
+commands=$(
+  awk '/^```bash$/ { b = 1; next } b && /^```$/ { b = 0; next } b' <<<"$body"
+  # shellcheck disable=SC2016 # apostrophes inverses littérales (spans Markdown)
+  grep -oE '`git [^`]+`' <<<"$body" | tr -d '`'
+)
+if grep -E '"[^"]*<[^>"]+>[^"]*"' <<<"$commands" >/dev/null; then
+  ko "injection : valeur <…> entre guillemets doubles dans une commande ($(grep -E '"[^"]*<[^>"]+>[^"]*"' <<<"$commands" | head -n 1))"
+else
+  ok "injection : aucune valeur <…> entre guillemets doubles dans une commande"
+fi
+if grep -E "(^|[^'.])<branche>" <<<"$commands" >/dev/null; then
+  ko "injection : <branche> sans apostrophes dans une commande ($(grep -E "(^|[^'.])<branche>" <<<"$commands" | head -n 1))"
+else
+  ok "injection : <branche> toujours entre apostrophes"
+fi
+cite "injection : nom contenant une apostrophe jamais inséré" "apostrophe"
+cite "Grep non utilisé (fichiers d'environnement)" "n'utilise pas Grep"
+
 # --- Aucune valeur propre à la fixture FieldOps -----------------------------------
 # Les exemples de la skill restent génériques : sinon les evals sur FieldOps
 # mesureraient la recopie d'un exemple, pas le comportement (surapprentissage).
@@ -202,6 +227,20 @@ fieldops_values=(
   "SMS"
   "technicien"
   "intervention"
+  "« maj »"
+  "« wip »"
+  "corrections"
+  "BREAKING CHANGE"
+  "T03"
+  "package.json"
+  "pubspec.yaml"
+  "purge"
+  "MAP_API_KEY"
+  "recette"
+  "Camille"
+  "tableur"
+  "facture"
+  "TVA"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
