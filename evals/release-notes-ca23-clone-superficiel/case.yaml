@@ -90,8 +90,7 @@ graders:
   - name: ca06-version-signalee
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Points non déterminés[^\n]*\n(?:(?!\n###? )[\s\S])*?version'
-    flags: "i"
+    pattern: '\n### Points non déterminés[^\n]*\n(?:(?!\n###? )[\s\S])*?package\.json'
     match: contains
   - name: ca23-premier-commit-disponible
     type: regex
@@ -101,7 +100,7 @@ graders:
   - name: ca23-historique-tronque-signale
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Points non déterminés[^\n]*\n(?:(?!\n###? )[\s\S])*?superficiel|tronqu|shallow'
+    pattern: '\n### Points non déterminés[^\n]*\n(?:(?!\n###? )[\s\S])*?(?:superficiel|tronqu|shallow)'
     flags: "i"
     match: contains
   - name: ca23-commits-disponibles
