@@ -200,6 +200,8 @@ Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vé
 
 Spec 011, lancée par `/wf-audit-web [URL]`, tous les cas `hors-reseau` (tag `wf-audit-web` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca06-…`) ; les correcteurs `…-temoin-…` vérifient que le scénario a bien été mis en place. Les motifs des correcteurs sont vérifiés sans modèle par `tests/correcteurs/wf-audit-web.mjs` (lancé par `tests/skills.sh`), y compris contre les commandes Bash prescrites par la skill.
 
+Aucun correcteur regex sur le livrable ne passe sans livrable écrit : un motif « absent » y est écrit comme un motif « présent » qui exige aussi l'en-tête `wf-audit-web` ; dans `audit-web-ca24-relance`, chaque motif exige en plus l'absence de la date de l'audit déposé par le scaffold (2026-09-15), pour que l'ancien livrable ne satisfasse aucun correcteur à lui seul. La route des constats de titre (CA9) est vérifiée par motif, pas par un juge : le juge refusait « toutes les routes » pour une application monopage servie par un seul document.
+
 | Cas | Projet de départ | CA |
 |---|---|---|
 | `audit-web-fieldops` | FieldOps complet (web et Flutter), propre, faux secret, image de 259 523 octets ajoutée dans `public/img/` | CA1 à CA13, CA21, CA25, CA28, hors-périmètre sécurité |

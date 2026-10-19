@@ -103,6 +103,21 @@ fieldops_values=(
   "portail"
   "legacy-php"
   "Intervention"
+  "index.html"
+  "app/layout"
+  "app/**/page"
+  "/img/"
+  "logo.svg"
+  "accueil"
+  "Ecran"
+  "contrats"
+  "devis"
+  "equipes"
+  "stocks"
+  "inventaire"
+  "purge"
+  "MAP_API_KEY"
+  "example.invalid"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
@@ -149,6 +164,39 @@ cite "CA24 dernier identifiant attribué" "Dernier identifiant attribué"
 cite "CA27 dossiers non lus" "dossiers non lus"
 cite "CA28 hébergeur" "hébergeur"
 cite "ADR-001 en-tête hors git" "hors git"
+cite "CA27 décompte exact des fichiers par dossier" "-exec dirname {} + | sort | uniq -c"
+cite "CA27 Glob tronqué" "tronqué"
+
+# --- Injection shell : aucun texte du projet ou de l'utilisateur entre guillemets doubles
+# Chaque commande Bash prescrite (accents graves de la règle « Bash ») qui insère un
+# texte variable (<URL>, <dossier…>) le place entre apostrophes, jamais entre
+# guillemets doubles (où `$(…)` et les accents graves seraient interprétés), et la
+# skill impose de rejeter toute apostrophe dans ce texte.
+
+bash_rule=$(awk '/^- \*\*Bash\*\*/ { on = 1; print; next } on && /^- \*\*/ { exit } on' <<<"$body")
+# shellcheck disable=SC2016 # accents graves littéraux
+commands=$(grep -oE '`[^`]+`' <<<"$bash_rule" | sed 's/^`//; s/`$//')
+injection_ok=1
+while IFS= read -r command; do
+  [ -n "$command" ] || continue
+  if grep -q '"' <<<"$command"; then
+    ko "injection : guillemets doubles dans une commande prescrite ($command)"
+    injection_ok=0
+  fi
+  # Hors des segments entre apostrophes, aucun texte variable <…> ne doit rester
+  # shellcheck disable=SC2001 # motif sur les apostrophes, plus lisible avec sed
+  if sed "s/'[^']*'//g" <<<"$command" | grep -qE '<[^>]+>'; then
+    ko "injection : texte variable hors apostrophes dans une commande prescrite ($command)"
+    injection_ok=0
+  fi
+done <<<"$commands"
+if [ "$(grep -c . <<<"$commands")" -lt 7 ]; then
+  ko "injection : règle « Bash » introuvable ou incomplète (7 commandes attendues)"
+  injection_ok=0
+fi
+[ "$injection_ok" -eq 1 ] && ok "injection : textes variables des commandes Bash entre apostrophes"
+cite "injection : apostrophe rejetée dans l'URL" "ne contient ni espace ni apostrophe"
+cite "injection : apostrophe rejetée dans le chemin de la skill" "contient une apostrophe"
 
 # --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------------
 

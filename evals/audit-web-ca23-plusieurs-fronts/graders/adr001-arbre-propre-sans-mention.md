@@ -1,9 +1,9 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/audit-web.md" }
-pattern: 'modifications non commitées'
+pattern: '^(?![\s\S]*?(?:modifications non commitées))(?=[\s\S]*?wf-audit-web)'
 flags: "i"
-match: not_contains
+match: contains
 ---
 
 ADR-001 : arbre de travail propre, donc pas de mention « modifications non commitées ».

@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/audit-web.md" }
-pattern: '^(?=(?:[^\n]*\n){0,12}[^\n]*wf-audit-web)(?=(?:[^\n]*\n){0,12}[^\n]*\b475123a)(?=(?:[^\n]*\n){0,12}[^\n]*\d{4}-\d{2}-\d{2})'
+pattern: '^(?![\s\S]*2026-09-15)[\s\S]*?(?:^(?=(?:[^\n]*\n){0,12}[^\n]*wf-audit-web)(?=(?:[^\n]*\n){0,12}[^\n]*\b475123a)(?=(?:[^\n]*\n){0,12}[^\n]*\d{4}-\d{2}-\d{2}))'
 match: contains
 ---
 
