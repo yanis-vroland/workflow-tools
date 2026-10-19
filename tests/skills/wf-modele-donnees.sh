@@ -205,7 +205,8 @@ cite "CA19 schéma PostgreSQL" "schema.sql"
 cite "CA19 données de test" "donnees-test.sql"
 cite "CA19 requêtes de vérification" "requetes.sql"
 cite "CA20 questions et décisions manquantes listées" "manquent pour passer au niveau B"
-cite "CA21 niveau B forcé" "--niveau b"
+# shellcheck disable=SC2016 # accents graves littéraux
+cite "CA21 niveau B forcé" '`--niveau b` force le niveau B'
 cite "CA21 élément dépendant d'une saisie vide marqué dans le schéma" "-- supposé"
 cite "CA22 noms en snake_case" "snake_case"
 cite "CA22 clé étrangère au singulier" "<table au singulier>_id"
@@ -217,8 +218,9 @@ cite "CA14 relation n-n sans table de jointure" "table de jointure"
 cite "CA23 identifiant de requête" "R01"
 cite "CA23 besoin sans requête signalé comme défaut" "défaut du schéma"
 cite "CA24 contraintes respectées par les données de test" "NOT NULL"
-cite "CA24 chaque requête renvoie au moins une ligne" "au moins une ligne"
-cite "CA25 Prisma" "schema.prisma"
+cite "CA24 chaque requête renvoie au moins une ligne" "renverrait au moins une ligne"
+# shellcheck disable=SC2016 # accents graves littéraux
+cite "CA25 Prisma" '`schema.prisma` (avec `datasource`'
 cite "CA25 migration Prisma" "_init/migration.sql"
 cite "CA25 TypeORM" "MigrationInterface"
 cite "CA25 Drift" "schemaVersion"
