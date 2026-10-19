@@ -12,7 +12,7 @@ execution:
   model: claude-sonnet-5-5
   max_turns: 60
   timeout_seconds: 1200
-  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
 
 context:
   scaffold_script: scaffold.sh
@@ -40,16 +40,19 @@ graders:
     input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/rapport-avancement\.md")'
     min: 0
     max: 0
+  # Le rapport déposé par le scaffold a déjà un seul titre et une seule
+  # synthèse : chaque correcteur exige aussi le commit actuel (ca67095), absent
+  # de l'ancien rapport, pour ne pas réussir sur l'état initial.
   - name: ca20-un-seul-titre-de-rapport
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '(?:^|\n)# [^\n]*'
-    match: "count:1"
+    pattern: '^(?=[\s\S]*\bca67095)(?!(?:[\s\S]*?(?:^|\n)# ){2})'
+    match: contains
   - name: ca20-une-seule-synthese
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '(?:^|\n)##? [^\n]*Synth[èe]se'
-    match: "count:1"
+    pattern: '^(?=[\s\S]*\bca67095)(?!(?:[\s\S]*?\n##? [^\n]*Synth[èe]se){2})'
+    match: contains
 
   # --- CA5 : période déduite du rapport précédent ---------------------------------------------
   - name: ca05-periode-commence-au-lendemain
@@ -90,7 +93,9 @@ graders:
   - name: ca03-en-tete-aucun-livrable-lu
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\baucun\b'
+    # « aucun » figure déjà dans l'en-tête de l'ancien rapport : exigé dans le
+    # même en-tête que le commit actuel
+    pattern: '^(?=(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bca67095)(?:(?!\n##? [^\n]*Synth)[\s\S])*?\baucun\b'
     flags: i
     match: contains
 

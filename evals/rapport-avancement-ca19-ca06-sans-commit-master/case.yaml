@@ -13,7 +13,7 @@ execution:
   model: claude-sonnet-5-5
   max_turns: 40
   timeout_seconds: 900
-  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
 
 context:
   scaffold_script: scaffold.sh
@@ -40,11 +40,14 @@ graders:
     pattern: '\n##? [^\n]*En cours[^\n]*\n(?:(?!\n##? )[\s\S])*?\bPDF\b'
     flags: i
     match: not_contains
+  # Repli sur master : seule branche longue du dépôt, le rapport n'est produit
+  # que si elle a été retenue (sans branche trouvée, l'outil demande et n'écrit
+  # rien, cas ca06-branche-introuvable). L'historique de master est lu :
   - name: ca06-repli-sur-master
-    type: regex
-    target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bmaster\b'
-    match: contains
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"git log ''?master''? '
+    min: 1
   - name: ca03-en-tete-periode
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }

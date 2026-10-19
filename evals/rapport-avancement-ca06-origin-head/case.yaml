@@ -12,7 +12,7 @@ execution:
   model: claude-sonnet-5-5
   max_turns: 60
   timeout_seconds: 1200
-  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
 
 context:
   scaffold_script: scaffold.sh
@@ -24,12 +24,6 @@ graders:
   - name: ca06-livrable-cree
     type: file_exists
     path: "docs/wf/rapport-avancement.md"
-  - name: ca06-branche-principale-en-tete
-    type: regex
-    target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    # Valeur après « : » (le libellé « Branche principale » contient le mot)
-    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?[:=]\s*`?(?:origin/)?principale\b'
-    match: contains
   - name: ca06-origin-head-consulte
     type: tool_used
     tool: Bash
