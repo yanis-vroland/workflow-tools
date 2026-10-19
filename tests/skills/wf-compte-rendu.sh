@@ -110,10 +110,32 @@ else
 fi
 cite "CA7 cellule « non déterminé »" "non déterminé"
 
-# --- CA2, CA15, CA17 : questions posées pendant l'exécution ----------------------
+# --- Consignes des questions posées pendant l'exécution ---------------------------
+# Simple présence de la consigne dans la skill : ce n'est pas une preuve du
+# comportement, vérifié par les evals compte-rendu-ca15-*, -ca17-* (dont
+# compte-rendu-ca17-nouvelle-reunion pour le suffixe).
 
-cite "CA17 suffixe -2 pour une nouvelle réunion" "-2.md"
-cite "CA15 jamais la date du jour sans la demander" "date du jour"
+cite "consigne du suffixe -2 d'une nouvelle réunion (CA17)" "-2.md"
+cite "consigne : jamais la date du jour sans la demander (CA15)" "date du jour"
+
+# --- Injection shell ---------------------------------------------------------------
+# Un texte venu de l'utilisateur ou des notes (chemin, objet) ne doit jamais être
+# inséré dans une commande entre guillemets doubles : il passe par l'entrée
+# standard, dans un heredoc à délimiteur entre apostrophes.
+
+if grep -qE '"<[^">]+>"' <<<"$body"; then
+  ko "aucun texte de l'utilisateur entre guillemets doubles dans une commande ($(grep -oE '"<[^">]+>"' <<<"$body" | head -n 1))"
+else
+  ok "aucun texte de l'utilisateur entre guillemets doubles dans une commande"
+fi
+if grep -qF "sys.argv" <<<"$body"; then
+  ko "objet passé par l'entrée standard (sys.argv présent)"
+else
+  ok "objet passé par l'entrée standard (pas de sys.argv)"
+fi
+cite "objet lu sur l'entrée standard" "sys.stdin.read()"
+cite "heredoc de l'objet à délimiteur entre apostrophes" "<<'WF_OBJET'"
+cite "heredoc du chemin à délimiteur entre apostrophes" "<<'WF_CHEMIN'"
 
 # --- CA18 : formats acceptés -----------------------------------------------------
 
@@ -125,22 +147,23 @@ done
 # Les exemples de la skill restent génériques : sinon les evals mesureraient la
 # recopie d'un exemple, pas le comportement.
 
+# Noms, dates, formulations et valeurs de la fixture fieldops-brief et des
+# données des cas evals/compte-rendu-*, cherchés dans tout SKILL.md (frontmatter
+# compris).
 fieldops_values=(
-  "FieldOps"
-  "Sophie"
-  "Renaud"
-  "Marc Olivier"
-  "Julien"
-  "Inès"
-  "Recette2026"
-  "export PDF"
-  "tableur"
-  "point-hebdo"
-  "point hebdomadaire"
+  "FieldOps" "Sophie" "Renaud" "Marc Olivier" "Julien" "Ferrand" "Inès" "Garnier"
+  "Hugo" "Lemaire" "Nadia" "Benali" "Paul Girard" "Claire Morel"
+  "Camille" "Durand" "Tom Becker" "Priya" "Natarajan"
+  "Recette2026" "recette-sdt" "export PDF" "tableur" "point-hebdo" "point hebdomadaire"
+  "Weekly sync" "release 1.3" "iOS 16" "atelier" "Revue de sprint" "chantier"
+  "14/10" "9/10" "10/10" "12/10" "16/10" "17/10" "vendredi" "7 octobre"
+  "07/10/2026" "14/10/2026" "Oct 7" "October 28"
+  "on garde" "on valide" "we agree" "00:00:04" "00:00:05" "00:00:11"
+  "5b26289" "2fc99c0" "notes-reunion" "equipe-sud" "equipe-nord"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
-  if grep -qiF -- "$value" <<<"$body"; then
+  if grep -qiF -- "$value" "$skill"; then
     ko "aucune valeur de FieldOps dans la skill (« $value » présent)"
     leak_ok=0
   fi
