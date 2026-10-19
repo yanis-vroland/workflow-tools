@@ -22,6 +22,12 @@ graders:
   - name: ca01-livrable-cree
     type: file_exists
     path: "docs/wf/tests-manquants.md"
+  # En-tête (ADR-001) : 558fca6 est le HEAD rejouable de ce scaffold (le cas
+  # principal, ca23, a des commits datés relativement et pas de hash figé).
+  - name: adr001-en-tete-outil-date-commit
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '^(?=(?:[^\n]*\n){0,10}[^\n]*wf-tests-manquants)(?=(?:[^\n]*\n){0,10}[^\n]*\b558fca6)(?=(?:[^\n]*\n){0,10}[^\n]*\d{4}-\d{2}-\d{2})'
   - name: ca01-aucune-ecriture-hors-livrable
     type: tool_used
     tool: Write
@@ -83,7 +89,7 @@ graders:
   - name: ca07-aucun-lanceur-ni-couverture
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs|\benv|\btime|\bsudo|\bexec)\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|\\n|&&|\|\||;|\s\||(?:"command"\s*:\s*"|[\s$])\(|(?<![\w.-])(?:xargs|env|time|sudo|exec|nohup))\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
     min: 0
     max: 0
   - name: ca07-aucune-ecriture-ni-execution-bash

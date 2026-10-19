@@ -37,11 +37,11 @@ graders:
   - name: ca20-m1-conserve
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M1\b[^\n]*src/api/routes/interventions\.ts'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M1\b[^\n]*src/api/routes/interventions\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Application'
   - name: ca20-m3-conserve
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M3\b[^\n]*mobile/lib/screens/intervention_list_screen\.dart'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M3\b[^\n]*mobile/lib/screens/intervention_list_screen\.dart[^\n]*\n(?:(?!\n###? )[\s\S])*?Application'
   - name: ca20-scheduling-retire
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
@@ -52,15 +52,13 @@ graders:
     target: { source: file, path: "docs/wf/tests-manquants.md" }
     pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M2\b'
     match: not_contains
-  - name: ca20-m4-jamais-reattribue
+  # M4 est absent du livrable déposé : un simple « pas de M4 » réussirait sans
+  # relance. Le grader exige donc à la fois une nouvelle entrée M5 et l'absence
+  # de M4 dans la même section.
+  - name: ca20-m4-jamais-reattribue-nouvelles-entrees-a-partir-de-m5
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M4\b'
-    match: not_contains
-  - name: ca20-nouvelles-entrees-a-partir-de-m5
-    type: regex
-    target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M5\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\n### M5\b)(?!(?:(?!\n## )[\s\S])*?\n### M4\b)'
   - name: ca20-dernier-identifiant-a-jour
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }

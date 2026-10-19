@@ -12,16 +12,17 @@ execution:
   model: claude-sonnet-5-5
   max_turns: 100
   timeout_seconds: 1500
-  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
 
 context:
   scaffold_script: scaffold.sh
 
 # Convention des motifs : une section va de son titre « ## <nom> » au titre
 # « ## » suivant ; une entrée de « Tests manquants » va de son titre « ### » au
-# titre « ## » ou « ### » suivant. Les points chauds attendus (CA9) dépendent de
-# la date d'exécution (12 mois glissants) : interventions.ts et
-# intervention_list_screen.dart y restent au moins jusqu'en février 2027.
+# titre « ## » ou « ### » suivant. Les points chauds attendus (CA9) sont
+# garantis quelle que soit la date par les commits récents du scaffold
+# (datés relativement au jour d'exécution). Edit est accordé pour que les
+# graders « aucune édition » mesurent quelque chose.
 graders:
   # --- CA1 : seul le livrable est écrit, aucun fichier de test -------------------
   - name: ca01-livrable-cree
@@ -130,7 +131,7 @@ graders:
   - name: ca07-aucun-lanceur-ni-couverture
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs|\benv|\btime|\bsudo|\bexec)\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|\\n|&&|\|\||;|\s\||(?:"command"\s*:\s*"|[\s$])\(|(?<![\w.-])(?:xargs|env|time|sudo|exec|nohup))\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
     min: 0
     max: 0
 
@@ -206,8 +207,9 @@ graders:
     pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?Priorit[ée][^\n]*\bfaible\b(?:(?!\n## )[\s\S])*?Priorit[ée][^\n]*\bmoyenne\b'
     flags: i
     match: not_contains
-  # interventions.ts (6 commits sur 12 mois à la date de la spec) avant
-  # intervention_list_screen.dart (4 commits)
+  # interventions.ts (4 commits récents du scaffold, plus ceux de la fixture
+  # encore dans la fenêtre) avant intervention_list_screen.dart (2 commits
+  # récents, plus ceux de la fixture, toujours moins nombreux)
   - name: ca11-commits-decroissants
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
@@ -380,7 +382,7 @@ graders:
   - name: adr001-en-tete-outil-date-commit
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '^(?=(?:[^\n]*\n){0,10}[^\n]*wf-tests-manquants)(?=(?:[^\n]*\n){0,10}[^\n]*\b5b26289)(?=(?:[^\n]*\n){0,10}[^\n]*\d{4}-\d{2}-\d{2})'
+    pattern: '^(?=(?:[^\n]*\n){0,10}[^\n]*wf-tests-manquants)(?=(?:[^\n]*\n){0,10}[^\n]*Commit analys[ée] : [0-9a-f]{7,40}\b)(?=(?:[^\n]*\n){0,10}[^\n]*\d{4}-\d{2}-\d{2})'
   - name: adr001-arbre-propre-sans-mention
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }

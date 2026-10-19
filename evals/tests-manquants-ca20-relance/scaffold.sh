@@ -8,6 +8,9 @@
 #   - M4, déjà retiré lors d'une exécution antérieure, est le dernier
 #     identifiant attribué : aucun des deux (M2, M4) ne doit être réattribué,
 #     les nouvelles entrées commencent à M5.
+# Le livrable précédent n'a pas de ligne « Application : » dans ses entrées
+# (version antérieure) : les graders qui vérifient la conservation de M1 et M3
+# exigent cette ligne, pour ne pas réussir sur le livrable déposé tel quel.
 # Le livrable et le test sont commités (commit déterministe) : arbre propre.
 set -euo pipefail
 
@@ -31,10 +34,9 @@ mkdir -p docs/wf
 cat >docs/wf/tests-manquants.md <<'MD'
 # Tests à écrire en priorité
 
-Outil : wf-tests-manquants · Date : 2026-10-02 · Commit analysé : 5b26289
+Outil : wf-tests-manquants · Date : 2026-10-02 · Commit analysé : 0000000
 Dernier identifiant attribué : M4
 
-Établi par lecture des fichiers : aucun test n'a été lancé, aucune couverture n'a été mesurée, aucune dépendance n'a été installée.
 
 ## Synthèse
 
@@ -68,7 +70,6 @@ Deux applications, peu testées : trois entrées retenues.
 
 ### M1 · `src/api/routes/interventions.ts`
 
-- Application : web
 - À tester : `interventionsRouter`
 - Type de test : intégration
 - Priorité : haute
@@ -77,7 +78,6 @@ Deux applications, peu testées : trois entrées retenues.
 
 ### M3 · `mobile/lib/screens/intervention_list_screen.dart`
 
-- Application : Flutter
 - À tester : `InterventionListScreen`
 - Type de test : widget
 - Priorité : haute
@@ -86,7 +86,6 @@ Deux applications, peu testées : trois entrées retenues.
 
 ### M2 · `src/domain/scheduling.ts`
 
-- Application : web
 - À tester : `overlaps`, `isAvailable`, `suggestTechnician`
 - Type de test : unitaire
 - Priorité : moyenne

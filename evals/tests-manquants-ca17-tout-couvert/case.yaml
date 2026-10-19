@@ -54,6 +54,6 @@ graders:
   - name: ca07-aucun-lanceur-ni-installation
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs|\benv|\btime|\bsudo|\bexec)\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|\\n|&&|\|\||;|\s\||(?:"command"\s*:\s*"|[\s$])\(|(?<![\w.-])(?:xargs|env|time|sudo|exec|nohup))\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
     min: 0
     max: 0

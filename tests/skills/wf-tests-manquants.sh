@@ -176,4 +176,19 @@ cite "CA22 message sans code source" "Le répertoire ne contient aucun code sour
 cite "CA23 application de chaque entrée" "Application :"
 cite "CA24 dossiers non lus" "dossiers non lus"
 
+# --- ADR-001 : fichiers d'environnement jamais affichés par Grep -------------------
+# En mode contenu, Grep afficherait les lignes d'un fichier d'environnement
+# avant qu'on puisse l'écarter : la skill impose leur exclusion par glob.
+cite "ADR-001 exclusion des fichiers d'environnement par glob dans Grep" 'glob: "!**/.env*"'
+
+# --- Correcteurs des evals et commandes Bash prescrites (sans modèle) ---------------
+# Commandes de la skill confrontées aux correcteurs Bash « max: 0 », correcteur
+# des lanceurs sur exemples, aucun texte du projet substitué dans une commande.
+
+if ! command -v node >/dev/null 2>&1; then
+  ko "node introuvable : correcteurs des evals non vérifiés (tests/correcteurs/wf-tests-manquants.mjs)"
+elif ! node "$root/tests/correcteurs/wf-tests-manquants.mjs"; then
+  fail=1
+fi
+
 exit $fail
