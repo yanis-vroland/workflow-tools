@@ -18,7 +18,7 @@ Le chemin `docs/wf/release-notes.md`, le titre des sections `## Version <numéro
 - **Entrée** : l'historique git, et rien d'autre. Ne lis aucun fichier du projet avec Read, Glob ou Grep, à la seule exception de `docs/wf/release-notes.md` s'il existe. Le contenu du manifeste se lit par `git show` (étape 4).
 - **Bash** : seulement les commandes données dans cette skill, recopiées telles quelles en remplaçant les `<…>`, sans redirection vers un fichier ni autre commande. Aucune commande git qui modifie le dépôt (add, commit, tag, checkout, switch, stash, reset, fetch, pull…), aucune installation ni exécution du projet.
 - **Modifications non commitées** : elles ne sont jamais prises en compte dans les notes. N'utilise jamais `git diff` sur l'arbre de travail ni `git diff HEAD` : seuls les commits de la plage comptent. Elles ne servent qu'à la mention de l'en-tête (étape 7).
-- **Secrets** : ne lis jamais le contenu ni le diff d'un fichier d'environnement (`.env`, `.env.local`, `.env.production`…, `.env.example` compris, inutile ici) ni d'un fichier d'identifiants (`.envrc`, `.npmrc`, `key.properties`, clés et certificats), même versionné dans le dépôt : toute commande `git show` porte les exclusions de l'étape 6. Aucune valeur de ces fichiers dans le livrable.
+- **Secrets** : ne lis jamais le contenu ni le diff d'un fichier d'environnement (`.env`, `.env.local`, `.env.staging`…, `.env.example` compris, inutile ici) ni d'un fichier d'identifiants (`.envrc`, `.npmrc`, `key.properties`, clés et certificats), même versionné dans le dépôt : toute commande `git show` porte les exclusions de l'étape 6. Aucune valeur de ces fichiers dans le livrable.
 - **Données personnelles** : aucune adresse e-mail et aucun nom de contributeur dans le livrable, y compris ceux des lignes `Co-Authored-By:` ou `Signed-off-by:` des messages. N'utilise aucun format git qui affiche l'auteur ou le committer, ni aucune commande qui liste les contributeurs.
 - **Honnêteté** : chaque entrée s'appuie sur un ou plusieurs commits de la plage, cités dans « Références ». Rien n'est inventé (ni fonctionnalité, ni bénéfice, ni action requise) ; ce qui n'a pas pu être établi est « non déterminé » et figure dans « Points non déterminés ».
 - **Aucune question** pendant l'exécution.
@@ -121,7 +121,7 @@ Sujet au format Conventional Commits : `<type>(<portée>)!: <description>`, port
 | `revert` (ou sujet `Revert "…"`) | voir « annulations » |
 | autre type, ou sujet hors convention | classé d'après son message et son diff, voir « hors convention » |
 
-**Regroupement** : plusieurs commits qui portent sur la même fonctionnalité (même portée et même objet décrit, ex. l'ajout d'une fonction puis son bouton d'accès) produisent une seule entrée, qui les cite tous. Deux fonctionnalités distinctes d'un même module restent deux entrées.
+**Regroupement** : plusieurs commits qui portent sur la même fonctionnalité (même portée et même objet décrit, ex. un formulaire de saisie puis son tri par colonne) produisent une seule entrée, qui les cite tous. Deux fonctionnalités distinctes d'un même module restent deux entrées.
 
 **Correction d'une nouveauté** : un `fix` qui corrige une fonctionnalité introduite par un `feat` de la même plage (même portée et même objet, ou diff qui touche les fichiers de ce `feat`) ne produit aucune entrée dans « Corrections » : il est rattaché à l'entrée de cette fonctionnalité dans « Nouveautés ». Les utilisateurs n'ont jamais vu le défaut.
 
