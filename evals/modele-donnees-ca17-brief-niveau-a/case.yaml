@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: modele-donnees-ca17-brief-niveau-a
+description: >-
+  Spec 017, cas principal du niveau A : wf-modele-donnees lancé sur la fixture
+  FieldOps brief (projet sans code ni git) avec le brief et les notes d'appel.
+  Couvre CA17, CA1 à CA9, CA12 à CA15.
+tags: [wf-modele-donnees, spec-017, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

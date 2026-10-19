@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: modele-donnees-ca10-ca11-relance-niveau-a
+description: >-
+  Spec 017, CA10 et CA11 : relance sans argument d'un livrable au niveau A dont la
+  réponse à Q01 et la décision D01 ont été saisies à la main, dont la question
+  bloquante Q03 reste vide, et dont des identifiants ont été retirés (E03, E06,
+  RG03, RG06, Q02, D02). Les saisies sont conservées et citées comme sources,
+  les identifiants conservés et jamais réattribués.
+tags: [wf-modele-donnees, spec-017, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
