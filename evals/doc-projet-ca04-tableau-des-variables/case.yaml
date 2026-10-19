@@ -34,11 +34,11 @@ graders:
     target: { source: file, path: "docs/wf/doc-projet.md" }
     pattern: '\n#{1,6} [^\n]*Configuration[^\n]*\n(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*Variable\s*\|\s*Utilisé pour\s*\|\s*Où la renseigner\s*\|\s*Comment l[’'']obtenir\s*\|'
 
-  # --- Une ligne par variable de .env.example ------------------------------------
+  # --- Une ligne par variable de .env.example, dans « Configuration » -----------
   - name: ca04-une-ligne-par-variable
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '^(?=[\s\S]*\n\|\s*[\x60*]*NODE_ENV[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*PORT[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*DATABASE_URL[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*POSTGRES_PASSWORD[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*JWT_SECRET[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*MAP_API_URL[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*MAP_API_KEY[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*MAIL_API_URL[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*MAIL_API_KEY[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*MAIL_FROM[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*PAYMENT_API_URL[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*PAYMENT_API_KEY[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*PAYMENT_WEBHOOK_SECRET[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*SEED_PASSWORD[\x60*]*\s*\|)(?=[\s\S]*\n\|\s*[\x60*]*STRIPE_SECRET_KEY[\x60*]*\s*\|)'
+    pattern: '\n#{1,6} [^\n]*Configuration[^\n]*\n(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*NODE_ENV[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*PORT[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*DATABASE_URL[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*POSTGRES_PASSWORD[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*JWT_SECRET[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*MAP_API_URL[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*MAP_API_KEY[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*MAP_API_KEY_EXPIRES_AT[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*MAIL_API_URL[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*MAIL_API_KEY[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*MAIL_FROM[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*PAYMENT_API_URL[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*PAYMENT_API_KEY[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*PAYMENT_WEBHOOK_SECRET[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*SEED_PASSWORD[\x60*]*\s*\|)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*[\x60*]*STRIPE_SECRET_KEY[\x60*]*\s*\|)'
 
   # --- Utilisé pour : établi par le code, fichier cité ----------------------------
   - name: ca04-utilise-pour-cite-db-ts
@@ -61,14 +61,20 @@ graders:
     flags: i
 
   # --- Où la renseigner : fichier ou mécanisme qui fournit la variable ------------
+  # « .env » seul, pas « .env.example » (le modèle, pas le fichier renseigné)
   - name: ca04-ou-la-renseigner-stripe
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '\n\|\s*[\x60*]*STRIPE_SECRET_KEY[\x60*]*\s*\|[^|\n]*\|[^|\n]*\.env\b[^|\n]*\|'
+    pattern: '\n\|\s*[\x60*]*STRIPE_SECRET_KEY[\x60*]*\s*\|[^|\n]*\|[^|\n]*\.env\b(?!\.)[^|\n]*\|'
   - name: ca04-ou-la-renseigner-database-url
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '\n\|\s*[\x60*]*DATABASE_URL[\x60*]*\s*\|[^|\n]*\|[^|\n]*(?:\.env\b|docker-compose\.yml)[^|\n]*\|'
+    pattern: '\n\|\s*[\x60*]*DATABASE_URL[\x60*]*\s*\|[^|\n]*\|[^|\n]*(?:\.env\b(?!\.)|docker-compose\.yml)[^|\n]*\|'
+  # POSTGRES_PASSWORD est fournie au service db par docker-compose.yml
+  - name: ca04-ou-la-renseigner-postgres-password-docker-compose
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '\n\|\s*[\x60*]*POSTGRES_PASSWORD[\x60*]*\s*\|[^|\n]*\|[^|\n]*docker-compose\.yml[^|\n]*\|'
 
   # --- Comment l'obtenir : service nommé seulement s'il est établi par le code ----
   - name: ca04-comment-l-obtenir-stripe-par-son-sdk
@@ -81,7 +87,9 @@ graders:
     target: { source: file, path: "docs/wf/doc-projet.md" }
     pattern: '^(?=[\s\S]*\n\|\s*[\x60*]*MAP_API_KEY[\x60*]*\s*\|(?:[^|\n]*\|){2}[^|\n]*non déterminé[^|\n]*\|[ \t]*(?:\n|$))(?=[\s\S]*\n\|\s*[\x60*]*MAIL_API_KEY[\x60*]*\s*\|(?:[^|\n]*\|){2}[^|\n]*non déterminé[^|\n]*\|[ \t]*(?:\n|$))(?=[\s\S]*\n\|\s*[\x60*]*PAYMENT_API_KEY[\x60*]*\s*\|(?:[^|\n]*\|){2}[^|\n]*non déterminé[^|\n]*\|[ \t]*(?:\n|$))'
     flags: i
-  # Aucun service deviné d'après le nom d'une variable
+  # Aucun service deviné d'après le nom d'une variable. Liste fermée de
+  # fournisseurs plausibles : elle n'attrape pas tout, le grader llm suivant sert
+  # de filet pour les autres.
   - name: ca04-aucun-service-invente
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
@@ -108,7 +116,7 @@ graders:
   - name: ca04-aucune-valeur-de-variable
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '\bchangeme\b|\bdev-secret\b|\bsk_(?:test|live)_|postgres://|(?:maps|mail|payments)\.example\.invalid|no-reply@|\b(?:NODE_ENV|PORT|DATABASE_URL|POSTGRES_PASSWORD|JWT_SECRET|MAP_API_URL|MAP_API_KEY|MAIL_API_URL|MAIL_API_KEY|MAIL_FROM|PAYMENT_API_URL|PAYMENT_API_KEY|PAYMENT_WEBHOOK_SECRET|SEED_PASSWORD|STRIPE_SECRET_KEY)=\S'
+    pattern: '\bchangeme\b|\bdev-secret\b|\bsk_(?:test|live)_|postgres://|(?:maps|mail|payments)\.example\.invalid|no-reply@|\b(?:NODE_ENV|PORT|DATABASE_URL|POSTGRES_PASSWORD|JWT_SECRET|MAP_API_URL|MAP_API_KEY|MAP_API_KEY_EXPIRES_AT|MAIL_API_URL|MAIL_API_KEY|MAIL_FROM|PAYMENT_API_URL|PAYMENT_API_KEY|PAYMENT_WEBHOOK_SECRET|SEED_PASSWORD|STRIPE_SECRET_KEY)=\S|\b2027-03-31\b'
     match: not_contains
   - name: ca04-marqueur-du-faux-secret-absent-de-la-session
     type: regex

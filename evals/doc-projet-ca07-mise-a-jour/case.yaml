@@ -53,6 +53,11 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
     pattern: '\n#{1,6} [^\n]*Configuration[^\n]*\n(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*Variable\s*\|\s*Utilisé pour\s*\|\s*Où la renseigner\s*\|\s*Comment l[’'']obtenir\s*\|'
+  - name: ca07-ca04-ancienne-liste-retiree
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: 'Variables listées dans \x60\.env\.example\x60 :'
+    match: not_contains
   - name: ca07-installation-commande-reelle
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }

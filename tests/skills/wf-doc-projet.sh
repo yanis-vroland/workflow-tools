@@ -93,13 +93,14 @@ else
 fi
 
 # --- CA4 : tableau des variables d'environnement ---------------------------------
-# En-tête exact du tableau, service nommé seulement s'il est établi par le code
-# (SDK ou API), et « non déterminé » sinon.
+# En-tête exact du tableau, une règle par colonne, et service nommé seulement
+# s'il est établi par le code (SDK ou API).
 
 cite CA4 "| Variable | Utilisé pour | Où la renseigner | Comment l'obtenir |"
 cite CA4 'SDK'
-cite CA4 'non déterminé'
-cite CA4 '.env.example'
+cite CA4 '**Utilisé pour**'
+cite CA4 '**Où la renseigner**'
+cite CA4 '**Comment l'"'"'obtenir**'
 
 # --- CA5, CA9, CA11 : schéma et seuil ------------------------------------------
 
