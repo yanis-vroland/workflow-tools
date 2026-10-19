@@ -9,7 +9,7 @@ Les cas se lancent en deux passes, selon leur tag réseau (voir « Réseau ») :
 ```bash
 # Registres joignables (tag reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag reseau \
-  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)"
+  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)"
 
 # Aucun réseau (tag hors-reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag hors-reseau \
@@ -28,7 +28,7 @@ claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 
 Dès que `Bash` est accordé, ses commandes tournent dans le bac à sable de Claude Code, dont l'accès réseau est limité aux domaines accordés par `--allow-tools "WebFetch(domain:…)"`. Sans ces autorisations, aucun registre n'est joignable. D'où deux passes :
 
-- tag `reseau` : le cas a besoin des registres (npm, pub.dev) ;
+- tag `reseau` : le cas a besoin des registres (npm, pub.dev) ou de la base d'avis OSV.dev (`api.osv.dev`) ;
 - tag `hors-reseau` : le cas tourne sans aucun réseau, y compris ceux qui exigent un registre injoignable.
 
 Chaque cas porte exactement un de ces deux tags ; `.github/scripts/verifier-tags-evals.sh` le vérifie en CI, sinon le cas ne serait jamais lancé.
@@ -127,3 +127,26 @@ Spec 004, tous les cas tagués `hors-reseau`. Chaque grader porte dans son nom l
 - `cadrage-besoin-ca03-source-hors-projet` : source hors du projet, créée par le scaffold dans le répertoire parent et passée en `../briefs-externes/brief-externe.md`, gardée en relatif dans l'en-tête, aucun chemin absolu (CA3). Le bac à sable de l'eval n'autorise la lecture que sous ce parent (`home/`, la session tournant dans `home/cwd`) ; la conversion d'un argument absolu en chemin relatif n'est pas testable par une eval, le chemin absolu de la session n'étant pas connu à l'avance ;
 - `cadrage-besoin-ca20-source-anglaise` : source en anglais, priorités « essential » et « optional » (CA20, CA5) ;
 - `cadrage-besoin-ca22-projet-avec-code` : projet cible avec code et git, aucun fichier de `src/` ni `mobile/` lu (CA22, CA3, faux secret de l'ADR-001).
+
+### wf-revue-securite
+
+Spec 010, lancée par `/wf-revue-securite` (tag `wf-revue-securite` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca12-…`) ; les graders `temoin-…` vérifient que le scaffold a bien planté la faille ou la valeur dont un grader d'absence vérifie qu'elle n'est pas reprise. Les failles propres à un cas sont plantées par son `scaffold.sh` et commitées (arbre propre), avec des valeurs manifestement factices (`FAUX_…`) ; celles du FieldOps commun sont décrites dans `tests/fixtures/README.md`. Les deux cas `reseau` ont besoin d'OSV.dev : la passe `reseau` accorde `WebFetch(domain:api.osv.dev)`.
+
+| Cas | Projet de départ | Tag | CA |
+|---|---|---|---|
+| `revue-securite-fieldops` | FieldOps complet (web et Flutter), propre ; ajouts : body-parser 1.20.1 transitive via express dans `package-lock.json`, clé littérale dans `mobile/lib/services/map_service.dart` | `reseau` | CA1 à CA6, CA9 à CA15, CA17, CA18, CA24 |
+| `revue-securite-ca07-sans-lockfile` | FieldOps web seul, `package-lock.json` retiré | `reseau` | CA7 |
+| `revue-securite-ca08-ca16-base-injoignable` | FieldOps complet, `.env.staging` suivi par git (marqueur factice) | `hors-reseau` | CA8, CA16, CA17, CA1 |
+| `revue-securite-ca19-aucun-constat` | petit projet TypeScript sous git, sans dépendance ni faille | `hors-reseau` | CA19, CA2 |
+| `revue-securite-ca20-relance` | FieldOps complet et livrable précédent commité (S2, S4, S7, S9 ; dernier identifiant S11) | `hors-reseau` | CA20 |
+| `revue-securite-ca22-stack-mixte` | FieldOps complet et outil d'import Python (`outils/import/`) | `hors-reseau` | CA22 |
+| `revue-securite-ca23-repertoire-vide` | répertoire vide | `hors-reseau` | CA23 (cas limite) |
+| `revue-securite-ca23-sans-code-source` | FieldOps brief (documents seuls) | `hors-reseau` | CA23 (cas limite) |
+| `revue-securite-ca25-projet-volumineux` | FieldOps et 2 000 modules générés sous `src/legacy/`, dont un porteur d'une injection et d'un jeton factices | `hors-reseau` | CA25 |
+
+- Commit attendu dans l'en-tête du cas principal : `21bc390` (HEAD du scaffold, rejouable). Une modification de la fixture ou du scaffold le change : mettre à jour `ca03-en-tete-commit`.
+- CA8 : comme pour `wf-analyse-projet`, la base est coupée par le bac à sable (passe `hors-reseau`) ; le témoin `ca08-temoin-echec-reseau` exige dans la trace la sortie d'une interrogation échouée (`osv.dev injoignable (curl <code>…)`). Tous les cas `hors-reseau` qui ont des dépendances exercent donc aussi CA8.
+- Les avis évoluent (ADR-001) : seuls des avis publiés de longue date sont attendus (express 4.18.2, body-parser 1.20.1), et jamais une sévérité ou une version corrigée précise.
+- CA14 : « aucun caractère de la valeur » est vérifié sur la valeur entière et ses fragments distinctifs (`dev-secret`, `FAUX_JETON`, `c41d`), pas lettre par lettre.
+- CA21 (contrat lu par `wf-montee-version`) est vérifié par les tests structurels (`tests/skills/wf-revue-securite.sh`), pas par une eval.
+- Les motifs des graders sont compilés et vérifiés sur des exemples positifs et négatifs par `tests/correcteurs/wf-revue-securite.mjs`, lancé par `tests/skills.sh`.
