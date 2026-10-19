@@ -69,7 +69,7 @@ graders:
   - name: ca03-application-web-non-analysee
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: 'src/(?:api|web|domain|db|services)/|vite\.config|docker-compose|Dockerfile|\.nvmrc|\.eslintrc'
+    pattern: 'src/(?:api|web|domain|db|services|jobs)/|vite\.config|docker-compose|Dockerfile|\.nvmrc|\.eslintrc'
     match: not_contains
   - name: ca03-web-ignore-selon-le-correcteur
     type: llm
