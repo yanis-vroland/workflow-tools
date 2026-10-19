@@ -28,9 +28,10 @@ Analyse les arguments, débarrassés des espaces de début et de fin et, s'ils s
 
 1. **Aucun argument** : demande la source et arrête-toi sans rien écrire. Ne cherche pas de notes dans le projet. Message type :
    « Indique le chemin du fichier de notes ou de transcription (`.txt`, `.md`, `.vtt` ou `.srt`), ou colle directement le texte des notes dans ta réponse. »
-   À la réponse : un chemin est traité comme un argument (point 2), un texte comme des notes collées (point 3).
+   À la réponse : un chemin est traité comme un argument (points 2 et 3), un texte comme des notes collées (point 4).
 2. **L'argument est un fichier existant** (sauf nom en `.env*`, écarté sans test) : c'est un fichier de notes. Teste-le avec la commande « Vérifier un fichier » ci-dessous. Sinon, si l'argument ressemble à un chemin (une seule ligne, sans espace hors guillemets, et contenant un `/` ou se terminant par une extension comme `.md`) : « fichier introuvable » (étape 1 bis).
-3. **Sinon**, l'argument est le texte des notes, collé dans la commande : c'est la source, désignée « notes fournies dans la conversation ». Un texte collé vide revient au point 1.
+3. **Chemin suivi d'une précision** : si l'argument ne tient pas en un seul chemin mais que sa première ligne commence par un chemin (premier mot, ou texte entre guillemets, qui contient un `/` ou se termine par une extension) suivi d'autre texte, ce chemin est traité comme au point 2, et le texte qui suit est une **réponse anticipée** aux questions des étapes 3 et 4 (date de la réunion ; « relance » ou « nouvelle réunion »). Applique-la au lieu de poser la question correspondante. Ce n'est pas une source : rien n'en est repris dans le compte rendu, hors la date de la réunion qu'elle donne.
+4. **Sinon**, l'argument est le texte des notes, collé dans la commande : c'est la source, désignée « notes fournies dans la conversation ». Un texte collé vide revient au point 1.
 
 ### Étape 1 bis : fichier refusé
 
@@ -66,7 +67,8 @@ Lis le fichier de notes avec Read, et rien d'autre. Formats :
 
 1. une date de réunion écrite dans les notes (titre, ligne « Date : », en-tête), quel que soit son format (« 3 mars 2025 », « 03/03/2025 », « March 3, 2025 »…), convertie au format `AAAA-MM-JJ`. Une échéance d'action n'est pas une date de réunion. Une date sans année n'est retenue que si le nom du fichier donne la même date avec l'année ;
 2. sinon, une date au format `AAAA-MM-JJ` dans le nom du fichier de notes ;
-3. sinon, demande la date de la réunion et arrête-toi sans rien écrire : « Les notes ne donnent pas la date de la réunion. Quelle est-elle (AAAA-MM-JJ) ? ». N'utilise jamais la date du jour sans l'avoir demandée, et ne la propose pas d'office ; ne déduis pas la date d'une échéance ou d'un jour de la semaine.
+3. sinon, la date donnée par une réponse anticipée (étape 1, point 3) ou par ta réponse à la question ci-dessous ;
+4. sinon, demande la date de la réunion et arrête-toi sans rien écrire : « Les notes ne donnent pas la date de la réunion. Quelle est-elle (AAAA-MM-JJ) ? ». N'utilise jamais la date du jour sans l'avoir demandée, et ne la propose pas d'office ; ne déduis pas la date d'une échéance ou d'un jour de la semaine.
 
 Si les notes et le nom du fichier donnent deux dates différentes, retiens celle des notes et signale l'écart dans « Points non déterminés ».
 
@@ -93,7 +95,7 @@ Liste le dossier avec `ls docs/wf/compte-rendu/` (absent : aucun compte rendu, p
 
 - **Aucun de ces fichiers n'existe** : le compte rendu sera `N`.
 - **L'un d'eux a la même source** : lis son en-tête (Read) ; si sa ligne « Source des notes » donne le même nom de fichier que les notes actuelles, c'est une relance sur les mêmes notes, éventuellement complétées : ce fichier est mis à jour (étape 5), sans question et sans créer de nouveau fichier.
-- **Sinon** (autre source, ou notes fournies dans la conversation d'un côté ou de l'autre) : demande, sans rien écrire, s'il s'agit d'une relance ou d'une nouvelle réunion, en nommant le compte rendu existant et sa source. Message type :
+- **Sinon** (autre source, ou notes fournies dans la conversation d'un côté ou de l'autre) : si une réponse anticipée (étape 1, point 3) dit « relance » ou « nouvelle réunion », applique-la directement ; sinon, demande, sans rien écrire, s'il s'agit d'une relance ou d'une nouvelle réunion, en nommant le compte rendu existant et sa source. Message type :
   « Un compte rendu `<N>` existe déjà pour cette date et cet objet (source : <source>). S'agit-il d'une relance de cette réunion (le compte rendu existant sera mis à jour) ou d'une nouvelle réunion (un nouveau compte rendu `<AAAA-MM-JJ-objet>-2.md` sera créé, l'existant ne sera pas modifié) ? »
   - Relance : le compte rendu existant est mis à jour.
   - Nouvelle réunion : le compte rendu prend le premier suffixe libre, `-2` d'abord (`…-2.md`), puis `-3`… ; les comptes rendus existants ne sont pas modifiés.
