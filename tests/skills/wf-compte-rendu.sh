@@ -170,4 +170,12 @@ for value in "${fieldops_values[@]}"; do
 done
 [ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
 
+# --- Correcteurs des evals : compilation, exemples, commande du nom de fichier ------
+
+if ! command -v node >/dev/null 2>&1; then
+  ko "node introuvable : correcteurs des evals non vérifiés (tests/correcteurs/wf-compte-rendu.mjs)"
+elif ! node "$root/tests/correcteurs/wf-compte-rendu.mjs"; then
+  ko "correcteurs des evals (tests/correcteurs/wf-compte-rendu.mjs)"
+fi
+
 exit $fail

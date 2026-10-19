@@ -2,7 +2,7 @@
 
 - Outil : wf-compte-rendu
 - Date : 2026-10-14
-- Commit analysé : 5b26289
+- Commit analysé : a1b2c3d
 - Date de la réunion : 2026-10-14
 - Source des notes : 2026-10-14-revue-de-sprint.md
 

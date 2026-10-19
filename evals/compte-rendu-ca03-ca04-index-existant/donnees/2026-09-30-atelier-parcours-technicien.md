@@ -2,7 +2,7 @@
 
 - Outil : wf-compte-rendu
 - Date : 2026-09-30
-- Commit analysé : 5b26289
+- Commit analysé : a1b2c3d
 - Date de la réunion : 2026-09-30
 - Source des notes : 2026-09-30-atelier.md
 
