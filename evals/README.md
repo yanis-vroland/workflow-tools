@@ -213,11 +213,17 @@ Tous les cas portent `ca01-commandes-autorisees` : Bash ne sert qu'aux commandes
 | `passation-ca19-stack-non-couverte` | projet Python fictif déployé par `flyctl`, Stripe par `.env.example`, Sentry par `requirements.txt` seul, IP en dur | CA19 (cas limite), CA5, CA7, CA8, CA23 |
 | `passation-ca22-repertoire-vide`, `passation-ca22-sans-code-source` | répertoire vide ; FieldOps brief (documents seuls) | CA22 (cas limite) |
 
-Hash de commit attendus dans les en-têtes (scaffolds rejouables) : `5b26289` (FieldOps, y compris `ca10` et `ca11`, dont les références ajoutées ne déplacent pas `HEAD`), `8918f31` (`ca03-ca04`), `33b6f4f` (`ca15`). Une modification de la fixture ou de ces scaffolds les change : mettre à jour les graders `ca21-entete-commit`, `ca16-commit-de-reference` et `ca15-commit-mis-a-jour`.
+Hash de commit attendus dans les en-têtes (scaffolds rejouables) : `2fc99c0` (FieldOps, y compris `ca10` et `ca11`, dont les références ajoutées ne déplacent pas `HEAD`), `8de0c62` (`ca03-ca04`), `a2ef90b` (`ca15`). Une modification de la fixture ou de ces scaffolds les change : mettre à jour les graders `ca21-entete-commit`, `ca16-commit-de-reference` et `ca15-commit-mis-a-jour`.
 
 CA10 : aucune branche distante ne peut être récupérée en eval ; le scaffold crée donc les références distantes à la main (`git update-ref`, `git symbolic-ref`), avec des commits construits par `git commit-tree` sans toucher à l'arbre de travail.
 
-CA23 : les adresses en dur de FieldOps sont celles du registre d'images et du webhook de `.github/workflows/deploy.yml` (lignes 29 à 33 et 44 à 48) ; `localhost`, le service `db` de `docker-compose.yml`, `.env.example` et les README sont exclus. Le cas Python ajoute une adresse IP de la plage de documentation (`203.0.113.42`) et une adresse d'écoute `0.0.0.0`, exclue comme adresse locale.
+CA23 : les adresses en dur de FieldOps sont celles du registre d'images et du webhook de `.github/workflows/deploy.yml` (lignes 29 à 33 et 44 à 48) ; `localhost`, le service `db` de `docker-compose.yml`, `.env.example` et les README sont exclus. Le cas Python ajoute une adresse IP de la plage de documentation (`203.0.113.42`) et une adresse d'écoute `0.0.0.0`, exclue comme adresse locale. Les exclusions sont vérifiées par regex, ligne par ligne (`ca23-exclusions-non-signalees`) : le juge `llm` qui les vérifiait était bruité sur ce long livrable.
+
+CA5 et CA8 : `.github/workflows/purge.yml` (tâche planifiée, spec 018) n'est pas une procédure de déploiement, mais son secret `PRODUCTION_DATABASE_URL` est à transmettre ; `MAP_API_KEY_EXPIRES_AT` (`.env.example`) est une date d'expiration, pas un secret.
+
+CA15 : le dossier déposé suit un format antérieur (statut en colonne du milieu, « Titulaire : »…), pour que les correcteurs de conservation n'y réussissent pas sans relance.
+
+`tests/correcteurs/wf-passation.mjs`, lancé par `tests/skills/wf-passation.sh`, compile tous les motifs des cas `passation-*`, vérifie la liste blanche Bash sur des commandes autorisées et interdites, les correcteurs de `passation-fieldops` sur un livrable conforme et des livrables fautifs, et l'échec des correcteurs de conservation de CA15 sur le dossier déposé.
 
 ## Correcteurs
 
