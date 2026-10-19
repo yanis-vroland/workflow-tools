@@ -69,7 +69,7 @@ graders:
   - name: ca03-application-web-non-analysee
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: 'src/(?:api|web|domain|db|services|jobs)/|vite\.config|docker-compose|Dockerfile|\.nvmrc|\.eslintrc'
+    pattern: 'src/(?:api|web|domain|db|services|jobs)/|vite\.config|docker-compose|Dockerfile|\.nvmrc|\.eslintrc|purge\.yml|purge-closed-interventions|MAP_API_KEY_EXPIRES_AT|PRODUCTION_DATABASE_URL'
     match: not_contains
   - name: ca03-web-ignore-selon-le-correcteur
     type: llm
@@ -301,11 +301,11 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: '^(?:(?!\n## )[\s\S])*?\d{4}-\d{2}-\d{2}'
-  # 5b26289 : HEAD de tests/fixtures/build-fieldops.sh, rejouable
+  # 2fc99c0 : HEAD de tests/fixtures/build-fieldops.sh, rejouable
   - name: ca26-entete-commit
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\b5b26289'
+    pattern: '^(?:(?!\n## )[\s\S])*?\b2fc99c0'
   - name: ca26-arbre-propre-sans-mention
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
