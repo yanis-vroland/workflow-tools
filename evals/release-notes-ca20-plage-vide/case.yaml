@@ -38,10 +38,17 @@ graders:
     input_match: '"file_path"'
     min: 0
     max: 0
-  - name: aucune-ecriture-bash-ni-tag
+  - name: aucune-ecriture-bash
     type: tool_used
     tool: Bash
     input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    min: 0
+    max: 0
+  # CA1 et hors périmètre : aucun tag créé ou supprimé, aucun push, aucune release publiée
+  - name: aucun-tag-ni-publication
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:\bgit\s+(?:-[cC]\s+\S+\s+)*tag\s+(?!-l\b|--list\b|-n\d*\b|--merged\b|--no-merged\b|--contains\b|--no-contains\b|--points-at\b|--sort\b|--format\b|--column\b|--no-column\b|-i\b|--ignore-case\b)\S|\bgit\s+(?:-[cC]\s+\S+\s+)*push\b|\b(?:gh|glab)\s+release\s+create\b)'
     min: 0
     max: 0
   - name: ca20-tag-cite
