@@ -246,7 +246,7 @@ Spec 010, lancée par `/wf-revue-securite` (tag `wf-revue-securite` pour ne lanc
 
 ### wf-modele-donnees
 
-Spec 017, lancée par `/wf-modele-donnees`, tous les cas `hors-reseau` (tags `wf-modele-donnees` et `spec-017`). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour. Les données propres à un cas sont dans son dossier `donnees/`. Livraison en trois PR (niveau A, puis B, puis C) : cette version couvre les CA communs et les niveaux A et B.
+Spec 017, lancée par `/wf-modele-donnees`, tous les cas `hors-reseau` (tags `wf-modele-donnees` et `spec-017`). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour. Les données propres à un cas sont dans son dossier `donnees/`. Livraison en trois PR (niveau A, puis B, puis C) : cette version couvre les CA communs et les trois niveaux.
 
 | Cas | Projet de départ | CA |
 |---|---|---|
@@ -259,9 +259,15 @@ Spec 017, lancée par `/wf-modele-donnees`, tous les cas `hors-reseau` (tags `wf
 | `modele-donnees-ca19-niveau-b-postgresql` | FieldOps brief, livrable de niveau A rempli (Q01, Q03, D01) et ancienne `migration.sql` sans objet, aucun ORM | CA19, CA3, CA10, CA13 à CA16, CA22 à CA24, CA37 |
 | `modele-donnees-ca21-niveau-b-force` | livrable de niveau A du cas de relance (Q03 vide), `--niveau b` | CA21, CA10 |
 | `modele-donnees-ca25-prisma` | projet web dépendant de Prisma, sans schéma, livrable de niveau A rempli | CA25, CA1, CA15, CA16 |
+| `modele-donnees-ca26-evolution-fieldops` | FieldOps complet (schéma PostgreSQL, base sqflite, faux secret), notes d'appel passées en `../fieldops-brief/notes-appel.md` | CA26, CA27, CA31, CA1 à CA3, CA15, CA16, CA38 |
+| `modele-donnees-ca28-ca32-migration-sans-perte` | FieldOps complet, demande d'évolution en `../demandes/` : priorité obligatoire, renommage de `report`, `hourly_rate` inutile | CA28 à CA32, CA27, CA14 (écarts aux conventions), CA1, CA15, CA16 |
+| `modele-donnees-ca30-suppression-decidee` | FieldOps complet, même demande, livrable de niveau C dont D01 confirme la suppression de `hourly_rate` | CA30 (suppression confirmée), CA10, CA29 |
+| `modele-donnees-ca34-niveau-c-sans-schema` | FieldOps brief, `--niveau c` | CA34 (cas limite, sans schéma) |
 
-Les cas `ca21` et `ca25` reprennent le livrable de niveau A d'un autre cas (`donnees/` du cas de relance ou du cas `ca19`) : le modifier change aussi ces cas.
+Les cas `ca21` et `ca25` reprennent le livrable de niveau A d'un autre cas (`donnees/` du cas de relance ou du cas `ca19`), et `ca30` la demande d'évolution du cas `ca28-ca32` : les modifier change aussi ces cas.
+
+Niveau C : les sources sont placées par le scaffold dans le répertoire parent de la session (`../fieldops-brief/`, `../demandes/`), seul emplacement hors du projet que le bac à sable de l'eval laisse lire ; l'arbre de travail de FieldOps reste donc propre, et l'en-tête porte le commit `5b26289` sans « modifications non commitées ».
 
 Les vérifications croisées entre fichiers (index justifiés par une requête, données de test qui respectent le schéma et rendent une ligne à chaque requête) sont confiées à un juge `llm` sur la trace, qui contient le contenu de chaque appel Write : aucun fichier n'est exécuté (ADR-001, amendement 2), le juge raisonne sur le texte.
 
-Non couverts par une eval : CA25 pour TypeORM, Drift et sqflite (un seul ORM, Prisma, est joué ; les formats des quatre sont vérifiés par les tests structurels), CA36 (ORM non couvert, tests structurels seulement).
+Non couverts par une eval : CA25 pour TypeORM, Drift et sqflite (un seul ORM, Prisma, est joué ; les formats des quatre sont vérifiés par les tests structurels), CA36 (ORM non couvert, tests structurels seulement), et au niveau C les migrations Prisma, TypeORM, Drift et SQL numérotées (FieldOps n'a ni ORM ni outil de migration).
