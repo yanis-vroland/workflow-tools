@@ -69,15 +69,15 @@ Lis les manifestes, fichiers de verrouillage, README, `Makefile`, `Dockerfile`, 
   ```markdown
   | Variable | Utilisé pour | Où la renseigner | Comment l'obtenir |
   |---|---|---|---|
-  | `DB_URL` | connexion à la base (`src/db/client.ts`) | `.env` d'après `.env.example`, `docker-compose.yml` | non déterminé |
-  | `SENDGRID_API_KEY` | envoi des e-mails (`src/mail/send.ts`) | secret de CI (`.github/workflows/deploy.yml`) | SendGrid (SDK `@sendgrid/mail`, `src/mail/send.ts`) |
+  | `DB_URL` | connexion à la base (`server/database.ts`) | `.env` d'après `.env.example`, `docker-compose.yml` | non déterminé |
+  | `SENDGRID_API_KEY` | envoi des e-mails (`server/notify.ts`) | secret de CI (`.gitlab-ci.yml`) | SendGrid (SDK `@sendgrid/mail`, `server/notify.ts`) |
   | `LOG_LEVEL` | non déterminé | `.env` d'après `.env.example` | non déterminé |
   ```
 
   - **Variable** : le nom, tiré de `.env.example` ou du code.
   - **Utilisé pour** : le rôle établi par l'usage de la variable dans le code, avec le fichier cité. Une variable que le code ne lit pas, ou dont l'usage ne dit pas le rôle : « non déterminé ». Un commentaire de `.env.example` ou le nom de la variable ne suffisent pas.
   - **Où la renseigner** : le fichier ou le mécanisme qui la fournit, tel que le projet le montre : `.env` d'après `.env.example`, `docker-compose.yml` (`environment`, `env_file`), `Dockerfile` (`ENV`), secret de CI (`secrets.X` d'un workflow), option de lancement (`--dart-define=X`). Sans trace : « non déterminé ».
-  - **Comment l'obtenir** : le service qui délivre la valeur, **seulement** quand le code l'établit : SDK d'un service identifié (paquet importé, ex. `@sendgrid/mail`, `firebase_core`) ou appel à l'API d'un service nommé, avec le fichier cité. Sinon « non déterminé », même si le nom de la variable évoque un service (`MAP_API_KEY` envoyée à une URL configurable ne désigne aucun service). Aucune procédure n'est décrite ni inventée : ni création de compte, ni menu de console, ni commande de génération.
+  - **Comment l'obtenir** : le service qui délivre la valeur, **seulement** quand le code l'établit : SDK d'un service identifié (paquet importé, ex. `@sendgrid/mail`, `firebase_core`) ou appel à l'API d'un service nommé, avec le fichier cité. Sinon « non déterminé », même si le nom de la variable évoque un service (`WEATHER_API_KEY` envoyée à l'adresse lue dans `WEATHER_API_URL` ne désigne aucun service). Aucune procédure n'est décrite ni inventée : ni création de compte, ni menu de console, ni commande de génération.
   - Dans un monorepo, un tableau par application, sous sa sous-section : son `.env.example`, les variables lues dans son code et celles passées à son lancement (`--dart-define=X`…).
 - **Fonctionnalités** : ce que fait le projet, tiré des routes, pages, écrans et modules métier, avec les fichiers cités. Pas de référence exhaustive d'API.
 - **Structure du code** : arborescence des dossiers principaux et rôle de chacun.
