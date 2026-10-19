@@ -79,7 +79,7 @@ const SECTIONS = [
   "Secrets et configuration",
   "Points non déterminés",
 ];
-const doc = (sections = {}, header = "Outil : wf-revue-securite · Date : 2026-10-19 · Commit : 21bc390") =>
+const doc = (sections = {}, header = "Outil : wf-revue-securite · Date : 2026-10-19 · Commit : fc765ad") =>
   [
     "# Revue de sécurité de Exemple",
     "",
@@ -112,6 +112,14 @@ const deleteRoute = constat("S4", {
   Emplacement: "`src/api/routes/interventions.ts:82`",
   Route: "`DELETE /api/interventions/:id`",
   Statut: "confirmé",
+});
+const purgeEntry = constat("S6", {
+  Application: "API",
+  Niveau: "élevé",
+  Catégorie: "contrôle d'accès (A01:2025 Broken Access Control)",
+  Emplacement: "`src/jobs/purge-closed-interventions.ts:11`",
+  Description: "requête `DELETE` exécutée sans contrôle, ligne 37 du rapport",
+  Statut: "à vérifier",
 });
 const jwt = constat("S5", {
   Niveau: "élevé",
@@ -249,7 +257,7 @@ const suites = [
     file: "revue-securite-fieldops/graders/ca03-en-tete-commit.md",
     input: text,
     positive: [doc()],
-    negative: [doc({ Synthèse: "21bc390" }, "Outil : wf-revue-securite · Date : 2026-10-19 · Commit : 5b26289")],
+    negative: [doc({ Synthèse: "fc765ad" }, "Outil : wf-revue-securite · Date : 2026-10-19 · Commit : 2fc99c0")],
   },
   {
     file: "revue-securite-fieldops/graders/ca04-referentiel-web.md",
@@ -301,7 +309,11 @@ const suites = [
     file: "revue-securite-fieldops/graders/ca13-delete-sans-controle-d-acces.md",
     input: text,
     positive: [doc({ "Constats dans le code": deleteRoute })],
-    negative: [doc({ "Constats dans le code": deleteRoute.replace(/contrôle d'accès/g, "configuration") })],
+    negative: [
+      doc({ "Constats dans le code": deleteRoute.replace(/contrôle d'accès/g, "configuration") }),
+      // Le job de purge (src/jobs/purge-closed-interventions.ts) contient aussi un DELETE et « interventions.ts »
+      doc({ "Constats dans le code": purgeEntry }),
+    ],
   },
   {
     file: "revue-securite-fieldops/graders/ca13-route-citee.md",
@@ -313,7 +325,7 @@ const suites = [
     file: "revue-securite-fieldops/graders/ca10-delete-eleve.md",
     input: text,
     positive: [doc({ "Constats dans le code": deleteRoute })],
-    negative: [doc({ "Constats dans le code": deleteRoute.replace("élevé", "moyen") })],
+    negative: [doc({ "Constats dans le code": deleteRoute.replace("élevé", "moyen") }), doc({ "Constats dans le code": purgeEntry })],
   },
   {
     file: "revue-securite-fieldops/graders/ca14-secret-jwt-eleve.md",

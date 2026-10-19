@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/revue-securite.md" }
-pattern: '^(?![\s\S]*Date : 2026-10-01\b)[\s\S]*?\n### S4\b(?=(?:(?!\n###? )[\s\S])*?\bDELETE\b)'
+pattern: '^(?![\s\S]*Date : 2026-10-01\b)[\s\S]*?\n### S4\b(?=(?:(?!\n###? )[\s\S])*?\bDELETE\b)(?=(?:(?!\n###? )[\s\S])*?routes/interventions\.ts)'
 match: contains
 ---
 

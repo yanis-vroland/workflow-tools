@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/revue-securite.md" }
-pattern: '\n## [^\n]*Constats dans le code[^\n]*\n(?:(?!\n## )[\s\S])*?\n### S\d+(?=(?:(?!\n###? )[\s\S])*?contr[ôo]le d.acc[èe]s)(?=(?:(?!\n###? )[\s\S])*?\bDELETE\b)(?=(?:(?!\n###? )[\s\S])*?interventions\.ts)'
+pattern: '\n## [^\n]*Constats dans le code[^\n]*\n(?:(?!\n## )[\s\S])*?\n### S\d+(?=(?:(?!\n###? )[\s\S])*?contr[ôo]le d.acc[èe]s)(?=(?:(?!\n###? )[\s\S])*?\bDELETE\b)(?=(?:(?!\n###? )[\s\S])*?routes/interventions\.ts)'
 flags: 'i'
 match: contains
 ---

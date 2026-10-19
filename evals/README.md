@@ -144,7 +144,7 @@ Spec 010, lancée par `/wf-revue-securite` (tag `wf-revue-securite` pour ne lanc
 | `revue-securite-ca23-sans-code-source` | FieldOps brief (documents seuls) | `hors-reseau` | CA23 (cas limite) |
 | `revue-securite-ca25-projet-volumineux` | FieldOps et 2 000 modules générés sous `src/legacy/`, dont un porteur d'une injection et d'un jeton factices | `hors-reseau` | CA25 |
 
-- Commit attendu dans l'en-tête du cas principal : `21bc390` (HEAD du scaffold, rejouable). Une modification de la fixture ou du scaffold le change : mettre à jour `ca03-en-tete-commit`.
+- Commit attendu dans l'en-tête du cas principal : `fc765ad` (HEAD du scaffold, rejouable). Une modification de la fixture ou du scaffold le change : mettre à jour `ca03-en-tete-commit`.
 - CA8 : comme pour `wf-analyse-projet`, la base est coupée par le bac à sable (passe `hors-reseau`) ; le témoin `ca08-temoin-echec-reseau` exige dans la trace la sortie d'une interrogation échouée (`osv.dev injoignable (curl <code>…)`). Tous les cas `hors-reseau` qui ont des dépendances exercent donc aussi CA8.
 - Les avis évoluent (ADR-001) : seuls des avis publiés de longue date sont attendus (express 4.18.2, body-parser 1.20.1), et jamais une sévérité ou une version corrigée précise.
 - CA14 : « aucun caractère de la valeur » est vérifié sur la valeur entière et ses fragments distinctifs (`dev-secret`, `FAUX_JETON`, `c41d`), pas lettre par lettre.
