@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: specs-tickets-ca01-cadrage-sans-chiffrage
+description: >-
+  Spec 006, cas principal : wf-specs-tickets lancé sans argument sur la fixture
+  FieldOps brief (projet sans code ni git) après cadrage, sans livrable de
+  chiffrage. Couvre CA1 à CA9 (« non estimé »), CA11, CA12, CA15, CA17 et CA20.
+tags: [wf-specs-tickets, spec-006, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: specs-tickets-ca18-sans-cadrage
+description: >-
+  Spec 006, CA18 : wf-specs-tickets lancé sans argument dans la fixture FieldOps
+  brief, qui ne contient pas de docs/wf/cadrage-besoin.md. L'outil renvoie vers
+  /wf-cadrage-besoin ou vers un fichier de besoin, et n'écrit aucun livrable.
+tags: [wf-specs-tickets, spec-006, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
