@@ -11,7 +11,8 @@ Tu rédiges, en français, le rapport d'avancement du projet ouvert dans le rép
 
 - **Écriture** : un seul fichier, `docs/wf/rapport-avancement.md`, écrit avec l'outil Write (qui crée `docs/wf/` au besoin ; pas de `mkdir`). Aucun autre fichier du projet n'est créé, modifié, déplacé ou supprimé, en particulier les livrables des autres outils dans `docs/wf/` (tickets, comptes rendus), qui sont seulement lus.
 - **Git en lecture seule, sans réseau** : seules les références connues localement sont lues. Ne lance jamais `git fetch`, `git pull`, ni aucune commande git qui modifie le dépôt, ses références ou sa configuration.
-- **Bash** ne sert qu'aux commandes listées dans ce document, recopiées telles quelles en remplaçant seulement les valeurs entre chevrons (`<branche>`, `<début>`, `<fin>`, `<hash>`, `<Tnn>`), chacune seule : pas de redirection, de `;`, de `&&`, de `||`, de sous-shell, de variable ni de retour à la ligne. Le seul tube permis est `| tail -n 1`, là où il est écrit. Aucune autre commande, même en lecture (`ls`, `cat`, `find`, `grep`…). Pour lire un fichier, utilise Read et Glob.
+- **Bash** ne sert qu'aux commandes listées dans ce document, recopiées telles quelles en remplaçant seulement les valeurs entre chevrons (`<branche>`, `<début>`, `<fin>`, `<hash>`, `<Tnn>`), chacune seule : pas de redirection, de `;`, de `&&`, de `||`, de sous-shell, de variable ni de retour à la ligne. Le seul tube permis est `| tail -n 1`, là où il est écrit. Aucune autre commande, même en lecture (`ls`, `cat`, `find`, `grep`…). Pour lire un fichier, utilise Read et Glob ; n'utilise pas Grep.
+- **Valeurs insérées dans une commande** : elles viennent du projet ou de l'utilisateur, vérifie-les avant de les insérer, sinon ne lance pas la commande. `<début>` et `<fin>` : exactement `AAAA-MM-JJ` (chiffres et tirets). `<hash>` : 7 à 40 caractères parmi `0-9a-f`. `<Tnn>` : la lettre `T` suivie de chiffres seulement. `<branche>` et `<autre branche>` : un nom tel que l'affiche `git for-each-ref`, toujours entre apostrophes comme écrit ici ; un nom qui contient une apostrophe n'est jamais inséré (signale la branche dans « Points non déterminés »).
 - **Secrets** : ne lis jamais, ni avec Read, ni avec Grep, ni avec git, un fichier d'environnement (`.env`, `.env.local`, `.env.production`…, sauf `.env.example`) ni un fichier de secrets, même s'il est versionné. Son diff ne doit jamais être affiché : toute commande `git show` qui affiche un diff porte l'exclusion `':(exclude,glob)**/.env*'`. Aucune valeur de variable d'environnement dans le rapport.
 - **Personnes** : le rapport ne nomme aucun contributeur et ne donne aucun nombre de commits par personne. Ne demande jamais à git le nom ou l'adresse e-mail d'un auteur : chaque `git log` ou `git show` porte l'option `--format` indiquée ici. Aucune adresse e-mail dans le rapport.
 - **Ni temps ni argent** : aucun temps passé, aucun budget consommé, aucun montant, aucun pourcentage d'avancement.
@@ -46,28 +47,28 @@ Si aucune ne convient (pas d'`origin/HEAD`, ni `main`, ni `master`), n'écris ri
 Commits de la branche principale dans la période, d'après leur date de commit, sans les commits de fusion :
 
 ```bash
-git log <branche> --no-merges --since="<début> 00:00:00" --until="<fin> 23:59:59" --format='%h %cs %s'
+git log '<branche>' --no-merges --since='<début> 00:00:00' --until='<fin> 23:59:59' --format='%h %cs %s'
 ```
 
 Garde seulement les commits dont la date affichée (`%cs`) est comprise entre `<début>` et `<fin>`, bornes incluses. Les commits de fusion ne sont jamais décrits ni cités comme tels : les commits qu'ils intègrent figurent déjà dans la liste.
 
-**Historique incomplet** : lance `git rev-parse --is-shallow-repository`. Si la réponse est `true`, lance `git log <branche> --format=%cs | tail -n 1` : c'est la date du plus ancien commit disponible. Si elle est postérieure à `<début>`, « Points non déterminés » signale que le dépôt est un clone superficiel dont l'historique ne couvre pas toute la période, et indique la période réellement couverte (de cette date à `<fin>`).
+**Historique incomplet** : lance `git rev-parse --is-shallow-repository`. Si la réponse est `true`, lance `git log '<branche>' --format=%cs | tail -n 1` : c'est la date du plus ancien commit disponible. Si elle est postérieure à `<début>`, « Points non déterminés » signale que le dépôt est un clone superficiel dont l'historique ne couvre pas toute la période, et indique la période réellement couverte (de cette date à `<fin>`).
 
 **Branches non fusionnées** :
 
 ```bash
-git for-each-ref --no-merged=<branche> --format='%(refname:short)' refs/heads refs/remotes
+git for-each-ref --no-merged='<branche>' --format='%(refname:short)' refs/heads refs/remotes
 ```
 
 Ignore `origin` (`origin/HEAD`) et toute référence qui porte le nom de la branche principale. Une branche locale et sa branche distante de même nom (`<nom>` et `origin/<nom>`) sont une seule branche. Pour chacune :
 
 ```bash
-git log <branche>..<autre branche> --no-merges --since="<début> 00:00:00" --until="<fin> 23:59:59" --format='%h %cs %s'
+git log '<branche>..<autre branche>' --no-merges --since='<début> 00:00:00' --until='<fin> 23:59:59' --format='%h %cs %s'
 ```
 
 Une branche qui a au moins un commit dans la période (même filtre sur `%cs`) va dans « En cours ». Un commit présent dans deux branches n'est rattaché qu'à la première.
 
-**Détail d'un commit** : quand le message ne permet pas de comprendre ce qui a été fait (un mot vague comme « maj », « wip », « fix », « corrections », sans objet), lis le commit :
+**Détail d'un commit** : quand le message ne permet pas de comprendre ce qui a été fait (un mot vague, sans objet, comme « divers » ou « modifs »), lis le commit :
 
 ```bash
 git show --stat --format=%B <hash>
@@ -86,7 +87,7 @@ Ces livrables sont lus, jamais modifiés. Leur forme est un contrat (amendement 
   git log --branches --remotes --format='%h %s' --grep=<Tnn>
   ```
 
-  et dans le nom d'une branche fusionnée dans la branche principale : `git for-each-ref --merged=<branche> --format='%(refname:short)' refs/heads refs/remotes`. Vérifie dans la sortie que l'identifiant trouvé est bien `<Tnn>` et non un identifiant plus long (`T1` dans `T12`). Un ticket dont l'identifiant n'apparaît nulle part est une prochaine étape.
+  et dans le nom d'une branche fusionnée dans la branche principale : `git for-each-ref --merged='<branche>' --format='%(refname:short)' refs/heads refs/remotes`. Vérifie dans la sortie que l'identifiant trouvé est bien `<Tnn>` et non un identifiant plus long (`T1` dans `T12`). Un ticket dont l'identifiant n'apparaît nulle part est une prochaine étape.
 - **Comptes rendus** (`wf-compte-rendu`) : avec Glob, `docs/wf/compte-rendu/*.md` (hors `index.md`). Seuls comptent ceux dont le nom de fichier commence par une date `AAAA-MM-JJ` comprise dans la période. Pour chacun, lis la section « Questions en suspens ».
 
 ## Étape 6 : rapport existant
@@ -98,10 +99,10 @@ Si `docs/wf/rapport-avancement.md` existe, tu le réécris en entier avec Write 
 Titres de section en `##`, exactement dans cet ordre, sans table des matières.
 
 ```markdown
-# Rapport d'avancement de <nom du projet>
+# Rapport d'avancement
 
 Outil : wf-rapport-avancement · Date : AAAA-MM-JJ · Commit : <hash court>[ · modifications non commitées]
-Période : du AAAA-MM-JJ au AAAA-MM-JJ (bornes incluses) · Branche principale : `<nom>`
+Période : du AAAA-MM-JJ au AAAA-MM-JJ (bornes incluses)
 Livrables wf- lus : `docs/wf/specs-tickets.md`, `docs/wf/compte-rendu/<fichier>.md` (ou « aucun »)
 
 ## Synthèse
@@ -148,11 +149,11 @@ Livrables wf- lus : `docs/wf/specs-tickets.md`, `docs/wf/compte-rendu/<fichier>.
 
 ## Remplir chaque section
 
-**En-tête** : nom du projet tiré du titre du README, sinon du manifeste (`package.json`, `pubspec.yaml`…), sinon « Rapport d'avancement » seul. « Livrables wf- lus » liste par leur chemin `docs/wf/specs-tickets.md` s'il existe et chaque compte rendu de la période effectivement lu, sinon « aucun ».
+**En-tête** : « Livrables wf- lus » liste par leur chemin `docs/wf/specs-tickets.md` s'il existe et chaque compte rendu de la période effectivement lu, sinon « aucun ».
 
 **Synthèse** : au plus 5 phrases, pour le client : l'essentiel du réalisé, ce qui est en cours, et ce qu'on attend de lui s'il y a lieu. Sans commit sur la branche principale dans la période, elle le dit.
 
-**Réalisé** : les commits de la branche principale de la période, regroupés par fonctionnalité (plusieurs commits, y compris sur le web et le mobile, forment une seule entrée), rédigés pour un lecteur non développeur : ni chemin de fichier, ni nom de fonction, de classe ou de variable, ni hash de commit, ni préfixe de type (`feat:`, `fix:`).
+**Réalisé** : les commits de la branche principale de la période, regroupés par fonctionnalité (plusieurs commits, y compris sur des parties différentes de l'application, forment une seule entrée), rédigés pour un lecteur non développeur : ni chemin de fichier, ni nom de fonction, de classe ou de variable, ni hash de commit, ni préfixe de type (`feat:`, `fix:`).
 - Les commits de type `chore`, `ci`, `test`, `refactor`, `build`, `style` ou `docs` (Conventional Commits, avec ou sans portée ni `!`) forment une seule entrée, « Travaux techniques internes », qui indique leur nombre. Elle n'apparaît pas s'il n'y en a aucun.
 - Les autres commits (`feat`, `fix`, `perf`, `revert`, messages hors convention) sont décrits d'après leur message, ou leur diff si le message ne suffit pas. Un ajout suivi de son annulation (`revert`) dans la période forme une entrée qui dit les deux.
 - Les commits qui restent indescriptibles après lecture du diff forment une entrée « Modifications non décrites : <N> (voir Points non déterminés) ».
@@ -165,7 +166,7 @@ Livrables wf- lus : `docs/wf/specs-tickets.md`, `docs/wf/compte-rendu/<fichier>.
 - Sans ce livrable : « non déterminé » (tu demanderas les prochaines étapes dans le message final, voir « Fin »).
 - Dans tous les cas, aucune étape n'est déduite du code, des commentaires `TODO` ou `FIXME`, des messages de commit ou des branches.
 
-**Points de vigilance** : chaque point cite sa source : commit (hash court), compte rendu (nom du fichier) ou réponse de l'utilisateur. Chaque commit de type `revert` de la période y figure systématiquement (ce qui a été annulé, avec le hash du commit d'annulation). Un changement cassant annoncé (`!` après le type, ou `BREAKING CHANGE`) y figure aussi. N'y mets aucun jugement de qualité ni de dette. S'il n'y a rien : « Aucun point identifié. »
+**Points de vigilance** : chaque point cite sa source : commit (hash court), compte rendu (nom du fichier) ou réponse de l'utilisateur. Chaque commit de type `revert` de la période y figure systématiquement (ce qui a été annulé, avec le hash du commit d'annulation). N'y mets aucun jugement de qualité ni de dette. S'il n'y a rien : « Aucun point identifié. »
 
 **Décisions attendues** :
 - Comptes rendus de la période présents : chaque entrée de leur section « Questions en suspens », reprise fidèlement, suivie du nom du fichier du compte rendu source. Si ces sections sont toutes vides : « aucune identifiée ».
@@ -173,7 +174,7 @@ Livrables wf- lus : `docs/wf/specs-tickets.md`, `docs/wf/compte-rendu/<fichier>.
 
 **Points non déterminés** : liste à puces de ce qui n'a pas pu être établi : historique incomplet (clone superficiel) avec la période réellement couverte, commits indescriptibles avec leur hash court et la raison, livrables `wf-` illisibles ou hors contrat. S'il n'y a rien : « - Aucun. »
 
-**Sources** : deux sous-sections, « Réalisé » et « En cours ». Chaque entrée de ces sections y est reprise par son titre, suivie des hash courts de ses commits et, si leur message en mentionne, des numéros de PR (`#12`) ou de ticket (`T03`). Chaque commit de la période y figure une seule fois : aucun oublié, aucun en double, aucun commit de fusion, aucun commit hors période. Une branche en cours y est nommée.
+**Sources** : deux sous-sections, « Réalisé » et « En cours ». Chaque entrée de ces sections y est reprise par son titre, suivie des hash courts de ses commits et, si leur message en mentionne, des numéros de PR (`#58`) ou de ticket (`T42`). Chaque commit de la période y figure une seule fois : aucun oublié, aucun en double, aucun commit de fusion, aucun commit hors période. Une branche en cours y est nommée.
 
 ## Réponses de l'utilisateur
 
