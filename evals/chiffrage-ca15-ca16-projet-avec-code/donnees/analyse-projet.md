@@ -1,6 +1,6 @@
 # Analyse du projet
 
-Outil : wf-analyse-projet · Date : 2026-10-08 · Commit analysé : 5b26289
+Outil : wf-analyse-projet · Date : 2026-10-08 · Commit analysé : 2fc99c0
 
 ## Synthèse
 

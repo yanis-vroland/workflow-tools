@@ -3,7 +3,7 @@ type: llm
 focus: { source: file, path: "docs/wf/chiffrage.md" }
 ---
 
-005-CA15. Le projet contient du code source : une API et un back-office TypeScript (`src/api/`, `src/web/`, `src/domain/`, `src/services/`, `src/db/`) et une application Flutter (`mobile/`).
+005-CA15. Le projet contient du code source : une API et un back-office TypeScript (`src/api/`, `src/web/`, `src/domain/`, `src/services/`, `src/db/`, `src/jobs/`) et une application Flutter (`mobile/`).
 
 Dans la section « Hypothèses » :
 

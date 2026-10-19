@@ -158,6 +158,14 @@ fieldops_values=(
   "chaudière"
   "dispatcher"
   "technicien"
+  "purge"
+  "MAP_API_KEY"
+  "mailer"
+  "cahier-des-charges"
+  "ordre-du-jour"
+  "tableau de bord"
+  "hors connexion"
+  "stores"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do

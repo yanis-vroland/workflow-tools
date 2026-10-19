@@ -203,7 +203,7 @@ Spec 005, lancée par `/wf-chiffrage`, tous les cas `hors-reseau` (tags `wf-chif
 | Cas | Projet de départ | CA |
 |---|---|---|
 | `chiffrage-ca01-cadrage-fieldops-brief` | FieldOps brief (ni code ni git) et cadrage B01 à B07 : un besoin trop imprécis (B07), questions ouvertes et répondues, budget en euros dans une réponse | CA1 à CA14, CA22 |
-| `chiffrage-ca15-ca16-projet-avec-code` | FieldOps complet (git propre, faux secret), cadrage de trois évolutions du back-office et livrable `wf-analyse-projet` à deux risques élevés, dont un sans rapport avec les évolutions | CA15, CA16, CA17, CA23, CA3 (commit `5b26289`), CA1, CA6, CA14 |
+| `chiffrage-ca15-ca16-projet-avec-code` | FieldOps complet (git propre, faux secret), cadrage de trois évolutions du back-office et livrable `wf-analyse-projet` à deux risques élevés, dont un sans rapport avec les évolutions | CA15, CA16, CA17, CA23, CA3 (commit `2fc99c0`), CA1, CA6, CA14 |
 | `chiffrage-ca18-relance` | FieldOps brief, cadrage mis à jour (B03 retiré, B05 modifié, B06 ajouté) et chiffrage précédent (C01 à C09, dernier identifiant attribué C10) | CA18 (cas limite), CA3 |
 | `chiffrage-ca19-sans-cadrage` | FieldOps brief sans cadrage, sans argument | CA19 (cas limite) |
 | `chiffrage-ca20-texte-saisi` | FieldOps brief avec cadrage, texte saisi dans la commande | CA20 (cas limite) |

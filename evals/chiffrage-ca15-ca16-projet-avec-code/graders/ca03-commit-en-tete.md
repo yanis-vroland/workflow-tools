@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/chiffrage.md" }
-pattern: '^(?:[^\n]*\n){0,15}[^\n]*\b5b26289\b'
+pattern: '^(?:[^\n]*\n){0,15}[^\n]*\b2fc99c0\b'
 match: contains
 ---
 
