@@ -112,6 +112,29 @@ fieldops_values=(
   "STRIPE_SECRET_KEY"
   "FLY_API_TOKEN"
   "203.0.113"
+  "PRODUCTION_DATABASE_URL"
+  "MAP_API"
+  "_API_KEY"
+  "purge"
+  "2fc99c0"
+  "cartographie"
+  "registre d'images"
+  "webhook"
+  "flyctl"
+  "requirements.txt"
+  "stripe"
+  "Stripe"
+  "sentry"
+  "Sentry"
+  "0.0.0.0"
+  "10.0.2.2"
+  "Application web"
+  "Application mobile"
+  "direction technique du client"
+  "export-pdf"
+  "notifications-push"
+  "fix/libelles"
+  "trunk"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
@@ -170,6 +193,26 @@ cite "CA11 branche principale par origin/HEAD" "refs/remotes/origin/HEAD"
 cite "CA11 branche principale main" "refs/heads/main"
 cite "CA11 branche principale master" "refs/heads/master"
 absent "Hors périmètre : aucune récupération distante prescrite" '`git (fetch|pull|ls-remote|remote update)'
+
+# --- Injection shell : aucun texte du projet entre guillemets dans une commande ---
+# Les seules commandes Bash prescrites sont celles de la liste blanche, sans
+# guillemets ; un nom de branche n'y est passé qu'après filtrage de ses caractères.
+# shellcheck disable=SC2016 # motifs littéraux : aucune expansion voulue
+absent "Injection : aucune commande Bash prescrite avec des guillemets doubles" '^ *- `(git|date)[^`]*"'
+# shellcheck disable=SC2016 # motifs littéraux : aucune expansion voulue
+absent "Injection : aucune commande Bash prescrite avec une substitution" '^ *- `(git|date)[^`]*(\$\(|\$\{)'
+cite "Injection : filtrage des noms de branche avant toute commande" "nom non pris en charge : date et avance non déterminées"
+cite "Grep en mode contenu précédé du mode files_with_matches" "files_with_matches"
+
+# --- Correcteurs des evals (motifs compilés, liste blanche Bash) -------------------
+
+if ! command -v node >/dev/null 2>&1; then
+  ko "node introuvable : correcteurs des evals non vérifiés (tests/correcteurs/wf-passation.mjs)"
+elif out=$(node "$root/tests/correcteurs/wf-passation.mjs" 2>&1); then
+  ok "correcteurs des evals (tests/correcteurs/wf-passation.mjs)"
+else
+  ko "correcteurs des evals (tests/correcteurs/wf-passation.mjs) : $out"
+fi
 
 # --- CA12 à CA14 : points d'attention et checklist -------------------------------
 

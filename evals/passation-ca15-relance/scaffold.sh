@@ -9,6 +9,10 @@
 #       * « Comment l'obtenir » de DEPLOY_TOKEN : « auprès de l'hébergeur, voir
 #         contrat d'hébergement » ;
 #       * responsable côté client : « direction technique du client ».
+#     Il suit un format antérieur (colonnes Action | Statut | Source, secrets
+#     sans « Utilisé pour », « Titulaire : », interlocuteur séparé par un
+#     tiret) : les correcteurs exigent le format actuel, qu'aucune copie telle
+#     quelle de l'ancien fichier ne satisfait.
 #     Le service de paiement n'y figure pas : il doit apparaître, « à faire ».
 #     La branche feat/ancien-import n'existe plus (source disparue).
 set -euo pipefail
@@ -78,7 +82,7 @@ Outil : wf-passation · Date : 2026-09-01 · Commit : 0000000
 - Commit de référence : `0000000`.
 - Checklist : 7 lignes (3 « à faire », 1 « en cours », 2 « fait », 1 « abandonnée »).
 - Interlocuteurs :
-  - Responsable côté client : direction technique du client
+  - Responsable côté client — direction technique du client
   - Prestataire sortant : à compléter
   - Repreneur : à compléter
 
@@ -100,8 +104,8 @@ Outil : wf-passation · Date : 2026-09-01 · Commit : 0000000
 
 ### Application web (racine)
 
-- **Cartographie** : `src/services/mapClient.ts` · titulaire du compte : direction technique du client
-- **E-mail transactionnel** : `src/services/mailer.ts` · titulaire du compte : à compléter
+- **Cartographie** : `src/services/mapClient.ts` · Titulaire : direction technique du client
+- **E-mail transactionnel** : `src/services/mailer.ts` · Titulaire : à compléter
 
 ### Application mobile (`mobile/`)
 
@@ -111,10 +115,10 @@ Outil : wf-passation · Date : 2026-09-01 · Commit : 0000000
 
 Valeurs à transmettre par un canal sécurisé, hors de ce document.
 
-| Secret | Utilisé pour | Référencé dans | Comment l'obtenir |
-|---|---|---|---|
-| `REGISTRY_TOKEN` | connexion au registre d'images (`.github/workflows/deploy.yml`) | `.github/workflows/deploy.yml` | à compléter |
-| `DEPLOY_TOKEN` | appel du webhook de redémarrage (`.github/workflows/deploy.yml`) | `.github/workflows/deploy.yml` | auprès de l'hébergeur, voir contrat d'hébergement |
+| Secret | Comment l'obtenir | Référencé dans |
+|---|---|---|
+| `REGISTRY_TOKEN` | à compléter | `.github/workflows/deploy.yml` |
+| `DEPLOY_TOKEN` | auprès de l'hébergeur, voir contrat d'hébergement | `.github/workflows/deploy.yml` |
 
 ## Travaux en cours
 
@@ -129,15 +133,15 @@ Valeurs à transmettre par un canal sécurisé, hors de ce document.
 
 ## Checklist de passation
 
-| Action | Source | Statut |
-|---|---|---|
-| Transférer l'accès au service de cartographie | `src/services/mapClient.ts` | fait |
-| Transférer l'accès au service d'e-mail transactionnel | `src/services/mailer.ts` | à faire |
-| Transmettre le secret `REGISTRY_TOKEN` | `.github/workflows/deploy.yml` | fait |
-| Transmettre le secret `DEPLOY_TOKEN` | `.github/workflows/deploy.yml` | à faire |
-| Transférer les droits sur le dépôt de code | dépôt git | en cours |
-| Fusionner, abandonner ou transmettre la branche `feat/export-pdf` | git | à faire |
-| Fusionner, abandonner ou transmettre la branche `feat/ancien-import` | git | abandonnée |
+| Action | Statut | Source |
+| --- | --- | --- |
+| Transférer l'accès au service de cartographie | fait | `src/services/mapClient.ts` |
+| Transférer l'accès au service d'e-mail transactionnel | à faire | `src/services/mailer.ts` |
+| Transmettre le secret `REGISTRY_TOKEN` | fait | `.github/workflows/deploy.yml` |
+| Transmettre le secret `DEPLOY_TOKEN` | à faire | `.github/workflows/deploy.yml` |
+| Transférer les droits sur le dépôt de code | en cours | dépôt git |
+| Fusionner, abandonner ou transmettre la branche `feat/export-pdf` | à faire | git |
+| Fusionner, abandonner ou transmettre la branche `feat/ancien-import` | abandonnée | git |
 
 ## Points non déterminés
 

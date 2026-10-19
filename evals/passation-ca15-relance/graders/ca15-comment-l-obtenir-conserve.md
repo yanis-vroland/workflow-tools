@@ -1,8 +1,10 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/passation.md" }
-pattern: '\n##? [^\n]*Secrets [àa] transmettre[^\n]*\n(?:(?!\n##? )[\s\S])*?(?<=\n)\|(?=[^\n]*\bDEPLOY_TOKEN\b)(?=[^\n]*voir contrat d.hébergement)'
+pattern: '\n##? [^\n]*Secrets [àa] transmettre[^\n]*\n(?:(?!\n##? )[\s\S])*?(?<=\n)\|(?=[^\n]*\bDEPLOY_TOKEN\b)(?=[^\n]*voir contrat d.hébergement\s*\|[ \t]*(?:\n|$))'
 match: contains
 ---
 
 CA15 : la saisie « auprès de l'hébergeur, voir contrat d'hébergement » de la colonne « Comment l'obtenir » de `DEPLOY_TOKEN` est conservée.
+
+Discriminant : le dossier déposé par le scaffold suit un format antérieur (statut en colonne du milieu, « Titulaire : », tableau des secrets à trois colonnes, interlocuteur séparé par un tiret) ; seul un dossier réécrit au format actuel satisfait ce motif.
