@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: passation-ca22-repertoire-vide
+description: >-
+  Spec 016 (wf-passation). Répertoire vide : l'outil l'indique et n'écrit
+  aucun livrable (CA22).
+tags: [wf-passation, spec-016, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

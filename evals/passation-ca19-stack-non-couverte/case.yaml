@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: passation-ca19-stack-non-couverte
+description: >-
+  Spec 016 (wf-passation). Projet fictif en Python (stack non couverte en
+  v1), déployé sur Fly.io par la CI, avec Stripe repéré par .env.example et
+  Sentry seulement par requirements.txt, et une adresse IP écrite en dur dans
+  le code. Couvre CA19, CA5, CA7, CA8, CA23.
+tags: [wf-passation, spec-016, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: passation-ca22-sans-code-source
+description: >-
+  Spec 016 (wf-passation). Répertoire sans code source : la fixture FieldOps
+  brief (brief client et notes, ni code ni git). L'outil l'indique et n'écrit
+  aucun livrable (CA22).
+tags: [wf-passation, spec-016, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

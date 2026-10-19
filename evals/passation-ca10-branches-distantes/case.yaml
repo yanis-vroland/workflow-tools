@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: passation-ca10-branches-distantes
+description: >-
+  Spec 016 (wf-passation). FieldOps avec des références distantes connues
+  localement (origin/HEAD vers origin/main, branche distante non fusionnée
+  origin/feat/notifications-push de 2 commits), une branche locale déjà
+  fusionnée (fix/libelles) et une modification non commitée. Couvre CA10,
+  CA14 (une ligne par branche), CA21, CA17 et l'interdiction de récupérer les
+  références distantes.
+tags: [wf-passation, spec-016, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

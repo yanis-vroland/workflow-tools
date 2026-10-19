@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: passation-ca11-branche-principale-inconnue
+description: >-
+  Spec 016 (wf-passation). FieldOps dont la branche principale a été renommée
+  en trunk : ni origin/HEAD, ni main, ni master. Couvre CA11 (aucune branche
+  déclarée non fusionnée, point non déterminé), CA14 (aucune ligne de
+  branche).
+tags: [wf-passation, spec-016, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
