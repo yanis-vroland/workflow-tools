@@ -105,6 +105,28 @@ CA15 et CA20 : seul un sous-dossier effectivement suivi par un dépôt qui a des
 
 CA20 : le répertoire de la session est imposé par `claude plugin eval` et le scaffold n'écrit rien au-dessus. Le dépôt est donc construit avec `core.worktree` : répertoire git dans le répertoire de la session, racine de travail dans son parent, dont la session est le sous-dossier (`git rev-parse --show-prefix` non vide). Seul ce sous-dossier est extrait (`sparse-checkout`). L'historique de FieldOps y est réécrit, suivi de 12 commits plus récents dans `plateforme/` (hors du sous-dossier, une cinquième autrice) : dernier commit du dépôt 2026-10-06, du sous-dossier 2026-09-29. Les hash dépendent du nom du répertoire de la session et ne sont pas figés.
 
+### wf-recette
+
+Spec 014, lancée par `/wf-recette` (ou `/wf-recette <référence>`), tous les cas `hors-reseau` (tag `wf-recette` pour ne lancer qu'eux). Chaque correcteur porte dans son nom l'identifiant du CA qu'il vérifie (`ca04-…`) ; les correcteurs `temoin-…` et les témoins positifs des cas sans livrable vérifient que le scénario a bien eu lieu. Les livrables d'entrée de `wf-specs-tickets` sont fabriqués par le scaffold selon le contrat de la spec 006 (sous-sections `Tnn : <titre>`, critères `CAn` propres à chaque ticket).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `recette-ca04-specs-fieldops` | FieldOps complet, propre, sans argument : specs 001 et 002 validées, 003 en brouillon | CA1 à CA4, CA7, CA8, CA12 à CA16 (sans argument), CA20, CA21 |
+| `recette-ca05-specs-tickets` | FieldOps et, commités, un livrable `docs/wf/specs-tickets.md` (T01 à T03, dont un critère interne) et une spec 004 à critère de performance | CA5, CA11, CA4, CA7, CA1, CA20, CA21 |
+| `recette-ca06-depuis-le-code` | FieldOps sans `docs/specs/` (retiré par un commit), `--dirty` | CA6, CA7, CA3, CA8, CA20 (modifications non commitées) |
+| `recette-ca09-ca10-relance` | FieldOps et cahier précédent commité : statuts et commentaires saisis, sources disparues, identifiant déjà retiré | CA9, CA10, CA8, CA14, CA3 |
+| `recette-ca16-reference` | FieldOps, livrable `wf-specs-tickets` étiqueté `v1.3.0`, puis spec 002 et ticket T02 modifiés ; `/wf-recette v1.3.0` | CA16, CA5, CA1, CA20 |
+| `recette-ca17-reference-inconnue` | FieldOps et cahier précédent commité ; `/wf-recette v9.9.9` | CA17 (cas limite), CA21 |
+| `recette-ca18-stack-non-couverte` | projet Python sans spec | CA18 (cas limite) |
+| `recette-ca19-repertoire-vide` | répertoire vide | CA19 (cas limite) |
+| `recette-ca19-sans-code-source` | FieldOps brief (documents seuls) | CA19 (cas limite) |
+
+Tous les cas portent un correcteur `…-aucune-commande-hors-liste` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F` et, avec une référence, `git log -1 --format=%h <ref> --`, `git diff --name-only <ref> HEAD` et `git show <ref>:docs/wf/specs-tickets.md` (liste blanche). CA14 (synthèse exacte) est jugé par un correcteur `llm`, qui recompte le tableau.
+
+Hash rejouables des scaffolds, vérifiés dans les en-têtes : `5b26289` (FieldOps complet), `b1aa967` (CA5), `b4342b5` (CA6), `4e279f7` (CA9-CA10), `2f42f56` (CA16, HEAD) et `6ac4b3b` (CA16, commit de `v1.3.0`). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `ca20-entete-commit` et `ca16-reference-et-commit`.
+
+Limite : `file_exists` ne voit que les fichiers créés pendant l'exécution. Dans les cas où un cahier précédent est commité (CA9-CA10, CA17), l'écriture est vérifiée par l'outil Write (`tool_used`) et par un témoin de date, pas par `file_exists`.
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
