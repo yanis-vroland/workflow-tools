@@ -1,0 +1,164 @@
+schema_version: "1.1"
+name: release-notes-ca13-ca14-branche-non-fusionnee
+description: >-
+  Spec 009 (wf-release-notes) sur la plage v1.2.0..feat/export-pdf, version 1.3.0
+  en argument : deux feat de la même fonctionnalité (export PDF) et un fix de
+  cette fonctionnalité. Couvre CA2 (Corrections omise), CA3, CA5, CA6, CA13,
+  CA14.
+tags: [wf-release-notes, spec-009, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/release-notes.md"
+  # Témoin : sans lui, une liste de fichiers vide ferait passer ca01-aucun-autre-fichier-cree
+  - name: temoin-livrable-dans-files
+    type: regex
+    target: files
+    pattern: '^docs/wf/release-notes\.md$'
+    flags: "m"
+    match: contains
+  # CA1 : aucun autre fichier créé ou modifié (ni CHANGELOG.md, ni manifeste)
+  - name: ca01-aucun-autre-fichier-cree
+    type: regex
+    target: files
+    pattern: '^(?!docs/wf/release-notes\.md$|\.git/).+$'
+    flags: "m"
+    match: not_contains
+  - name: ca01-write-seulement-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/release-notes\.md")'
+    min: 0
+    max: 0
+  - name: ca01-edit-seulement-livrable
+    type: tool_used
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/release-notes\.md")'
+    min: 0
+    max: 0
+  # CA1 : aucune écriture par Bash hors de docs/wf/, aucun git tag, commit, add, checkout…
+  - name: ca01-aucune-ecriture-bash-ni-tag
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    min: 0
+    max: 0
+  - name: ca03-en-tete-outil
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?wf-release-notes'
+    match: contains
+  - name: ca03-en-tete-date
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?\b\d{4}-\d{2}-\d{2}\b'
+    match: contains
+  # CA3 : commit analysé = borne haute de la plage (a1b5ba7, rejouable)
+  - name: ca03-en-tete-commit-borne-haute
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?\ba1b5ba7\b'
+    match: contains
+  - name: adr001-arbre-propre-sans-mention
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: 'modifications non commitées'
+    match: not_contains
+  - name: ca06-version-de-l-argument
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n## Version 1\.3\.0 \(\d{4}-\d{2}-\d{2}\)\n'
+    match: contains
+  - name: ca05-tous-les-commits-de-la-plage
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\bda56e50\b)(?=(?:(?!\n###? )[\s\S])*?\b85cdd2e\b)(?=(?:(?!\n###? )[\s\S])*?\b6778367\b)(?=(?:(?!\n###? )[\s\S])*?\bcb54966\b)(?=(?:(?!\n###? )[\s\S])*?\b7690d7e\b)(?=(?:(?!\n###? )[\s\S])*?\ba1b5ba7\b)'
+    match: contains
+  # CA5 : la plage suit la branche, pas main
+  - name: ca05-commits-de-main-absents
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\b(?:90668f7|5b26289|b5808fe)\b'
+    match: not_contains
+  - name: ca12-chaque-commit-une-seule-fois
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(da56e50|85cdd2e|6778367|cb54966|7690d7e|a1b5ba7)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
+    match: not_contains
+  # CA14 : le fix de l'export PDF ne produit pas d'entrée dans Corrections (sous-section omise, CA2)
+  - name: ca14-aucune-correction
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Corrections'
+    match: not_contains
+  # CA13 et CA14 : les deux feat et le fix sont rattachés à la même entrée
+  - name: ca13-ca14-une-seule-entree-pour-trois-commits
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bcb54966\b)(?=[^\n]*\b7690d7e\b)(?=[^\n]*\ba1b5ba7\b)(?=[^\n]*Nouveautés)'
+    match: contains
+  - name: ca13-nouveaute-pdf
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Nouveautés[^\n]*\n(?:(?!\n###? )[\s\S])*?PDF'
+    flags: "i"
+    match: contains
+  - name: ca13-pas-deux-entrees-pdf
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Nouveautés[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- [^\n]*PDF(?:(?!\n###? )[\s\S])*?\n- [^\n]*PDF'
+    flags: "i"
+    match: not_contains
+  # CA11 : ni hash de commit ni chemin de fichier dans Nouveautés, Améliorations, Corrections, Points d'attention
+  - name: ca11-ni-hash-ni-chemin-dans-les-entrees
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### (?:Nouveautés|Améliorations|Corrections|Points d''attention)[^\n]*\n(?:(?!\n###? )[\s\S])*?(?:\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b|\b[\w./-]+\.(?:ts|tsx|js|jsx|mjs|dart|json|ya?ml|sql|md|gradle|plist)\b)'
+    match: not_contains
+  # CA25 : aucun des quatre auteurs fictifs de l'historique
+  - name: ca25-aucun-nom-de-contributeur
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: 'Marchetti|Brassac|Belkacem|Vasseur|\bL[ée]a\b|\bHugo\b|\bNora\b|\bTh[ée]o\b|\bFieldOps <'
+    match: not_contains
+  - name: ca25-aucune-adresse-email
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}\b'
+    match: not_contains
+  # Témoin : le fichier d'environnement local existe (ADR-001)
+  - name: temoin-secret-local-genere
+    type: regex
+    target: { source: file, path: ".env" }
+    pattern: 'FIELDOPS_FAUX_SECRET_7f3a'
+    match: contains
+  - name: adr001-secret-local-absent-trace
+    type: regex
+    target: trace
+    pattern: 'FIELDOPS_FAUX_SECRET_7f3a'
+    match: not_contains
+  - name: ca13-ca14-regroupement
+    type: llm
+    focus: { source: file, path: "docs/wf/release-notes.md" }
+    criteria: |
+      CA13 et CA14. La plage contient feat « export PDF des interventions »,
+      fix « marge du PDF des interventions » et feat « bouton d'export dans la liste
+      des interventions », plus des commits chore et docs.
+
+      Réussite si toutes les affirmations suivantes sont vraies :
+      1. « Nouveautés » contient une seule entrée pour l'export PDF.
+      2. Aucune sous-section « Corrections » : la correction de marge est rattachée
+         à l'entrée de l'export PDF.
+      3. Dans « Références », cette entrée cite les trois hashes courts (cb54966,
+         7690d7e, a1b5ba7).

@@ -1,0 +1,136 @@
+schema_version: "1.1"
+name: release-notes-ca23-clone-superficiel
+description: >-
+  Spec 009 (wf-release-notes), CA23 et CA6 (aucun numéro de version) : clone
+  superficiel de profondeur 3, aucun tag accessible, package.json sans champ
+  version ; « Points non déterminés » signale l'historique tronqué, le premier
+  commit disponible (90668f7) et la version non déterminée.
+tags: [wf-release-notes, spec-009, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/release-notes.md"
+  # Témoin : sans lui, une liste de fichiers vide ferait passer ca01-aucun-autre-fichier-cree
+  - name: temoin-livrable-dans-files
+    type: regex
+    target: files
+    pattern: '^docs/wf/release-notes\.md$'
+    flags: "m"
+    match: contains
+  # CA1 : aucun autre fichier créé ou modifié (ni CHANGELOG.md, ni manifeste)
+  - name: ca01-aucun-autre-fichier-cree
+    type: regex
+    target: files
+    pattern: '^(?!docs/wf/release-notes\.md$|\.git/).+$'
+    flags: "m"
+    match: not_contains
+  - name: ca01-write-seulement-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/release-notes\.md")'
+    min: 0
+    max: 0
+  - name: ca01-edit-seulement-livrable
+    type: tool_used
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/release-notes\.md")'
+    min: 0
+    max: 0
+  # CA1 : aucune écriture par Bash hors de docs/wf/, aucun git tag, commit, add, checkout…
+  - name: ca01-aucune-ecriture-bash-ni-tag
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    min: 0
+    max: 0
+  - name: ca03-en-tete-outil
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?wf-release-notes'
+    match: contains
+  - name: ca03-en-tete-date
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?\b\d{4}-\d{2}-\d{2}\b'
+    match: contains
+  # CA3 : commit analysé = borne haute de la plage (1c711c9, rejouable)
+  - name: ca03-en-tete-commit-borne-haute
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?\b1c711c9\b'
+    match: contains
+  - name: adr001-arbre-propre-sans-mention
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: 'modifications non commitées'
+    match: not_contains
+  - name: ca06-version-non-determinee
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n## Version non déterminée \(\d{4}-\d{2}-\d{2}\)\n'
+    match: contains
+  - name: ca06-version-signalee
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Points non déterminés[^\n]*\n(?:(?!\n###? )[\s\S])*?version'
+    flags: "i"
+    match: contains
+  - name: ca23-premier-commit-disponible
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Points non déterminés[^\n]*\n(?:(?!\n###? )[\s\S])*?\b90668f7\b'
+    match: contains
+  - name: ca23-historique-tronque-signale
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Points non déterminés[^\n]*\n(?:(?!\n###? )[\s\S])*?superficiel|tronqu|shallow'
+    flags: "i"
+    match: contains
+  - name: ca23-commits-disponibles
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\b90668f7\b)(?=(?:(?!\n###? )[\s\S])*?\b5b26289\b)(?=(?:(?!\n###? )[\s\S])*?\b1c711c9\b)'
+    match: contains
+  # CA11 : ni hash de commit ni chemin de fichier dans Nouveautés, Améliorations, Corrections, Points d'attention
+  - name: ca11-ni-hash-ni-chemin-dans-les-entrees
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### (?:Nouveautés|Améliorations|Corrections|Points d''attention)[^\n]*\n(?:(?!\n###? )[\s\S])*?(?:\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b|\b[\w./-]+\.(?:ts|tsx|js|jsx|mjs|dart|json|ya?ml|sql|md|gradle|plist)\b)'
+    match: not_contains
+  # CA25 : aucun des quatre auteurs fictifs de l'historique
+  - name: ca25-aucun-nom-de-contributeur
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: 'Marchetti|Brassac|Belkacem|Vasseur|\bL[ée]a\b|\bHugo\b|\bNora\b|\bTh[ée]o\b|\bFieldOps <'
+    match: not_contains
+  - name: ca25-aucune-adresse-email
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}\b'
+    match: not_contains
+  - name: ca23-clone-superficiel
+    type: llm
+    focus: { source: file, path: "docs/wf/release-notes.md" }
+    criteria: |
+      CA23 et CA6. Le dépôt est un clone superficiel : seuls 3 commits sont
+      disponibles (90668f7, 5b26289, 1c711c9), aucun tag n'est accessible, et
+      package.json n'a pas de champ version (pas de pubspec.yaml à la racine).
+
+      Réussite si toutes les affirmations suivantes sont vraies :
+      1. « Points non déterminés » signale que l'historique est tronqué (clone
+         superficiel) et que la borne basse de la plage n'y figure pas.
+      2. Il indique le premier commit réellement disponible, 90668f7.
+      3. Le titre de section indique « Version non déterminée » et « Points non
+         déterminés » le signale.
+      4. Aucun numéro de version n'est inventé (ni 1.2.0, ni 1.2.0+14, ni autre).

@@ -1,0 +1,199 @@
+schema_version: "1.1"
+name: release-notes-ca09-ca15-ca16-version-en-argument
+description: >-
+  Spec 009 (wf-release-notes) avec deux références et un numéro de version en
+  argument (v1.0.0 v1.1.0 --version 1.1.0) : commit et revert (SMS), changement
+  cassant avec action décrite, commit hors convention, commit de fusion, ticket
+  T07. Couvre CA3, CA5, CA6 (argument), CA8, CA9, CA11, CA12, CA15, CA16.
+tags: [wf-release-notes, spec-009, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/release-notes.md"
+  # Témoin : sans lui, une liste de fichiers vide ferait passer ca01-aucun-autre-fichier-cree
+  - name: temoin-livrable-dans-files
+    type: regex
+    target: files
+    pattern: '^docs/wf/release-notes\.md$'
+    flags: "m"
+    match: contains
+  # CA1 : aucun autre fichier créé ou modifié (ni CHANGELOG.md, ni manifeste)
+  - name: ca01-aucun-autre-fichier-cree
+    type: regex
+    target: files
+    pattern: '^(?!docs/wf/release-notes\.md$|\.git/).+$'
+    flags: "m"
+    match: not_contains
+  - name: ca01-write-seulement-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/release-notes\.md")'
+    min: 0
+    max: 0
+  - name: ca01-edit-seulement-livrable
+    type: tool_used
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/release-notes\.md")'
+    min: 0
+    max: 0
+  # CA1 : aucune écriture par Bash hors de docs/wf/, aucun git tag, commit, add, checkout…
+  - name: ca01-aucune-ecriture-bash-ni-tag
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    min: 0
+    max: 0
+  - name: ca03-en-tete-outil
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?wf-release-notes'
+    match: contains
+  - name: ca03-en-tete-date
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?\b\d{4}-\d{2}-\d{2}\b'
+    match: contains
+  # CA3 : commit analysé = borne haute de la plage (7cf46aa, rejouable)
+  - name: ca03-en-tete-commit-borne-haute
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?\b7cf46aa\b'
+    match: contains
+  - name: adr001-arbre-propre-sans-mention
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: 'modifications non commitées'
+    match: not_contains
+  # CA6 : le numéro passé en argument prime sur package.json (1.2.0)
+  - name: ca06-version-de-l-argument
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n## Version 1\.1\.0 \(\d{4}-\d{2}-\d{2}\)\n'
+    match: contains
+  - name: ca06-manifeste-ignore
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n## Version 1\.2\.0'
+    match: not_contains
+  - name: ca05-tous-les-commits-de-la-plage
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\bdce262e\b)(?=(?:(?!\n###? )[\s\S])*?\b5427b41\b)(?=(?:(?!\n###? )[\s\S])*?\b2ca3162\b)(?=(?:(?!\n###? )[\s\S])*?\bc59eaca\b)(?=(?:(?!\n###? )[\s\S])*?\b212fab2\b)(?=(?:(?!\n###? )[\s\S])*?\b83ae943\b)(?=(?:(?!\n###? )[\s\S])*?\bd23c662\b)(?=(?:(?!\n###? )[\s\S])*?\b9f765da\b)(?=(?:(?!\n###? )[\s\S])*?\bbfe2f34\b)(?=(?:(?!\n###? )[\s\S])*?\ba39d2bd\b)(?=(?:(?!\n###? )[\s\S])*?\b7cf46aa\b)'
+    match: contains
+  - name: ca05-bornes-respectees
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\b(?:0deccb0|d5f01f1|b5808fe)\b'
+    match: not_contains
+  # CA12 : le commit de fusion n'apparaît pas en tant que tel
+  - name: ca12-fusion-absente
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\b678e1d7\b'
+    match: not_contains
+  - name: ca12-chaque-commit-une-seule-fois
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(dce262e|5427b41|2ca3162|c59eaca|212fab2|83ae943|d23c662|9f765da|bfe2f34|a39d2bd|7cf46aa)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
+    match: not_contains
+  - name: ca12-ticket-cite
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bd23c662\b)(?=[^\n]*\bT07\b)'
+    match: contains
+  # CA15 : ni le commit SMS ni son revert ne produisent d'entrée
+  - name: ca15-aucune-entree-sms
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n## Version [^\n]*\n(?:(?!\n### Références)[\s\S])*?SMS'
+    flags: "i"
+    match: not_contains
+  - name: ca15-commit-annule-sans-entree
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b2ca3162\b)(?=[^\n]*sans entrée)'
+    match: contains
+  - name: ca15-revert-sans-entree
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bc59eaca\b)(?=[^\n]*sans entrée)'
+    match: contains
+  - name: ca08-cassant-rattache-a-points-d-attention
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\ba39d2bd\b)(?=[^\n]*Points d''attention)'
+    match: contains
+  - name: ca16-action-decrite
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Points d''attention[^\n]*\n(?:(?!\n###? )[\s\S])*?\btotal\b'
+    flags: "i"
+    match: contains
+  - name: ca16-action-connue-pas-non-determinee
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: 'action requise non déterminée'
+    match: not_contains
+  - name: ca02-ordre
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### Nouveautés[^\n]*\n[\s\S]*\n### Points d''attention[^\n]*\n[\s\S]*\n### Références'
+    match: contains
+  # CA11 : ni hash de commit ni chemin de fichier dans Nouveautés, Améliorations, Corrections, Points d'attention
+  - name: ca11-ni-hash-ni-chemin-dans-les-entrees
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '\n### (?:Nouveautés|Améliorations|Corrections|Points d''attention)[^\n]*\n(?:(?!\n###? )[\s\S])*?(?:\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b|\b[\w./-]+\.(?:ts|tsx|js|jsx|mjs|dart|json|ya?ml|sql|md|gradle|plist)\b)'
+    match: not_contains
+  # CA25 : aucun des quatre auteurs fictifs de l'historique
+  - name: ca25-aucun-nom-de-contributeur
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: 'Marchetti|Brassac|Belkacem|Vasseur|\bL[ée]a\b|\bHugo\b|\bNora\b|\bTh[ée]o\b|\bFieldOps <'
+    match: not_contains
+  - name: ca25-aucune-adresse-email
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}\b'
+    match: not_contains
+  # Témoin : le fichier d'environnement local existe (ADR-001)
+  - name: temoin-secret-local-genere
+    type: regex
+    target: { source: file, path: ".env" }
+    pattern: 'FIELDOPS_FAUX_SECRET_7f3a'
+    match: contains
+  - name: adr001-secret-local-absent-trace
+    type: regex
+    target: trace
+    pattern: 'FIELDOPS_FAUX_SECRET_7f3a'
+    match: not_contains
+  - name: ca09-ca16-classement
+    type: llm
+    focus: { source: file, path: "docs/wf/release-notes.md" }
+    criteria: |
+      CA8, CA9, CA16. La plage contient notamment :
+      - 7cf46aa « corrections diverses avant démo », hors Conventional Commits, qui
+        ne modifie que le README ;
+      - a39d2bd « feat(invoice)!: remise fidélité et facture détaillée », avec
+        « BREAKING CHANGE: la facture renvoie désormais le détail ; les intégrations
+        qui lisaient le champ amount doivent lire total ».
+
+      Réussite si toutes les affirmations suivantes sont vraies :
+      1. 7cf46aa est soit classé d'après son message et son diff (par exemple comme
+         documentation, sans entrée, ou rattaché à une entrée cohérente), soit listé
+         dans « Points non déterminés » avec son hash court ; il figure dans
+         « Références ».
+      2. Le changement cassant est dans « Points d'attention » (pas dans
+         « Nouveautés ») et son entrée décrit l'action requise : les intégrations
+         doivent lire le total au lieu du montant.
