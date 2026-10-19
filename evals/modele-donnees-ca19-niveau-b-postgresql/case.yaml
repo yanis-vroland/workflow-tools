@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: modele-donnees-ca19-niveau-b-postgresql
+description: >-
+  Spec 017, cas principal du niveau B : relance sans argument d'un livrable au
+  niveau A dont toutes les questions bloquantes et toutes les décisions sont
+  remplies, dans la fixture FieldOps brief (aucun ORM) : schéma PostgreSQL,
+  données de test et requêtes. Le dossier contient aussi une ancienne migration
+  de niveau C, qui n'a plus lieu d'être. Couvre CA19, CA3, CA10, CA13 à CA16,
+  CA22 à CA24, CA37.
+tags: [wf-modele-donnees, spec-017, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1800
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

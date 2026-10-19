@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: modele-donnees-ca21-niveau-b-force
+description: >-
+  Spec 017, CA21 : relance avec --niveau b d'un livrable au niveau A dont la
+  question bloquante Q03 reste vide. Le niveau B est produit, et chaque élément
+  qui dépend de Q03 est marqué « supposé » dans le schéma et dans index.md.
+tags: [wf-modele-donnees, spec-017, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1800
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
