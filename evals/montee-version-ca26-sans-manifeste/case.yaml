@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: montee-version-ca26-sans-manifeste
+description: >-
+  Spec 013 (wf-montee-version), CA26 : répertoire sans manifeste de
+  dépendances (FieldOps brief : brief et notes, ni code, ni git). L'outil
+  l'indique et n'écrit aucun livrable.
+tags: [wf-montee-version, spec-013, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 20
+  timeout_seconds: 400
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

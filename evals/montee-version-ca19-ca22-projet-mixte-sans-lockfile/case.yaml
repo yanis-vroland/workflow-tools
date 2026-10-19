@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: montee-version-ca19-ca22-projet-mixte-sans-lockfile
+description: >-
+  Spec 013 (wf-montee-version) : projet fictif mixte, hors git, avec une partie
+  JS/TS sans lockfile ni script (CA17, CA19) et une partie PHP (composer.json,
+  stack non couverte, CA22). lodash 3 → 4 supprime _.pluck, utilisé deux fois
+  (CA13). Nécessite le registre npm (cibles de la partie JS/TS).
+tags: [wf-montee-version, spec-013, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh
