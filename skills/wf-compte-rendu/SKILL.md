@@ -1,6 +1,6 @@
 ---
 name: wf-compte-rendu
-description: Transforme des notes de réunion brutes ou une transcription (fichier .txt, .md, .vtt, .srt, ou texte collé) en un compte rendu structuré, prêt à diffuser, dans docs/wf/compte-rendu/AAAA-MM-JJ-<objet>.md, avec un index des comptes rendus - participants, points abordés, décisions, actions (responsable, échéance), questions en suspens. À utiliser après une réunion de suivi, un atelier ou une revue, pour garder la trace des décisions et des actions à côté du code.
+description: Transforme des notes de réunion brutes ou une transcription (fichier .txt, .md, .vtt, .srt, ou texte collé) en un compte rendu structuré, prêt à diffuser, dans docs/wf/compte-rendu/AAAA-MM-JJ-<objet>.md, avec un index des comptes rendus - participants, points abordés, décisions, actions (responsable, échéance), questions en suspens. À utiliser après une réunion de suivi ou une revue, pour garder la trace des décisions et des actions à côté du code.
 argument-hint: [<fichier de notes> | <texte des notes>]
 ---
 
@@ -29,7 +29,7 @@ Analyse les arguments, débarrassés des espaces de début et de fin et, s'ils s
 1. **Aucun argument** : demande la source et arrête-toi sans rien écrire. Ne cherche pas de notes dans le projet. Message type :
    « Indique le chemin du fichier de notes ou de transcription (`.txt`, `.md`, `.vtt` ou `.srt`), ou colle directement le texte des notes dans ta réponse. »
    À la réponse : un chemin est traité comme un argument (point 2), un texte comme des notes collées (point 3).
-2. **L'argument est un fichier existant** (`test -f "<argument>"`, sauf nom en `.env*`, écarté sans test) : c'est un fichier de notes. Sinon, si l'argument ressemble à un chemin (une seule ligne, sans espace hors guillemets, et contenant un `/` ou se terminant par une extension comme `.md`) : « fichier introuvable » (étape 1 bis).
+2. **L'argument est un fichier existant** (sauf nom en `.env*`, écarté sans test) : c'est un fichier de notes. Teste-le avec la commande « Vérifier un fichier » ci-dessous. Sinon, si l'argument ressemble à un chemin (une seule ligne, sans espace hors guillemets, et contenant un `/` ou se terminant par une extension comme `.md`) : « fichier introuvable » (étape 1 bis).
 3. **Sinon**, l'argument est le texte des notes, collé dans la commande : c'est la source, désignée « notes fournies dans la conversation ». Un texte collé vide revient au point 1.
 
 ### Étape 1 bis : fichier refusé
@@ -39,7 +39,16 @@ Pour un fichier de notes, dans cet ordre :
 - nom commençant par `.env` : refusé, « fichier d'environnement, jamais lu » ;
 - fichier inexistant : « fichier introuvable » ;
 - extension (casse ignorée) autre que `.txt`, `.md`, `.vtt` ou `.srt` (ex. `.docx`, `.pdf`) : « format non pris en charge ; formats acceptés : `.txt`, `.md`, `.vtt`, `.srt` ». N'ouvre pas ce fichier et n'en exploite rien, pas même son nom ;
-- fichier vide ou ne contenant que des espaces (`test -s "<fichier>"` faux, ou `grep -q '[^[:space:]]' "<fichier>"` faux) : « fichier de notes vide ».
+- fichier vide ou ne contenant que des espaces (la commande ci-dessous affiche `vide`) : « fichier de notes vide ».
+
+**Vérifier un fichier.** Le chemin vient de l'utilisateur : ne l'insère jamais dans une commande entre guillemets doubles, ni sans guillemets (une substitution `$(…)` ou un accent grave s'exécuterait). Passe-le par l'entrée standard, dans un heredoc dont le délimiteur est entre apostrophes, en remplaçant seulement la ligne du milieu par le chemin tel quel (une seule ligne) :
+
+```bash
+IFS= read -r wf_path <<'WF_CHEMIN'
+<chemin du fichier de notes>
+WF_CHEMIN
+if [ ! -f "$wf_path" ]; then echo introuvable; elif grep -q '[^[:space:]]' -- "$wf_path"; then echo present; else echo vide; fi
+```
 
 Dans chacun de ces cas, n'écris rien, et ne te rabats sur aucun autre fichier du projet : indique le fichier en cause, nommé, sa raison, et qu'aucun compte rendu n'a été écrit.
 
@@ -48,14 +57,14 @@ Dans chacun de ces cas, n'écris rien, et ne te rabats sur aucun autre fichier d
 Lis le fichier de notes avec Read, et rien d'autre. Formats :
 
 - `.txt`, `.md` : notes brutes ou transcription en texte ; une transcription peut être horodatée avec tours de parole (`[00:12:34] Nom : …`).
-- `.vtt` (WebVTT) : ignore l'en-tête `WEBVTT`, les lignes de temps (`00:00:04.000 --> 00:00:11.500`) et les identifiants de repère ; l'orateur est dans la balise `<v Nom>`.
-- `.srt` : ignore les numéros de séquence et les lignes de temps (`00:00:04,000 --> 00:00:11,500`) ; l'orateur, s'il est donné, est en début de réplique (`Nom : …`).
+- `.vtt` (WebVTT) : ignore l'en-tête `WEBVTT`, les lignes de temps (`00:01:02.000 --> 00:01:09.000`) et les identifiants de repère ; l'orateur est dans la balise `<v Nom>`.
+- `.srt` : ignore les numéros de séquence et les lignes de temps (`00:01:02,000 --> 00:01:09,000`) ; l'orateur, s'il est donné, est en début de réplique (`Nom : …`).
 
 ## Étape 3 : date et objet de la réunion
 
 **Date de la réunion**, dans cet ordre :
 
-1. une date de réunion écrite dans les notes (titre, ligne « Date : », en-tête), quel que soit son format (« 7 octobre 2026 », « 07/10/2026 », « Oct 7, 2026 »…), convertie au format `AAAA-MM-JJ`. Une échéance d'action n'est pas une date de réunion. Une date sans année n'est retenue que si le nom du fichier donne la même date avec l'année ;
+1. une date de réunion écrite dans les notes (titre, ligne « Date : », en-tête), quel que soit son format (« 3 mars 2025 », « 03/03/2025 », « March 3, 2025 »…), convertie au format `AAAA-MM-JJ`. Une échéance d'action n'est pas une date de réunion. Une date sans année n'est retenue que si le nom du fichier donne la même date avec l'année ;
 2. sinon, une date au format `AAAA-MM-JJ` dans le nom du fichier de notes ;
 3. sinon, demande la date de la réunion et arrête-toi sans rien écrire : « Les notes ne donnent pas la date de la réunion. Quelle est-elle (AAAA-MM-JJ) ? ». N'utilise jamais la date du jour sans l'avoir demandée, et ne la propose pas d'office ; ne déduis pas la date d'une échéance ou d'un jour de la semaine.
 
@@ -68,10 +77,12 @@ Si les notes et le nom du fichier donnent deux dates différentes, retiens celle
 3. sinon, le nom du fichier de notes sans son extension, sans la date `AAAA-MM-JJ` et sans les séparateurs qui l'entourent ;
 4. pour des notes collées sans objet ni titre : « Réunion ».
 
-**Nom du fichier** : `AAAA-MM-JJ-<objet>.md`, où `<objet>` est l'objet en minuscules, sans accents, mots séparés par des tirets, au plus 5 mots (les 5 premiers). Calcule-le avec cette commande, sans l'adapter :
+**Nom du fichier** : `AAAA-MM-JJ-<objet>.md`, où `<objet>` est l'objet en minuscules, sans accents, mots séparés par des tirets, au plus 5 mots (les 5 premiers). Calcule-le avec cette commande, sans l'adapter : l'objet vient des notes, il est passé par l'entrée standard dans un heredoc à délimiteur entre apostrophes (aucune substitution possible), en remplaçant seulement la ligne du milieu par l'objet (une seule ligne) ; ne l'insère jamais dans la commande elle-même.
 
 ```bash
-python3 -c 'import re, sys, unicodedata; s = unicodedata.normalize("NFKD", sys.argv[1]).encode("ascii", "ignore").decode().lower(); print("-".join(re.findall(r"[a-z0-9]+", s)[:5]))' "<objet>"
+python3 -c 'import re, sys, unicodedata; s = sys.stdin.read().strip().replace("œ", "oe").replace("Œ", "OE").replace("æ", "ae").replace("Æ", "AE"); s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower(); print("-".join(re.findall(r"[a-z0-9]+", s)[:5]))' <<'WF_OBJET'
+<objet>
+WF_OBJET
 ```
 
 Exemple : réunion du 2026-03-02, objet « Revue de lot – Écrans » : `2026-03-02-revue-de-lot-ecrans.md`.
@@ -91,8 +102,8 @@ Liste le dossier avec `ls docs/wf/compte-rendu/` (absent : aucun compte rendu, p
 
 - **Participants** : les personnes listées comme présentes, ou qui prennent la parole dans une transcription ; chacune par son nom tel qu'écrit, suivi de son rôle s'il est donné (« Nom, rôle »). Aucune coordonnée. Une personne seulement mentionnée (absente, à contacter) n'est pas un participant.
 - **Points abordés** : les sujets traités, regroupés par sujet, en phrases de synthèse. Pour une transcription, les répliques sur un même sujet sont fusionnées : aucun horodatage, aucun verbatim ligne à ligne, pas une ligne par tour de parole.
-- **Décisions** : uniquement ce qui a fait l'objet d'un accord explicite dans les notes (« Décision : », « on garde », « on valide », « validé », « we agree »…). Une proposition, une idée, une piste ou un point « à valider » sans accord explicite n'est jamais une décision : il va dans « Questions en suspens ».
-- **Actions** : une ligne par action. Le responsable est la personne que les notes désignent explicitement (nom en tête de l'action, ou orateur qui s'engage à la première personne dans une transcription) ; l'échéance est celle que les notes donnent, recopiée telle qu'écrite (« pour le 14/10 », « vendredi »). Quand les notes ne donnent pas le responsable ou l'échéance, la cellule contient exactement « non déterminé » : n'en déduis jamais (ni du sujet, ni du rôle, ni d'une autre action).
+- **Décisions** : uniquement ce qui a fait l'objet d'un accord explicite dans les notes (formulation d'accord explicite, en toute langue : « adopté », « accord de tous », « approved »…). Une proposition, une idée, une piste ou un point « à valider » sans accord explicite n'est jamais une décision : il va dans « Questions en suspens ».
+- **Actions** : une ligne par action. Le responsable est la personne que les notes désignent explicitement (nom en tête de l'action, ou orateur qui s'engage à la première personne dans une transcription) ; l'échéance est celle que les notes donnent, recopiée telle qu'écrite (« pour le 05/06 », « d'ici la fin du mois »). Quand les notes ne donnent pas le responsable ou l'échéance, la cellule contient exactement « non déterminé » : n'en déduis jamais (ni du sujet, ni du rôle, ni d'une autre action).
 - **Questions en suspens** : les questions restées sans réponse, les propositions sans accord explicite, les points reportés ou à valider. Chaque entrée est une phrase autonome, compréhensible sans les notes : elle est reprise telle quelle par `wf-rapport-avancement`.
 - **Points non déterminés** : tout passage ambigu, cité entre « » (ex. un responsable désigné par un pronom sans antécédent), sans trancher l'ambiguïté ailleurs dans le compte rendu (le responsable reste « non déterminé ») ; le retrait d'un secret ; un écart de dates ; une information attendue absente des notes (aucune liste de participants, par exemple).
 - **Section vide** : les sept sections sont toujours présentes ; une section sans élément contient la seule ligne « Aucun élément. ». Le tableau des actions reste présent : sans action, son en-tête est suivi de la ligne « Aucun élément. ».
