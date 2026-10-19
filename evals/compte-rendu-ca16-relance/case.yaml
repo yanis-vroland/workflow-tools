@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: compte-rendu-ca16-relance
+description: >-
+  Spec 007, CA16 : un compte rendu existe déjà pour la même réunion (même date,
+  même objet, même fichier de notes source), avec son index ; les notes ont été
+  complétées d'une action depuis. La relance met à jour ce compte rendu au lieu
+  de le dupliquer, et l'index garde une seule ligne pour cette réunion.
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 25
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: compte-rendu-ca13-transcription-vtt
+description: >-
+  Spec 007, CA13 : transcription WebVTT horodatée avec tours de parole
+  (notes/2026-09-30-atelier.vtt de la fixture FieldOps brief). Le compte rendu
+  ne contient aucun horodatage ni le verbatim ligne à ligne ; les échanges sont
+  regroupés par sujet. Sans titre ni objet dans la transcription, l'objet vient
+  du nom du fichier. Couvre aussi CA3, CA8, CA9 et CA11 (aucun rôle inventé).
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 25
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: compte-rendu-ca02-sans-argument
+description: >-
+  Spec 007, CA2 : wf-compte-rendu lancé sans argument sur la fixture FieldOps
+  brief. L'outil demande un chemin de fichier de notes ou le texte des notes,
+  et n'écrit rien tant qu'il n'a pas de source (une eval n'a qu'un tour : la
+  suite, notes collées, est couverte par compte-rendu-ca02-notes-collees).
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 10
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

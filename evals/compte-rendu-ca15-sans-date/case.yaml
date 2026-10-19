@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: compte-rendu-ca15-sans-date
+description: >-
+  Spec 007, CA15 : notes sans date de réunion, dans un fichier dont le nom ne
+  contient pas de date (notes/reunion-chantier.md). L'outil demande la date de
+  la réunion, n'utilise pas la date du jour et n'écrit rien (une eval n'a qu'un
+  tour).
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 12
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

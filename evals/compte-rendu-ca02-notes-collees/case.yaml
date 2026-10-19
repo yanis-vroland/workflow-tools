@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: compte-rendu-ca02-notes-collees
+description: >-
+  Spec 007, CA2 et ADR-001 (amendement 1, notes collées dans la commande) : le
+  texte des notes est fourni directement après la commande, sans fichier. Le
+  compte rendu est produit, son en-tête indique « notes fournies dans la
+  conversation ». Couvre aussi CA4 (index créé), CA5, CA7, CA9 et CA11 (adresse
+  e-mail dans le texte collé).
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 25
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

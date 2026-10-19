@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: compte-rendu-ca18-fichier-vide
+description: >-
+  Spec 007, CA18 : fichier de notes vide (notes/2026-10-21-point-hebdo.md, 0
+  octet). L'outil l'indique et n'écrit aucun livrable.
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 10
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
