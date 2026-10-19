@@ -314,6 +314,26 @@ for (const suite of suites) {
   }
 }
 
+// --- Commandes prescrites par la skill : acceptées par la liste blanche -----------
+// Les commandes Bash de la skill (liste « Bash » des règles absolues, entre accents
+// graves) ne doivent pas être prises pour des commandes interdites.
+
+const skillFile = join(root, "skills", "wf-audit-web", "SKILL.md");
+if (existsSync(skillFile)) {
+  const skill = readFileSync(skillFile, "utf8");
+  const bashRule = /- \*\*Bash\*\*[\s\S]*?\n- \*\*/.exec(skill)?.[0] ?? "";
+  const commands = [...bashRule.matchAll(/^\s+(?:\d+\.\s+[^`\n]*|)`([^`]+)`\s*$/gm)].map((m) =>
+    m[1]
+      .replace("<URL>", "https://fieldops.example.invalid/interventions")
+      .replace("<dossier de la skill>", "/home/u/.claude/plugins/wf/skills/wf-audit-web"),
+  );
+  if (commands.length !== 6) ko(`SKILL.md : 6 commandes Bash attendues dans la règle « Bash », ${commands.length} trouvées`);
+  const whitelist = regexOf(grader("audit-web-fieldops/graders/ca01-bash-en-lecture-seule.md"));
+  for (const command of commands) {
+    if (whitelist.test(bash(command))) ko(`commande prescrite par la skill refusée par la liste blanche : ${command}`);
+  }
+}
+
 if (failures === 0) {
   console.log(`OK     correcteurs wf-audit-web : ${compiled} correcteurs compilés, ${suites.length} motifs vérifiés sur leurs exemples`);
 }
