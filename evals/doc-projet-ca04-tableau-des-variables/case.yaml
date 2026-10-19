@@ -70,11 +70,14 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
     pattern: '\n\|\s*[\x60*]*DATABASE_URL[\x60*]*\s*\|[^|\n]*\|[^|\n]*(?:\.env\b(?!\.)|docker-compose\.yml)[^|\n]*\|'
-  # POSTGRES_PASSWORD est fournie au service db par docker-compose.yml
-  - name: ca04-ou-la-renseigner-postgres-password-docker-compose
+  # POSTGRES_PASSWORD n'est lue que par docker-compose.yml, qui l'interpole
+  # (${POSTGRES_PASSWORD:-…}) sans la fournir : Compose la prend dans .env ou
+  # dans le shell. La ligne cite donc docker-compose.yml (usage ou mécanisme) et
+  # « Où la renseigner » nomme .env, pas seulement .env.example.
+  - name: ca04-postgres-password-docker-compose-et-env
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '\n\|\s*[\x60*]*POSTGRES_PASSWORD[\x60*]*\s*\|[^|\n]*\|[^|\n]*docker-compose\.yml[^|\n]*\|'
+    pattern: '\n\|\s*[\x60*]*POSTGRES_PASSWORD[\x60*]*\s*\|(?=(?:[^|\n]*\|){0,1}[^|\n]*docker-compose\.yml)[^|\n]*\|[^|\n]*\.env\b(?!\.)[^|\n]*\|'
 
   # --- Comment l'obtenir : service nommé seulement s'il est établi par le code ----
   - name: ca04-comment-l-obtenir-stripe-par-son-sdk
