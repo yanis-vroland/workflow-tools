@@ -1,10 +1,12 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/recette.md" }
-pattern: 'changeme|\b(?:admin|dispatch|tech1|tech2)@'
+pattern: '\bchangeme\b|\b(?:admin|dispatch|tech1|tech2)@|2027-03-31'
 flags: i
 match: not_contains
 ---
 
-CA15 : aucun identifiant de connexion ni mot de passe : ni la valeur factice
-`changeme` de `.env.example`, ni les comptes de démonstration de `src/db/seed.ts`.
+CA15 : aucun identifiant de connexion, mot de passe ni valeur de variable
+d'environnement : ni la valeur factice `changeme` de `.env.example` (mot
+entier : « changements » est permis), ni les comptes de démonstration de
+`src/db/seed.ts`, ni la valeur de `MAP_API_KEY_EXPIRES_AT`.

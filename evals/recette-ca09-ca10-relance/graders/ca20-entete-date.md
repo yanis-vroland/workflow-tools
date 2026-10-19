@@ -1,8 +1,10 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/recette.md" }
-pattern: '^(?:(?!\n##? [^\n]*P[ée]rim[èe]tre et sources)[\s\S])*?\d{4}-\d{2}-\d{2}'
+pattern: '^(?![\s\S]*2026-09-15)[\s\S]*?(?:^(?:(?!\n##? [^\n]*P[ée]rim[èe]tre et sources)[\s\S])*?\d{4}-\d{2}-\d{2})'
 match: contains
 ---
 
 CA20 : l'en-tête donne la date (AAAA-MM-JJ).
+
+Discriminant : échoue tant que le cahier déposé par le scaffold (daté du 2026-09-15) n'a pas été réécrit.
