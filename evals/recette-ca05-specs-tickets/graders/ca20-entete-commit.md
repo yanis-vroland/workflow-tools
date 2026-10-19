@@ -1,9 +1,9 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/recette.md" }
-pattern: '^(?:(?!\n##? [^\n]*P[ée]rim[èe]tre et sources)[\s\S])*?\bb1aa967\b'
+pattern: '^(?:(?!\n##? [^\n]*P[ée]rim[èe]tre et sources)[\s\S])*?\b54ff0b9\b'
 match: contains
 ---
 
 CA20 : l'en-tête donne le commit analysé (`git rev-parse --short HEAD`,
-déterministe pour ce scaffold : b1aa967).
+déterministe pour ce scaffold : 54ff0b9).

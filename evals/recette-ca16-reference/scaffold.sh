@@ -71,7 +71,7 @@ write_tickets() { # <critères de T02>
     cat <<'MD'
 # Specs et tickets : planification des techniciens
 
-Outil : wf-specs-tickets · Date : 2026-10-01 · Commit : 5b26289 · Fichiers d'entrée : cadrage-besoin.md
+Outil : wf-specs-tickets · Date : 2026-10-01 · Commit : 2fc99c0 · Fichiers d'entrée : cadrage-besoin.md
 
 ## Synthèse
 

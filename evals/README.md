@@ -123,7 +123,7 @@ Spec 014, lancée par `/wf-recette` (ou `/wf-recette <référence>`), tous les c
 
 Tous les cas portent un correcteur `…-aucune-commande-hors-liste` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F` et, avec une référence, `git log -1 --format=%h <ref> --`, `git diff --name-only <ref> HEAD` et `git show <ref>:docs/wf/specs-tickets.md` (liste blanche). CA14 (synthèse exacte) est jugé par un correcteur `llm`, qui recompte le tableau.
 
-Hash rejouables des scaffolds, vérifiés dans les en-têtes : `5b26289` (FieldOps complet), `b1aa967` (CA5), `b4342b5` (CA6), `4e279f7` (CA9-CA10), `2f42f56` (CA16, HEAD) et `6ac4b3b` (CA16, commit de `v1.3.0`). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `ca20-entete-commit` et `ca16-reference-et-commit`.
+Hash rejouables des scaffolds, vérifiés dans les en-têtes : `2fc99c0` (FieldOps complet), `54ff0b9` (CA5), `dd66a1d` (CA6), `355fc68` (CA9-CA10), `19c4ec9` (CA16, HEAD) et `85e1db9` (CA16, commit de `v1.3.0`). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `ca20-entete-commit` et `ca16-reference-et-commit`.
 
 Limite : `file_exists` ne voit que les fichiers créés pendant l'exécution. Dans les cas où un cahier précédent est commité (CA9-CA10, CA17), l'écriture est vérifiée par l'outil Write (`tool_used`) et par un témoin de date, pas par `file_exists`.
 
