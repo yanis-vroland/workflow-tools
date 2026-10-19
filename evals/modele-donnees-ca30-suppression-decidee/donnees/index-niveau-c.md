@@ -2,7 +2,7 @@
 
 - Outil : wf-modele-donnees
 - Date : 2026-10-10
-- Commit analysé : 5b26289
+- Commit analysé : 2fc99c0
 - Niveau atteint : C (évolution)
 - Sources lues : ../demandes/evolution-interventions.md
 - Derniers identifiants attribués : E01, RG02, Q00, D01

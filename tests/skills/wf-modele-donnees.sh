@@ -231,8 +231,9 @@ cite "CA36 exemple d'ORM non couvert" "Sequelize"
 
 cite "CA26 en-tête : niveau C" "C (évolution)"
 cite "CA26 schémas détectés avec leur ORM et leur outil de migration" "| Schéma | Base ou ORM | Outil de migration |"
-cite "CA26 outil de migration absent" "aucun"
-cite "CA26 migration par défaut" "migration.sql"
+cite "CA26 outil de migration absent" "<outil détecté, montée de version, ou aucun>"
+# shellcheck disable=SC2016 # accents graves littéraux
+cite "CA26 migration par défaut" '| SQL sans outil de migration | `migration.sql` |'
 cite "CA27 colonne ajoutée" "ajoutée"
 cite "CA27 colonne renommée" "renommée"
 cite "CA27 colonne supprimée" "supprimée"

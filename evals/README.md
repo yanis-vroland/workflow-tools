@@ -266,7 +266,7 @@ Spec 017, lancée par `/wf-modele-donnees`, tous les cas `hors-reseau` (tags `wf
 
 Les cas `ca21` et `ca25` reprennent le livrable de niveau A d'un autre cas (`donnees/` du cas de relance ou du cas `ca19`), et `ca30` la demande d'évolution du cas `ca28-ca32` : les modifier change aussi ces cas.
 
-Niveau C : les sources sont placées par le scaffold dans le répertoire parent de la session (`../fieldops-brief/`, `../demandes/`), seul emplacement hors du projet que le bac à sable de l'eval laisse lire ; l'arbre de travail de FieldOps reste donc propre, et l'en-tête porte le commit `5b26289` sans « modifications non commitées ».
+Niveau C : les sources sont placées par le scaffold dans le répertoire parent de la session (`../fieldops-brief/`, `../demandes/`), seul emplacement hors du projet que le bac à sable de l'eval laisse lire ; l'arbre de travail de FieldOps reste donc propre, et l'en-tête porte le commit `2fc99c0` sans « modifications non commitées ».
 
 Les vérifications croisées entre fichiers (index justifiés par une requête, données de test qui respectent le schéma et rendent une ligne à chaque requête) sont confiées à un juge `llm` sur la trace, qui contient le contenu de chaque appel Write : aucun fichier n'est exécuté (ADR-001, amendement 2), le juge raisonne sur le texte.
 
