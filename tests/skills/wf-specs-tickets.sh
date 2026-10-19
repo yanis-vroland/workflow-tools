@@ -141,19 +141,22 @@ done
 cite "CA7 section lue « Besoins fonctionnels » (contrat spec 004)" "Besoins fonctionnels"
 cite "CA11 section lue « Questions au client » (contrat spec 004)" "Questions au client"
 cite "CA11 champ « Réponse : » du cadrage" "Réponse :"
-cite "CA7 identifiants Bnn" "B01"
+cite "CA7, CA8 identifiants Bnn repris tels quels" "dont tu reprends l'identifiant \`Bnn\` tel quel"
 
 # --- CA9, CA10 : chiffrage ------------------------------------------------------------
 
 cite "CA9 section lue « Détail par lot » (contrat spec 005)" "Détail par lot"
 cite "CA9 section lue « Activités transverses » (contrat spec 005)" "Activités transverses"
-cite "CA9 identifiants Cnn" "C01"
-cite "CA9 mention « non estimé »" "non estimé"
-cite "CA10 seuil de 5 jours d'estimation haute cumulée" "5 jours"
+# shellcheck disable=SC2016 # accents graves littéraux, sans substitution
+cite "CA9 identifiants Cnn" 'identifiant `Cnn` (`C01`, `C02`…)'
+cite "CA9 sans réestimation" "Tu ne réestimes jamais"
+cite "CA9 mention « non estimé »" "indique exactement « non estimé »"
+cite "CA10 seuil de 5 jours d'estimation haute cumulée" "la somme de leurs estimations hautes est d'au plus 5 jours"
 
 # --- CA11 : points à clarifier ---------------------------------------------------------
 
-cite "CA11 mention « aucun »" "aucun"
+cite "CA11 mention « aucun »" "écris exactement « aucun »"
+cite "CA11 question répondue jamais citée" "Une question dont la réponse est remplie n'y figure jamais"
 
 # --- CA12, CA13 : ordre de réalisation ---------------------------------------------------
 
@@ -162,16 +165,20 @@ if grep -qF '```mermaid' <<<"$body"; then
 else
   ko "CA12 schéma Mermaid des dépendances (« \`\`\`mermaid » absent du corps)"
 fi
-cite "CA13 cycle de dépendances" "cycle"
+cite "CA13 ordre non proposé en cas de cycle" "Aucun ordre proposé : cycle de dépendances"
+cite "CA13 cycle décrit dans « Points non déterminés »" "« Points non déterminés » décrit le cycle"
 
 # --- CA14, CA15 : fichiers concernés -----------------------------------------------------
 
-cite "CA14 mention « à créer »" "à créer"
+cite "CA14 mention « (à créer) »" "(à créer)"
+cite "CA14 chemin vérifié par Glob" "Ne cite qu'un chemin que Glob a effectivement trouvé"
 cite "CA15 mention « non applicable (projet sans code) »" "non applicable (projet sans code)"
 
 # --- CA16 : identifiants stables ------------------------------------------------------------
 
-cite "CA16 identifiants Tnn" "T01"
+# shellcheck disable=SC2016 # accents graves littéraux, sans substitution
+cite "CA16 identifiant conservé" 'conserve son identifiant `Tnn`'
+cite "CA16 identifiant jamais réattribué" "n'est jamais réattribué"
 cite "CA16 dernier identifiant attribué conservé" "Derniers identifiants attribués"
 cite "CA16 référence Tnn-CAn (contrat)" "T03-CA2"
 
@@ -185,13 +192,15 @@ cite "CA18 syntaxe avec un fichier de besoin" "/wf-specs-tickets <"
 cite "CA20 exemple de branche feat/T03-export-pdf" "feat/T03-export-pdf"
 cite "CA20 suivi par wf-rapport-avancement" "wf-rapport-avancement"
 
-# --- Aucune valeur propre à la fixture FieldOps ------------------------------------------------
+# --- Aucune valeur de la fixture FieldOps ni des données des cas ----------------------------
 # Les exemples de la skill restent génériques : sinon les evals sur FieldOps
 # mesureraient la recopie d'un exemple, pas le comportement (surapprentissage).
 
-fieldops_values=(
+forbidden=(
   "FieldOps"
   "Démo Thermique"
+  "Renaud"
+  "Olivier"
   "dispatcher"
   "technicien"
   "chaudière"
@@ -199,14 +208,61 @@ fieldops_values=(
   "InterventionList"
   "src/api/routes"
   "planification"
+  "pdfExport"
+  "volume mensuel"
+  "logistique"
+  "organisation-atelier"
+  "cahier-des-charges"
+  "CA2 supprimé alors que CA3"
+  "T03 retiré"
+  "Q04"
+  "B05"
+  "T04"
+  "publication, déploiement"
+  "gestion de projet, recette"
+  "intuitive"
 )
+
+# Valeurs tirées des données des cas (evals/specs-tickets-*/donnees/*.md) :
+# libellés des besoins (trois premiers mots), titres des tickets, estimations
+# des tâches (« <basse> à <haute> j »).
+while IFS= read -r value; do
+  [ -n "$value" ] && forbidden+=("$value")
+done < <(
+  cat "$root"/evals/specs-tickets-*/donnees/*.md | awk -F'|' '
+    /^- B[0-9]+ : / { line = $0; sub(/^- B[0-9]+ : /, "", line); split(line, w, " "); print w[1] " " w[2] " " w[3] }
+    /^### T[0-9]+ : / { line = $0; sub(/^### T[0-9]+ : /, "", line); print line }
+    /^\| C[0-9]+ \|/ { low = $5; high = $6; gsub(/^ +| +$/, "", low); gsub(/^ +| +$/, "", high); print low " à " high " j" }
+  '
+)
+
 leak_ok=1
-for value in "${fieldops_values[@]}"; do
+for value in "${forbidden[@]}"; do
   if grep -qiF -- "$value" <<<"$body"; then
-    ko "aucune valeur de FieldOps dans la skill (« $value » présent)"
+    ko "aucune valeur de la fixture ni des données des cas dans la skill (« $value » présent)"
     leak_ok=0
   fi
 done
-[ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
+[ "$leak_ok" -eq 1 ] && ok "aucune valeur de la fixture ni des données des cas dans la skill (${#forbidden[@]} valeurs)"
+
+# --- Injection shell ---------------------------------------------------------------------------
+# Aucune commande prescrite n'insère un texte venu de l'utilisateur ou du projet :
+# ni « test -f », ni chemin ou texte entre guillemets doubles dans une commande.
+
+if grep -qF -- "test -f" <<<"$body"; then
+  ko "aucune commande test -f (injection shell par le chemin)"
+else
+  ok "aucune commande test -f (injection shell par le chemin)"
+fi
+# shellcheck disable=SC2016 # motif d'accents graves littéraux, sans substitution
+if grep -qE -- '`[^`]*"(<|\$)[^`]*`' <<<"$body"; then
+  ko "aucun texte variable entre guillemets doubles dans une commande"
+else
+  ok "aucun texte variable entre guillemets doubles dans une commande"
+fi
+
+# --- CA21 : Grep sans afficher de ligne d'un fichier d'environnement -----------------------
+
+cite "CA21 Grep en mode files_with_matches seulement" "Grep s'utilise uniquement en mode \`files_with_matches\`"
 
 exit $fail
