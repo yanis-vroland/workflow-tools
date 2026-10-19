@@ -20,17 +20,17 @@ context:
   scaffold_script: scaffold.sh
 
 # Commits de main dans la période (sans fusion), rejouables :
-#   dce262e 2026-01-13 feat(interventions) (borne de début)
-#   5427b41 2026-01-21 feat(mobile)
-#   2ca3162 2026-01-29 feat(notifications) SMS
-#   c59eaca 2026-02-05 revert SMS
-#   212fab2 2026-02-12 refactor(mobile)        -> travaux techniques internes
-#   83ae943 2026-02-24 feat(technicians)
-#   d23c662 2026-03-04 feat(planning) (T07)
-#   9f765da 2026-03-10 chore(db) (T07)         -> travaux techniques internes
-#   bfe2f34 2026-03-18 fix(interventions) (borne de fin)
-# Fusion 678e1d7 (2026-03-11) exclue ; hors période : 0deccb0 (2025-12-04),
-# a39d2bd (2026-04-02). HEAD : dfc630e (commit des livrables d'entrée).
+#   e1ee714 2026-01-13 feat(interventions) (borne de début)
+#   5c0ceb4 2026-01-21 feat(mobile)
+#   c9835c8 2026-01-29 feat(notifications) SMS
+#   db61e85 2026-02-05 revert SMS
+#   cba53e9 2026-02-12 refactor(mobile)        -> travaux techniques internes
+#   72df134 2026-02-24 feat(technicians)
+#   1b837fb 2026-03-04 feat(planning) (T07)
+#   83c489f 2026-03-10 chore(db) (T07)         -> travaux techniques internes
+#   1d9885f 2026-03-18 fix(interventions) (borne de fin)
+# Fusion a45fd17 (2026-03-11) exclue ; hors période : 3d2f1e4 (2025-12-04),
+# 11e4f47 (2026-04-02). HEAD : 2d9eb2a (commit des livrables d'entrée).
 graders:
   # --- CA1 : livrable unique, aucun autre fichier modifié ---------------------------
   - name: ca01-livrable-cree
@@ -85,7 +85,7 @@ graders:
   - name: ca03-en-tete-commit
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bdfc630e'
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\b2d9eb2a'
     match: contains
   - name: ca03-en-tete-date-du-jour
     type: regex
@@ -117,12 +117,12 @@ graders:
   - name: ca04-sources-tous-les-commits-de-la-periode
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Sources(?=[\s\S]*dce262e)(?=[\s\S]*5427b41)(?=[\s\S]*2ca3162)(?=[\s\S]*c59eaca)(?=[\s\S]*212fab2)(?=[\s\S]*83ae943)(?=[\s\S]*d23c662)(?=[\s\S]*9f765da)(?=[\s\S]*bfe2f34)'
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*e1ee714)(?=[\s\S]*5c0ceb4)(?=[\s\S]*c9835c8)(?=[\s\S]*db61e85)(?=[\s\S]*cba53e9)(?=[\s\S]*72df134)(?=[\s\S]*1b837fb)(?=[\s\S]*83c489f)(?=[\s\S]*1d9885f)'
     match: contains
   - name: ca04-aucun-commit-hors-periode
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Sources[\s\S]*(?:0deccb0|a39d2bd|7cf46aa|5b26289|dfc630e)'
+    pattern: '\n##? [^\n]*Sources[\s\S]*(?:3d2f1e4|11e4f47|17691e6|2fc99c0|2d9eb2a)'
     match: not_contains
   - name: ca04-aucune-fonctionnalite-hors-periode
     type: llm
@@ -182,7 +182,7 @@ graders:
   - name: ca09-commit-de-fusion-absent-des-sources
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Sources[\s\S]*678e1d7'
+    pattern: '\n##? [^\n]*Sources[\s\S]*a45fd17'
     match: not_contains
   - name: ca09-ticket-cite-dans-sources
     type: regex
@@ -196,7 +196,7 @@ graders:
       PASS si la section « Sources » rattache chaque entrée de « Réalisé » et
       d'« En cours » (reconnaissable par son titre ou sa formulation) à une
       liste de hash courts de commits, et si les deux commits qui citent le
-      ticket T07 (d23c662 et 9f765da) sont accompagnés de la mention T07. FAIL
+      ticket T07 (1b837fb et 83c489f) sont accompagnés de la mention T07. FAIL
       si une entrée de « Réalisé » n'a aucun commit dans « Sources », ou si
       « Sources » n'est qu'une liste de commits sans rattachement aux entrées.
 
@@ -204,7 +204,7 @@ graders:
   - name: ca10-branche-hors-periode-absente
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '(?:export-pdf|cb54966|7690d7e|a1b5ba7)'
+    pattern: '(?:export-pdf|098619f|54c62e2|4a5b78b)'
     match: not_contains
 
   # --- CA11 : prochaines étapes tirées des tickets --------------------------------------
@@ -248,7 +248,7 @@ graders:
   - name: ca14-revert-dans-points-de-vigilance
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Points de vigilance[^\n]*\n(?:(?!\n##? )[\s\S])*?c59eaca'
+    pattern: '\n##? [^\n]*Points de vigilance[^\n]*\n(?:(?!\n##? )[\s\S])*?db61e85'
     match: contains
   - name: ca14-chaque-point-source
     type: llm

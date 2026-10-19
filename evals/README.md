@@ -213,7 +213,7 @@ Spec 008, lancée par `/wf-rapport-avancement [début fin]`, tous les cas `hors-
 | `rapport-avancement-ca22-hors-git` | copie de FieldOps sans historique | CA22 |
 | `rapport-avancement-ca21-periode-inversee` | date de fin antérieure à la date de début | CA21 (cas limite) |
 
-Les hash attendus sont ceux des scaffolds, rejouables : `dfc630e` (HEAD du cas principal), `78c65c5` (branche en cours), `ca67095` (relance). Les dates de la période sont comparées à la date de commit en UTC (fixture) ; la date du jour n'est jamais figée, seulement bornée (postérieure à 2026-10).
+Les hash attendus sont ceux des scaffolds, rejouables : `2d9eb2a` (HEAD du cas principal), `4e7a5d4` (branche en cours), `21a6d55` (relance), et ceux de la fixture FieldOps (HEAD de `main` : `2fc99c0`). Les dates de la période sont comparées à la date de commit en UTC (fixture) ; la date du jour n'est jamais figée, seulement bornée (postérieure à 2026-10).
 
 Limites : l'eval ne joue qu'un tour, sans réponse de l'utilisateur. Les reprises de ce qu'il fournit (prochaines étapes, décisions attendues, points de vigilance « réponse de l'utilisateur », CA12 à CA14) ne sont donc pas jouées : seule la question finale l'est (`ca12-ca13-questions-posees`). La date mal formée et la date de début postérieure à la date du jour (CA21) ne sont couvertes que par les tests structurels.
 

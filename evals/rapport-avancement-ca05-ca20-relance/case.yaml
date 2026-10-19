@@ -17,10 +17,10 @@ execution:
 context:
   scaffold_script: scaffold.sh
 
-# HEAD : ca67095 (commit du rapport précédent, 2026-10-02). Commits de la
-# nouvelle période : main 90668f7, 5b26289, ca67095 ; feat/export-pdf 7690d7e,
-# a1b5ba7. Hors période (déjà couverts par le rapport précédent) : 6778367,
-# cb54966, b5808fe, da56e50, 85cdd2e.
+# HEAD : 21a6d55 (commit du rapport précédent, 2026-10-02). Commits de la
+# nouvelle période : main 921f57c, 2fc99c0, 21a6d55 ; feat/export-pdf 54c62e2,
+# 4a5b78b. Hors période (déjà couverts par le rapport précédent) : 3503397,
+# 098619f, db46741, 912c3a3, ed5587e.
 graders:
   # --- CA20 : mise à jour du même fichier, sans doublon ------------------------------------
   - name: ca20-livrable-reecrit
@@ -41,17 +41,17 @@ graders:
     min: 0
     max: 0
   # Le rapport déposé par le scaffold a déjà un seul titre et une seule
-  # synthèse : chaque correcteur exige aussi le commit actuel (ca67095), absent
+  # synthèse : chaque correcteur exige aussi le commit actuel (21a6d55), absent
   # de l'ancien rapport, pour ne pas réussir sur l'état initial.
   - name: ca20-un-seul-titre-de-rapport
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '^(?=[\s\S]*\bca67095)(?!(?:[\s\S]*?(?:^|\n)# ){2})'
+    pattern: '^(?=[\s\S]*\b21a6d55)(?!(?:[\s\S]*?(?:^|\n)# ){2})'
     match: contains
   - name: ca20-une-seule-synthese
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '^(?=[\s\S]*\bca67095)(?!(?:[\s\S]*?\n##? [^\n]*Synth[èe]se){2})'
+    pattern: '^(?=[\s\S]*\b21a6d55)(?!(?:[\s\S]*?\n##? [^\n]*Synth[èe]se){2})'
     match: contains
 
   # --- CA5 : période déduite du rapport précédent ---------------------------------------------
@@ -76,26 +76,26 @@ graders:
   - name: ca05-sources-de-la-nouvelle-periode
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Sources(?=[\s\S]*90668f7)(?=[\s\S]*5b26289)(?=[\s\S]*ca67095)(?=[\s\S]*7690d7e)(?=[\s\S]*a1b5ba7)'
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*921f57c)(?=[\s\S]*2fc99c0)(?=[\s\S]*21a6d55)(?=[\s\S]*54c62e2)(?=[\s\S]*4a5b78b)'
     match: contains
   - name: ca05-commits-de-l-ancienne-periode-retires
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '6778367|cb54966|b5808fe|da56e50|85cdd2e'
+    pattern: '3503397|098619f|db46741|912c3a3|ed5587e'
     match: not_contains
 
   # --- CA3 : en-tête mis à jour ----------------------------------------------------------------
   - name: ca03-en-tete-commit-actuel
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bca67095'
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\b21a6d55'
     match: contains
   - name: ca03-en-tete-aucun-livrable-lu
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
     # « aucun » figure déjà dans l'en-tête de l'ancien rapport : exigé dans le
     # même en-tête que le commit actuel
-    pattern: '^(?=(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bca67095)(?:(?!\n##? [^\n]*Synth)[\s\S])*?\baucun\b'
+    pattern: '^(?=(?:(?!\n##? [^\n]*Synth)[\s\S])*?\b21a6d55)(?:(?!\n##? [^\n]*Synth)[\s\S])*?\baucun\b'
     flags: i
     match: contains
 

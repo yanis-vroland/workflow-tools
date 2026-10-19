@@ -40,12 +40,12 @@ graders:
   - name: ca23-commits-disponibles-dans-sources
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Sources(?=[\s\S]*6778367)(?=[\s\S]*90668f7)(?=[\s\S]*5b26289)'
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*3503397)(?=[\s\S]*921f57c)(?=[\s\S]*2fc99c0)'
     match: contains
   - name: ca23-aucun-commit-invente
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '85cdd2e'
+    pattern: 'ed5587e'
     match: not_contains
   - name: ca01-bash-commandes-autorisees
     type: tool_used

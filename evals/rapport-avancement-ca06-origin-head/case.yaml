@@ -17,9 +17,9 @@ execution:
 context:
   scaffold_script: scaffold.sh
 
-# Sur principale, dans la période : 6778367, 90668f7, 5b26289 (tous internes).
-# Sur origin/feat/export-pdf : cb54966, 7690d7e, a1b5ba7. La branche locale
-# main (v1.0.0, 0deccb0) n'a aucun commit dans la période.
+# Sur principale, dans la période : 3503397, 921f57c, 2fc99c0 (tous internes).
+# Sur origin/feat/export-pdf : 098619f, 54c62e2, 4a5b78b. La branche locale
+# main (v1.0.0, 3d2f1e4) n'a aucun commit dans la période.
 graders:
   - name: ca06-livrable-cree
     type: file_exists
@@ -32,7 +32,7 @@ graders:
   - name: ca06-commits-de-principale-dans-sources
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Sources(?=[\s\S]*6778367)(?=[\s\S]*90668f7)(?=[\s\S]*5b26289)'
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*3503397)(?=[\s\S]*921f57c)(?=[\s\S]*2fc99c0)'
     match: contains
   - name: ca06-realise-non-vide
     type: regex

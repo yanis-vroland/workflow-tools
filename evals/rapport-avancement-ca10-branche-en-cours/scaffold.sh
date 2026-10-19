@@ -31,7 +31,9 @@ commit() {
 }
 
 # --- Branche non fusionnée hors période ------------------------------------------
-g checkout -q -b feat/import-tableur 85cdd2e
+# Base : commit du 2026-09-08 sur main (main~3), désigné par position pour ne
+# pas dépendre de son hash
+g checkout -q -b feat/import-tableur main~3
 mkdir -p src/import
 cat >src/import/csv.ts <<'TS'
 // Lecture du fichier CSV exporté du tableur des interventions

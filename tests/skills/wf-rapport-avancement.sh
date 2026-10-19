@@ -236,6 +236,8 @@ fieldops_values=(
   "pubspec.yaml"
   "purge"
   "MAP_API_KEY"
+  "2027-03-31"
+  "PRODUCTION_DATABASE_URL"
   "recette"
   "Camille"
   "tableur"

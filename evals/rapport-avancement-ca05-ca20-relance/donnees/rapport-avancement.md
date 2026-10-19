@@ -1,6 +1,6 @@
 # Rapport d'avancement de FieldOps
 
-Outil : wf-rapport-avancement · Date : 2026-09-25 · Commit : 6778367
+Outil : wf-rapport-avancement · Date : 2026-09-25 · Commit : 3503397
 Période : du 2026-08-01 au 2026-09-25 (bornes incluses) · Branche principale : main
 Livrables wf- lus : aucun
 
@@ -36,8 +36,8 @@ aucune identifiée
 
 ### Réalisé
 
-- Travaux techniques internes : `b5808fe`, `da56e50`, `85cdd2e`, `6778367`
+- Travaux techniques internes : `db46741`, `912c3a3`, `ed5587e`, `3503397`
 
 ### En cours
 
-- Export PDF des interventions (branche `feat/export-pdf`) : `cb54966`
+- Export PDF des interventions (branche `feat/export-pdf`) : `098619f`

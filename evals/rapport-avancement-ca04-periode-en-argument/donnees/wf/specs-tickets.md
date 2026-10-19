@@ -1,6 +1,6 @@
 # Tickets de FieldOps
 
-Outil : wf-specs-tickets · Date : 2025-10-28 · Commit : f9f97a3
+Outil : wf-specs-tickets · Date : 2025-10-28 · Commit : 9d2a6b2
 Fichiers d'entrée : cadrage-besoin.md
 
 ## Synthèse

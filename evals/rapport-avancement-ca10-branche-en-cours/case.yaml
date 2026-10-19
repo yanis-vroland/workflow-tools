@@ -20,13 +20,13 @@ context:
   scaffold_script: scaffold.sh
 
 # Commits de la période, rejouables :
-#   main : 6778367 (docs), 90668f7 (chore, T07), 5b26289 (chore),
-#          e50afe6 (chore recette, fichier d'environnement versionné),
-#          8cf7c57 (« maj » : titre et langue de la page du back-office),
-#          78c65c5 (« wip » : fichier binaire seul)
-#   feat/export-pdf : cb54966, 7690d7e, a1b5ba7
-#   feat/import-tableur : 8ff75d8 (2026-09-10, hors période)
-# Travaux techniques internes : 4 (6778367, 90668f7, 5b26289, e50afe6).
+#   main : 3503397 (docs), 921f57c (chore, T07), 2fc99c0 (chore),
+#          664f537 (chore recette, fichier d'environnement versionné),
+#          cd9a97d (« maj » : titre et langue de la page du back-office),
+#          4e7a5d4 (« wip » : fichier binaire seul)
+#   feat/export-pdf : 098619f, 54c62e2, 4a5b78b
+#   feat/import-tableur : a20e45c (2026-09-10, hors période)
+# Travaux techniques internes : 4 (3503397, 921f57c, 2fc99c0, 664f537).
 graders:
   # --- Témoins et CA1 ----------------------------------------------------------------------
   - name: ca01-livrable-cree
@@ -69,7 +69,7 @@ graders:
   - name: ca09-sources-tous-les-commits-de-la-periode
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Sources(?=[\s\S]*6778367)(?=[\s\S]*90668f7)(?=[\s\S]*5b26289)(?=[\s\S]*e50afe6)(?=[\s\S]*8cf7c57)(?=[\s\S]*78c65c5)(?=[\s\S]*cb54966)(?=[\s\S]*7690d7e)(?=[\s\S]*a1b5ba7)'
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*3503397)(?=[\s\S]*921f57c)(?=[\s\S]*2fc99c0)(?=[\s\S]*664f537)(?=[\s\S]*cd9a97d)(?=[\s\S]*4e7a5d4)(?=[\s\S]*098619f)(?=[\s\S]*54c62e2)(?=[\s\S]*4a5b78b)'
     match: contains
   - name: ca09-chaque-commit-une-seule-fois-dans-sources
     type: regex
@@ -87,7 +87,7 @@ graders:
   - name: ca10-branche-hors-periode-absente
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '(?:8ff75d8|import-tableur|\bCSV\b|\btableur\b)'
+    pattern: '(?:a20e45c|import-tableur|\bCSV\b|\btableur\b)'
     flags: i
     match: not_contains
   - name: ca10-une-entree-par-branche
@@ -178,17 +178,17 @@ graders:
   - name: ca24-commit-indescriptible-dans-points-non-determines
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n##? )[\s\S])*?78c65c5'
+    pattern: '\n##? [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n##? )[\s\S])*?4e7a5d4'
     match: contains
   - name: ca24-commit-decrit-par-son-diff-absent-des-points-non-determines
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n##? )[\s\S])*?8cf7c57'
+    pattern: '\n##? [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n##? )[\s\S])*?cd9a97d'
     match: not_contains
   - name: ca24-diff-consulte
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"git show (?:[^"\\]|\\.)*8cf7c57'
+    input_match: '"command"\s*:\s*"git show (?:[^"\\]|\\.)*cd9a97d'
     min: 1
   - name: ca24-commit-decrit-d-apres-son-diff
     type: llm
