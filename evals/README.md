@@ -55,8 +55,9 @@ Spec 002, lancée par `/wf-doc-projet`, tous les cas `hors-reseau` (tag `wf-doc-
 |---|---|---|
 | `doc-projet-ca09-fichier-unique` | FieldOps web seul, propre | CA1 à CA6, CA8, CA9, CA11, CA13 |
 | `doc-projet-ca10-monorepo` | FieldOps complet (web et Flutter), propre | CA10 (cas limite monorepo), CA1, CA3 à CA6, CA8, CA13 |
+| `doc-projet-ca04-tableau-des-variables` | FieldOps web seul, plus un paiement par carte via le SDK Stripe (commit rejouable), propre | CA4 (tableau des variables : chaque colonne, « non déterminé », aucun service ni procédure inventés), CA1 |
 | `doc-projet-ca08-modifications-non-commitees` | FieldOps web seul, `--dirty` | CA8 |
-| `doc-projet-ca07-mise-a-jour` | FieldOps web seul et livrable fichier déjà commité | CA7 |
+| `doc-projet-ca07-mise-a-jour` | FieldOps web seul et livrable fichier déjà commité | CA7, CA4 (ancienne liste des variables remplacée par le tableau) |
 | `doc-projet-ca12-dossier-vers-fichier` | FieldOps web seul et ancien livrable dossier | CA12 (cas limite) |
 | `doc-projet-ca12-fichier-vers-dossier` | FieldOps complet et ancien livrable fichier | CA12 (cas limite) |
 | `doc-projet-ca14-repertoire-vide` | répertoire vide | CA14 (cas limite) |
