@@ -141,6 +141,32 @@ absent "CA25 pas de git shortlog" 'git shortlog'
 
 cite "CA26 exclusion des fichiers d'environnement des diffs" ":(exclude,glob)**/.env*"
 
+# --- Injection shell : aucun texte variable entre guillemets doubles -------------------
+# Un <emplacement> (référence, hash, borne) remplacé entre guillemets doubles
+# laisserait passer $(…) ou des accents graves. Les emplacements des commandes
+# (blocs bash et commandes en ligne) sont entre apostrophes ou nus, après
+# validation des caractères de la référence.
+
+# Accents graves et $ littéraux, sans expansion voulue
+# shellcheck disable=SC2016
+commands=$(
+  awk '/^ *```bash$/ { in_block = 1; next } in_block && /^ *```$/ { in_block = 0 } in_block' <<<"$body"
+  grep -oE '`(git|date) [^`]*`' <<<"$body"
+)
+if grep -qE '"[^"]*<[^>"]+>[^"]*"' <<<"$commands"; then
+  ko "aucun emplacement <…> entre guillemets doubles dans une commande ($(grep -oE '"[^"]*<[^>"]+>[^"]*"' <<<"$commands" | head -n 1))"
+else
+  ok "aucun emplacement <…> entre guillemets doubles dans une commande"
+fi
+# shellcheck disable=SC2016
+if grep -qF '$ARGUMENTS' <<<"$commands"; then
+  ko "\$ARGUMENTS jamais inséré dans une commande"
+else
+  ok "\$ARGUMENTS jamais inséré dans une commande"
+fi
+cite "validation des caractères d'une référence avant toute commande" \
+  "contient autre chose que lettres, chiffres, \`.\`, \`_\`, \`/\` et \`-\`, ou qui commence par \`-\`, n'existe pas"
+
 # --- Hors périmètre : aucun tag, aucun CHANGELOG ---------------------------------------
 
 cite "CA1 CHANGELOG.md jamais modifié" "CHANGELOG.md"
@@ -159,8 +185,15 @@ fieldops_values=(
   "v1.1.0"
   "v1.2.0"
   "feat/export-pdf"
-  "5b26289"
-  "b5808fe"
+  "2fc99c0"
+  "db46741"
+  "purge"
+  "MAP_API_KEY"
+  "3.6.0"
+  "CSV"
+  "Export Excel"
+  "bouton"
+  "production"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
