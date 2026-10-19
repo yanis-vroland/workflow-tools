@@ -119,9 +119,10 @@ Spec 006, lancée par `/wf-specs-tickets`, tous les cas `hors-reseau` (tag `wf-s
 | `specs-tickets-ca18-sans-cadrage` | FieldOps brief sans `docs/wf/` | CA18 (cas limite) |
 | `specs-tickets-ca19-texte-saisi` | FieldOps brief et cadrage, texte saisi dans la commande | CA19 (cas limite) |
 | `specs-tickets-ca19-aucun-besoin` | FieldOps brief et fichier d'organisation sans besoin, passé en argument | CA19 (cas limite) |
-| `specs-tickets-ca22-fichier-argument` | FieldOps brief et cahier des charges dans `besoins/`, avec e-mails et téléphones, passé en argument | CA22 (cas limite), CA3, CA1 |
+| `specs-tickets-ca22-fichier-argument` | FieldOps brief et cahier des charges dans `besoins/`, avec e-mails, téléphones et noms, passé en argument | CA22 (cas limite), CA3, CA1 |
+| `specs-tickets-ca03-modifications-non-commitees` | FieldOps complet `--dirty`, cadrage du cas CA14 | CA3 (mention « modifications non commitées ») |
 
-Hash de commit attendu : `5b26289` (FieldOps complet, cas CA14). CA14 : les chemins existants sont listés dans le grader `ca14-chemins-existants-ou-a-creer` ; une modification de la fixture impose de le mettre à jour.
+Hash de commit attendu : `2fc99c0` (FieldOps complet, cas CA14 et CA3) ; le cadrage déposé porte un commit antérieur (`921f57c`), pour que le hash attendu ne puisse pas être recopié. CA14 : les chemins existants sont listés dans le grader `ca14-chemins-existants-ou-a-creer` ; une modification de la fixture impose de le mettre à jour, ainsi que les hash. Le cas principal accorde Edit, WebFetch et WebSearch pour que ses graders « max: 0 » sur ces outils mesurent quelque chose. Les motifs des correcteurs sont vérifiés par `tests/correcteurs/wf-specs-tickets.mjs`, lancé par `tests/skills.sh`.
 
 ## Correcteurs
 
