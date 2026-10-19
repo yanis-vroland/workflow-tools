@@ -265,4 +265,14 @@ fi
 
 cite "CA21 Grep en mode files_with_matches seulement" "Grep s'utilise uniquement en mode \`files_with_matches\`"
 
+# --- Motifs des correcteurs des evals (tests/correcteurs/wf-specs-tickets.mjs) -----------
+
+if ! command -v node >/dev/null 2>&1; then
+  ko "node introuvable : correcteurs des evals non vérifiés (tests/correcteurs/wf-specs-tickets.mjs)"
+elif ! node "$root/tests/correcteurs/wf-specs-tickets.mjs" >/dev/null; then
+  ko "correcteurs des evals (node tests/correcteurs/wf-specs-tickets.mjs pour le détail)"
+else
+  ok "correcteurs des evals : motifs compilés et vérifiés sur exemples"
+fi
+
 exit $fail

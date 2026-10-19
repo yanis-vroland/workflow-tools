@@ -3,7 +3,8 @@
 # répertoire de travail de l'eval, vide au lancement, puis y dépose un livrable
 # de /wf-cadrage-besoin (contrat de la spec 004) : trois évolutions du
 # back-office. docs/wf/ est ignoré par git pour que l'arbre de travail reste
-# propre (commit 5b26289, sans « modifications non commitées »).
+# propre (commit 2fc99c0, sans « modifications non commitées ») ; le cadrage
+# porte un commit antérieur (921f57c), qui ne doit pas être recopié.
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")/../.." && pwd)"
