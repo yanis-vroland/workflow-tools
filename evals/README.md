@@ -196,6 +196,29 @@ Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` me
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
+### wf-passation
+
+Spec 016, lancée par `/wf-passation`, tous les cas `hors-reseau` (tag `wf-passation`). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca08-…`).
+
+Tous les cas portent `ca01-commandes-autorisees` : Bash ne sert qu'aux commandes en lecture de la skill (`git rev-parse --short HEAD`, `git status --porcelain`, `date +%F`, `git symbolic-ref refs/remotes/origin/HEAD`, `git show-ref --verify refs/heads/main|master`, `git branch -a --no-merged …`, `git rev-list --count …`, `git log -1 --format=%cs …`), ce qui exclut aussi toute récupération distante (`git fetch`, hors périmètre).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `passation-fieldops` | FieldOps complet (web et Flutter), propre, faux secret, aucun livrable `wf-*` | CA1 à CA5, CA7 à CA10, CA12 à CA14, CA16, CA17, CA20 (monorepo), CA21, CA23 |
+| `passation-ca03-ca04-livrables-wf` | FieldOps `--dirty` et livrables commités : doc-projet en dossier, onboarding, exploitation (contrat de la spec 018), analyse-projet, chiffrage, revue-securite | CA3, CA4 (format dossier), CA13 (rien des livrables internes), CA21, CA1 |
+| `passation-ca15-relance` | FieldOps, doc-projet en fichier unique et dossier de passation précédent avec saisies à la main | CA15, CA4 (fichier unique), CA14, CA16 |
+| `passation-ca10-branches-distantes` | FieldOps `--dirty`, `origin/HEAD`, branche distante non fusionnée, branche locale fusionnée | CA10, CA14, CA17, CA21 |
+| `passation-ca11-branche-principale-inconnue` | FieldOps dont `main` est renommée `trunk` | CA11 (cas limite) |
+| `passation-ca06-ca18-hors-git-sans-deploiement` | copie de FieldOps hors git, sans workflow, `Dockerfile` ni `docker-compose.yml` | CA6, CA18 (cas limites), CA8 |
+| `passation-ca19-stack-non-couverte` | projet Python fictif déployé par `flyctl`, Stripe par `.env.example`, Sentry par `requirements.txt` seul, IP en dur | CA19 (cas limite), CA5, CA7, CA8, CA23 |
+| `passation-ca22-repertoire-vide`, `passation-ca22-sans-code-source` | répertoire vide ; FieldOps brief (documents seuls) | CA22 (cas limite) |
+
+Hash de commit attendus dans les en-têtes (scaffolds rejouables) : `5b26289` (FieldOps, y compris `ca10` et `ca11`, dont les références ajoutées ne déplacent pas `HEAD`), `8918f31` (`ca03-ca04`), `33b6f4f` (`ca15`). Une modification de la fixture ou de ces scaffolds les change : mettre à jour les graders `ca21-entete-commit`, `ca16-commit-de-reference` et `ca15-commit-mis-a-jour`.
+
+CA10 : aucune branche distante ne peut être récupérée en eval ; le scaffold crée donc les références distantes à la main (`git update-ref`, `git symbolic-ref`), avec des commits construits par `git commit-tree` sans toucher à l'arbre de travail.
+
+CA23 : les adresses en dur de FieldOps sont celles du registre d'images et du webhook de `.github/workflows/deploy.yml` (lignes 29 à 33 et 44 à 48) ; `localhost`, le service `db` de `docker-compose.yml`, `.env.example` et les README sont exclus. Le cas Python ajoute une adresse IP de la plage de documentation (`203.0.113.42`) et une adresse d'écoute `0.0.0.0`, exclue comme adresse locale.
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
