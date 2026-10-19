@@ -24,12 +24,20 @@ Tu ne produis que le niveau A. Tu n'écris jamais de schéma physique, de migrat
 
 - **Aucune question pendant l'exécution** : ce qui est à clarifier va dans le livrable (questions au client, encadrés « À décider »). Ne demande jamais de confirmation.
 - **Écriture** : le seul fichier que tu écris est `docs/wf/modele-donnees/index.md` (tu peux créer les dossiers `docs/wf/` et `docs/wf/modele-donnees/`, par `mkdir -p docs/wf/modele-donnees` ou par Write). Aucun fichier temporaire, aucune modification des sources ni de quoi que ce soit d'autre dans le projet, y compris les livrables des autres outils dans `docs/wf/`, qui sont seulement lus. Pas de branche, pas de commit. Ne supprime, ne déplace et ne renomme jamais un fichier, même dans `docs/wf/modele-donnees/`.
-- **Aucune exécution** : aucune commande ne lance une requête, une migration, un client de base de données ou un outil d'ORM (`psql`, `sqlite3`, `mysql`, `prisma migrate`, `prisma db push`, `typeorm migration:run`, `drift_dev`…), ni le projet, ses tests ou son installation (`npm`, `npx`, `node`, `flutter`, `dart`…). Bash ne sert qu'à : `date +%F`, `git rev-parse --short HEAD`, `git status --porcelain`, `test -f "<chemin>"` sur un argument, `pdfinfo` et `pdftotext` sur une source PDF, la conversion d'un chemin absolu en chemin relatif (`python3 -c 'import os, sys; print(os.path.relpath(sys.argv[1]))' "<chemin>"`) et `mkdir -p docs/wf/modele-donnees`. Pour chercher dans le projet, utilise Glob et Grep, jamais Bash. L'en-tête du livrable indique toujours que les fichiers produits n'ont pas été exécutés.
-- **Fichiers d'environnement** : un fichier dont le nom commence par `.env` (`.env`, `.env.local`, `.env.md`…), qu'il vienne des arguments, de l'en-tête ou du projet, n'est jamais ouvert, ni par Read, ni par Grep, ni par Bash. Seul `.env.example` pourrait être lu, mais ce n'est pas une source d'analyse : il est écarté comme les autres. Avec Grep, passe toujours le paramètre `glob` limité aux extensions recherchées (ex. `*.sql`, `*.{ts,dart}`) : un dossier peut contenir un fichier d'environnement. Aucune chaîne de connexion à une base (`postgres://…`, `mysql://…`, `DATABASE_URL=…`), aucun mot de passe ni secret n'est recopié dans le livrable.
+- **Aucune exécution** : aucune commande ne lance une requête, une migration, un client de base de données ou un outil d'ORM (`psql`, `sqlite3`, `mysql`, `prisma migrate`, `prisma db push`, `typeorm migration:run`, `drift_dev`…), ni le projet, ses tests ou son installation (`npm`, `npx`, `node`, `flutter`, `dart`…). Bash ne sert qu'à : `date +%F`, `git rev-parse --short HEAD`, `git status --porcelain`, `pdfinfo` et `pdftotext` sur une source PDF (étape 4), la conversion d'un chemin absolu en chemin relatif (commande ci-dessous) et `mkdir -p docs/wf/modele-donnees`. Pour chercher dans le projet, utilise Glob et Grep, jamais Bash. L'en-tête du livrable indique toujours que les fichiers produits n'ont pas été exécutés.
+- **Fichiers d'environnement** : un fichier dont le nom commence par `.env` (`.env`, `.env.local`, `.env.md`…), qu'il vienne des arguments, de l'en-tête ou du projet, n'est jamais ouvert, ni par Read, ni par Grep, ni par Bash. Seul `.env.example` pourrait être lu, mais ce n'est pas une source d'analyse : il est écarté comme les autres. Avec Grep, passe toujours le paramètre `glob` limité aux extensions recherchées (ex. `*.sql`, `*.{ts,dart}`) et le mode `output_mode: "files_with_matches"` : un dossier peut contenir un fichier d'environnement, et le mode contenu en afficherait les lignes avant qu'on puisse l'écarter. Ouvre ensuite avec Read les seuls fichiers trouvés dont le nom ne commence pas par `.env`. Aucune chaîne de connexion à une base (`postgres://…`, `mysql://…`, `<VARIABLE>=…`), aucun mot de passe ni secret n'est recopié dans le livrable.
 - **Honnêteté** : toute affirmation s'appuie sur une source citée. Ce qui n'est dans aucune source est marqué « supposé » (un élément du modèle) ou « non déterminé » (une information), jamais présenté comme un fait.
-- **Données personnelles** : aucune adresse e-mail, aucun numéro de téléphone, aucun nom de personne figurant dans les sources n'apparaît dans le livrable, ni dans les citations (coupe ou remplace par « […] »), ni dans les exemples. Désigne une personne par son rôle. Les exemples du dictionnaire de données sont tous fictifs et manifestement inventés (« Adhérent Fictif », « 1 rue de l'Exemple, 00000 Villefictive »), jamais tirés des sources.
+- **Données personnelles** : aucune adresse e-mail, aucun numéro de téléphone, aucun nom de personne figurant dans les sources n'apparaît dans le livrable, ni dans les citations (coupe ou remplace par « […] »), ni dans les exemples. Désigne une personne par son rôle. Les exemples du dictionnaire de données sont tous fictifs et manifestement inventés (« Nom Imaginaire », « 2 allée des Prototypes, 99999 Nullepart »), jamais tirés des sources.
 - **Langue** : le livrable est rédigé en français, quelle que soit la langue des sources. Les citations restent dans leur langue d'origine, entre « ».
-- **Désignation des sources** : dans la ligne « Sources lues » de l'en-tête, chaque source est désignée par son chemin relatif à la racine du projet, y compris hors du projet (`../demandes/brief.md`), jamais par un chemin absolu ; un argument absolu est converti par la commande `python3` ci-dessus. Partout ailleurs, une source est désignée par son nom de fichier seul (`brief.md`).
+- **Désignation des sources** : dans la ligne « Sources lues » de l'en-tête, chaque source est désignée par son chemin relatif à la racine du projet, y compris hors du projet (`../demandes/brief.md`), jamais par un chemin absolu ; un argument absolu est converti par cette commande, qui reçoit le chemin par l'entrée standard (jamais inséré dans la ligne de commande, où `$(…)`, des accents graves ou un guillemet seraient interprétés) :
+
+  ```bash
+  python3 -c 'import os, sys; print(os.path.relpath(sys.stdin.read().rstrip("\n")))' <<'CHEMIN'
+  <chemin absolu>
+  CHEMIN
+  ```
+
+  Partout ailleurs, une source est désignée par son nom de fichier seul (`brief.md`).
 
 ## Étape 1 : options et niveau demandé
 
@@ -39,7 +47,7 @@ Tu ne produis que le niveau A. Tu n'écris jamais de schéma physique, de migrat
 
 ## Étape 2 : déterminer les sources
 
-1. Vérifie avec Bash (`test -f docs/wf/modele-donnees/index.md`) si un livrable existe. S'il existe, lis-le avec Read : c'est une relance (étape 7).
+1. Vérifie avec Glob (motif `docs/wf/modele-donnees/index.md`) si un livrable existe. S'il existe, lis-le avec Read : c'est une relance (étape 7).
 2. **Avec des arguments de fichiers** : seuls ces fichiers sont des sources (plus, en relance, celles de l'en-tête, voir étape 7). Ne lis pas `docs/wf/cadrage-besoin.md` s'il n'est pas en argument.
 3. **Sans argument de fichier** :
    - en relance : les sources sont celles de la ligne « Sources lues » de l'en-tête du livrable existant, cherchées à leur chemin relatif enregistré depuis la racine du projet, uniquement ;
@@ -48,8 +56,9 @@ Tu ne produis que le niveau A. Tu n'écris jamais de schéma physique, de migrat
      `/wf-modele-donnees <fichier> [<fichier>…]` (analyse, cahier des charges, notes, transcription ; Markdown `.md`, texte `.txt` ou PDF à texte extractible), lancée à la racine du projet ; sans argument, l'outil lit `docs/wf/cadrage-besoin.md` s'il existe ; option `--niveau a|b|c` pour forcer le niveau.
 4. Écarte, en notant la raison de chacune :
    - un nom de fichier d'environnement (`.env*`), sans l'ouvrir ni le tester : « fichier d'environnement, jamais lu » ;
-   - un chemin qui n'existe pas : « fichier introuvable » ;
+   - un chemin qui n'existe pas : « fichier introuvable ». L'existence se vérifie avec Glob (paramètre `path` : le dossier du fichier, `pattern` : son nom), jamais par une commande Bash ;
    - une extension autre que `.md`, `.markdown`, `.txt` ou `.pdf` (ex. `.docx`, `.eml`) : « format non pris en charge, à convertir en Markdown, texte ou PDF ». N'ouvre pas ce fichier et n'en exploite rien ;
+   - un PDF dont le chemin contient une apostrophe, sans commande (étape 4) ;
    - un PDF sans texte extractible (étape 4), ou illisible faute de poppler (`pdfinfo` ou `pdftotext` introuvable : indique d'installer poppler).
 5. Si aucune source n'est lisible, n'écris rien : indique dans ton message chaque fichier en cause, nommé, avec sa raison, et qu'aucun livrable n'a été écrit faute de source lisible. Sinon, continue avec les sources lisibles : chaque fichier écarté sera signalé dans « Points non déterminés » et dans ton message final.
 
@@ -57,7 +66,7 @@ Tu ne produis que le niveau A. Tu n'écris jamais de schéma physique, de migrat
 
 Cherche dans le projet, avec Glob et Grep uniquement, en excluant `node_modules/`, les dossiers de build (`build/`, `dist/`, `.dart_tool/`) et tout `docs/wf/` (les fichiers d'un livrable ne sont pas un schéma du projet) :
 
-- un fichier `.sql` contenant `CREATE TABLE` (Grep insensible à la casse, `glob: "*.sql"`) ;
+- un fichier `.sql` contenant `CREATE TABLE` (Grep insensible à la casse, `glob: "*.sql"`, `output_mode: "files_with_matches"`) ;
 - un fichier `schema.prisma` ;
 - des entités TypeORM (`@Entity(` dans un fichier `*.ts`) ;
 - des tables Drift (`extends Table` dans un fichier `*.dart`) ;
@@ -68,7 +77,7 @@ Si un schéma est détecté et que l'option `--niveau a` n'est pas passée, le n
 ## Étape 4 : lire les sources
 
 - Markdown et texte : Read. Repère pour chaque passage le titre de section Markdown sous lequel il se trouve.
-- PDF : jamais avec Read. Avec Bash uniquement : `pdfinfo "<fichier>"` (ligne `Pages:`), puis pour chaque page N `pdftotext -f N -l N "<fichier>" -`. Une page est sans texte si la sortie est vide ou blanche ; si toutes le sont, le PDF n'a pas de texte extractible et il est écarté (étape 2), sans chercher à voir ce que montrent ses pages. Sinon, cite chaque passage avec sa page ; les pages sans texte vont dans « Points non déterminés ».
+- PDF : jamais avec Read. Avec Bash uniquement, le chemin entre guillemets simples : `pdfinfo '<fichier>'` (ligne `Pages:`), puis pour chaque page N `pdftotext -f N -l N '<fichier>' -`. Un PDF dont le chemin contient une apostrophe (`'`) est écarté sans aucune commande : « nom de fichier non pris en charge (apostrophe), à renommer ». Une page est sans texte si la sortie est vide ou blanche ; si toutes le sont, le PDF n'a pas de texte extractible et il est écarté (étape 2), sans chercher à voir ce que montrent ses pages. Sinon, cite chaque passage avec sa page ; les pages sans texte vont dans « Points non déterminés ».
 - `docs/wf/cadrage-besoin.md` (livrable de `wf-cadrage-besoin`) : sa section « Besoins fonctionnels » et ses identifiants `Bnn` font contrat. Un élément tiré d'un besoin cite son identifiant (`B03`) ; une réponse déjà saisie dans ce cadrage peut être citée (`cadrage-besoin.md, réponse à Q02`).
 - Une source se cite ainsi : « phrase » (`nom.md`, « Titre de section ») ; « phrase » (`nom.pdf`, page N) ; `B03` ; « réponse saisie à la question `Qnn` » ; « décision saisie en `Dnn` ».
 
@@ -131,7 +140,7 @@ erDiagram
 
 | Entité | Champ | Type | Obligatoire | Exemple | Source |
 |---|---|---|---|---|---|
-| Adhérent | nom | texte | oui | Adhérent Fictif | « <phrase> » (<fichier>, « <section> ») |
+| Adhérent | nom | texte | oui | Nom Imaginaire | « <phrase> » (<fichier>, « <section> ») |
 | Emprunt | état | énumération (en cours, rendu, en retard) | oui | en cours | B02 |
 | Ouvrage | cote | texte | non | ABC-001 | supposé |
 
