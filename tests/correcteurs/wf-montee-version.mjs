@@ -82,6 +82,9 @@ for (const c of cases) {
     if ("negate" in fields) errors.push(`${f} : clé negate non permise`);
     if (fields.type === "tool_used" && fields.tool === "Skill") errors.push(`${f} : tool_used Skill non permis`);
     if (fields.type === "tool_used" && fields.max === "0" && fields.min !== "0") errors.push(`${f} : max: 0 exige min: 0`);
+    // Un interdit sur un outil non accordé passerait forcément sans rien mesurer
+    const allowed = (/^\s+allowed_tools:\s*\[(.*)\]/m.exec(yaml)?.[1] ?? "").split(",").map((t) => t.trim());
+    if (fields.type === "tool_used" && !allowed.includes(fields.tool)) errors.push(`${f} : outil ${fields.tool} absent des allowed_tools du cas`);
     let re = null;
     const source = fields.input_match ?? fields.pattern;
     if (source !== undefined) {
@@ -524,6 +527,22 @@ sampleCase(c23, relaunchDoc, [
   ["ca23-en-tete-commit-actualise.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 0000000", offlineParts)],
   ["ca23-version-actuelle-du-lockfile.md", livrable(relaunchHeader, swap(offlineParts, "Inventaire des versions", "| `react` | `^17.0.2` | 17.0.2 |", "| `react` | `^16.14.0` | 16.14.0 |"))],
 ]);
+// Faux verts : l'ancien livrable déposé par le scaffold ne doit satisfaire aucun
+// correcteur positif (contains, count) du cas, sinon celui-ci ne prouve rien.
+{
+  const scaffold = readFileSync(join(evals, c23, "scaffold.sh"), "utf8");
+  const old = /cat >docs\/wf\/montee-version\.md <<'MD'\n([\s\S]*?)\nMD\n/.exec(scaffold)?.[1];
+  const errors = [];
+  if (!old) errors.push("ancien livrable introuvable dans scaffold.sh");
+  else
+    for (const [key, g] of Object.entries(graders)) {
+      if (!key.startsWith(`${c23}/`) || g.fields.type !== "regex" || !(g.fields.target ?? "").includes("montee-version.md")) continue;
+      if ((g.fields.match ?? "contains") === "not_contains") continue;
+      if (passes(g, old)) errors.push(`${key.slice(c23.length + 1)} réussit sur l'ancien livrable du scaffold`);
+    }
+  if (errors.length) ko(`${c23} : correcteurs positifs discriminants`, errors);
+  else ok(`${c23} : aucun correcteur positif ne réussit sur l'ancien livrable du scaffold`);
+}
 check(
   "CA23 aucun doublon",
   `${c23}/ca23-aucun-doublon.md`,

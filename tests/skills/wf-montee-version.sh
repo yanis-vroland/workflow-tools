@@ -123,7 +123,7 @@ cite "CA7 repli signalé dans Points non déterminés" "Points non déterminés"
 
 # --- CA8 à CA10 : argument et cibles ---------------------------------------------
 
-cite "CA8 exemple d'argument paquet" "/wf-montee-version react 19"
+cite "CA8 exemple d'argument paquet" "/wf-montee-version vue 3"
 cite "CA8 exemple d'argument SDK" "/wf-montee-version flutter 3.27"
 cite "CA9 et CA26 aucun livrable écrit" "aucun livrable n'a été écrit"
 cite "CA10 lot unique mineur et correctif" "lot unique"
@@ -218,6 +218,9 @@ fieldops_values=(
   "mobile/"
   "lodash"
   "pluck"
+  "react"
+  "19.2.0"
+  "apps/web"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
@@ -238,6 +241,24 @@ elif out=$(bash -n <<<"$blocks" 2>&1); then
 else
   ko "blocs bash syntaxiquement valides ($out)"
 fi
+
+# --- Injection shell : valeurs à substituer entre apostrophes seulement ----------------
+# Toute valeur venue du projet ou de l'utilisateur (paramètre <…> à remplacer) doit
+# être dans un segment entre apostrophes : hors apostrophes ou entre guillemets
+# doubles, un $(…) ou un ` dans l'argument serait exécuté. Les arguments de la
+# commande (`$ARGUMENTS`, `$1`…) ne sont jamais interpolés.
+# shellcheck disable=SC2001 # suppression multiligne de tous les segments entre apostrophes
+unquoted=$(sed "s/'[^']*'//g" <<<"$blocks" | grep -nE '<[A-Za-z@][^<>]*>' || true)
+# shellcheck disable=SC2016 # motif littéral : on cherche le texte « $ARGUMENTS »
+if [ -n "$unquoted" ]; then
+  ko "injection shell : paramètre <…> hors apostrophes dans un bloc bash ($unquoted)"
+elif grep -qE '\$ARGUMENTS|\$\{?[0-9@*]' <<<"$blocks"; then
+  ko "injection shell : argument de la commande interpolé dans un bloc bash"
+else
+  ok "injection shell : paramètres des blocs bash entre apostrophes seulement"
+fi
+cite "injection shell : valeur non conforme jamais dans une commande" "n'entre jamais dans une commande"
+cite "Grep en mode contenu : glob ou fichier unique imposé" "jamais un dossier sans \`glob\`"
 
 # --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------------
 
