@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/recette.md" }
-pattern: '##? [^\n]*Cas de recette(?:(?!\n##? )[\s\S])*\n\|\s*(?!REC-\d{3}\s*\||ID\s*\||:?-{3})[^\n]*\|'
+pattern: '##? [^\n]*Cas de recette(?:(?!\n##? )[\s\S])*\n\|(?!\s*(?:REC-\d{3}\s*\||ID\s*\||:?-{3}))[^\n]*\|'
 match: not_contains
 ---
 
