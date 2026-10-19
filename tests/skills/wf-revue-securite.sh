@@ -178,6 +178,18 @@ fixture_values=(
   "FAUX_JETON"
   "5b26289"
   "mobile/"
+  "API_KEY"
+  "tokenKey"
+  "httpOnly"
+  "localStorage"
+  "app.use"
+  "router.use"
+  "dart-define"
+  "defaultValue"
+  "CORS ouvert"
+  "tentatives de connexion"
+  "DELETE /api"
+  "requête paramétrée"
 )
 leak_ok=1
 for value in "${fixture_values[@]}"; do
@@ -187,5 +199,21 @@ for value in "${fixture_values[@]}"; do
   fi
 done
 [ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
+
+# --- Injection shell : gabarits des commandes Bash ---------------------------------------
+# Un texte venu du projet (nom de paquet, version, identifiant d'avis) n'est inséré
+# dans une commande qu'entre apostrophes, après rejet de toute apostrophe : jamais
+# entre guillemets doubles, où `$(…)` et les accents graves seraient interprétés.
+bash_blocks=$(awk '/^```bash$/ { in_block = 1; next } in_block && /^```$/ { in_block = 0 } in_block' <<<"$body")
+if [ -z "$bash_blocks" ]; then
+  ko "injection shell : aucun bloc \`\`\`bash dans la skill"
+elif grep -qE '"[^"]*<[a-z][^>]*>[^"]*"' <<<"$bash_blocks"; then
+  ko "injection shell : gabarit <…> entre guillemets doubles ($(grep -nE '"[^"]*<[a-z][^>]*>[^"]*"' <<<"$bash_blocks" | head -1))"
+elif sed -E "s/'<[a-z][^>]*>(@<[a-z][^>]*>)?'//g" <<<"$bash_blocks" | grep -qE '<[a-z][^>]*>'; then
+  ko "injection shell : gabarit <…> hors apostrophes"
+else
+  ok "injection shell : gabarits des commandes entre apostrophes seulement"
+fi
+cite "injection shell : rejet de l'apostrophe" "ni apostrophe"
 
 exit $fail
