@@ -51,7 +51,7 @@ graders:
   - name: ca01-aucune-ecriture-bash
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)[^\s;&|)"\\]+|tag\s+(?!-)[^\s;&|)"\\]+|tag\s+-[asdf]))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
     min: 0
     max: 0
   # CA1 et hors périmètre : aucun tag créé ou supprimé, aucun push, aucune release publiée
@@ -71,11 +71,11 @@ graders:
     target: { source: file, path: "docs/wf/release-notes.md" }
     pattern: '^(?:(?!\n## )[\s\S])*?\b\d{4}-\d{2}-\d{2}\b'
     match: contains
-  # CA3 : commit analysé = borne haute de la plage (a1b5ba7, rejouable)
+  # CA3 : commit analysé = borne haute de la plage (4a5b78b, rejouable)
   - name: ca03-en-tete-commit-borne-haute
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\ba1b5ba7\b'
+    pattern: '^(?:(?!\n## )[\s\S])*?\b4a5b78b\b'
     match: contains
   - name: adr001-arbre-propre-sans-mention
     type: regex
@@ -90,18 +90,18 @@ graders:
   - name: ca05-tous-les-commits-de-la-plage
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\bda56e50\b)(?=(?:(?!\n###? )[\s\S])*?\b85cdd2e\b)(?=(?:(?!\n###? )[\s\S])*?\b6778367\b)(?=(?:(?!\n###? )[\s\S])*?\bcb54966\b)(?=(?:(?!\n###? )[\s\S])*?\b7690d7e\b)(?=(?:(?!\n###? )[\s\S])*?\ba1b5ba7\b)'
+    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\b912c3a3\b)(?=(?:(?!\n###? )[\s\S])*?\bed5587e\b)(?=(?:(?!\n###? )[\s\S])*?\b3503397\b)(?=(?:(?!\n###? )[\s\S])*?\b098619f\b)(?=(?:(?!\n###? )[\s\S])*?\b54c62e2\b)(?=(?:(?!\n###? )[\s\S])*?\b4a5b78b\b)'
     match: contains
   # CA5 : la plage suit la branche, pas main
   - name: ca05-commits-de-main-absents
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\b(?:90668f7|5b26289|b5808fe)\b'
+    pattern: '\b(?:921f57c|2fc99c0|db46741)\b'
     match: not_contains
   - name: ca12-chaque-commit-une-seule-fois
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(da56e50|85cdd2e|6778367|cb54966|7690d7e|a1b5ba7)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(912c3a3|ed5587e|3503397|098619f|54c62e2|4a5b78b)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
     match: not_contains
   # CA14 : le fix de l'export PDF ne produit pas d'entrée dans Corrections (sous-section omise, CA2)
   - name: ca14-aucune-correction
@@ -113,7 +113,7 @@ graders:
   - name: ca13-ca14-une-seule-entree-pour-trois-commits
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bcb54966\b)(?=[^\n]*\b7690d7e\b)(?=[^\n]*\ba1b5ba7\b)(?=[^\n]*Nouveautés)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b098619f\b)(?=[^\n]*\b54c62e2\b)(?=[^\n]*\b4a5b78b\b)(?=[^\n]*Nouveautés)'
     match: contains
   - name: ca13-nouveaute-pdf
     type: regex
@@ -167,5 +167,5 @@ graders:
       1. « Nouveautés » contient une seule entrée pour l'export PDF.
       2. Aucune sous-section « Corrections » : la correction de marge est rattachée
          à l'entrée de l'export PDF.
-      3. Dans « Références », cette entrée cite les trois hashes courts (cb54966,
-         7690d7e, a1b5ba7).
+      3. Dans « Références », cette entrée cite les trois hashes courts (098619f,
+         54c62e2, 4a5b78b).

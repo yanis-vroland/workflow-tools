@@ -51,7 +51,7 @@ graders:
   - name: ca01-aucune-ecriture-bash
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)[^\s;&|)"\\]+|tag\s+(?!-)[^\s;&|)"\\]+|tag\s+-[asdf]))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
     min: 0
     max: 0
   # CA1 et hors périmètre : aucun tag créé ou supprimé, aucun push, aucune release publiée
@@ -71,11 +71,11 @@ graders:
     target: { source: file, path: "docs/wf/release-notes.md" }
     pattern: '^(?:(?!\n## )[\s\S])*?\b\d{4}-\d{2}-\d{2}\b'
     match: contains
-  # CA3 : commit analysé = borne haute de la plage (7cf46aa, rejouable)
+  # CA3 : commit analysé = borne haute de la plage (17691e6, rejouable)
   - name: ca03-en-tete-commit-borne-haute
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\b7cf46aa\b'
+    pattern: '^(?:(?!\n## )[\s\S])*?\b17691e6\b'
     match: contains
   - name: adr001-arbre-propre-sans-mention
     type: regex
@@ -96,28 +96,28 @@ graders:
   - name: ca05-tous-les-commits-de-la-plage
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\bdce262e\b)(?=(?:(?!\n###? )[\s\S])*?\b5427b41\b)(?=(?:(?!\n###? )[\s\S])*?\b2ca3162\b)(?=(?:(?!\n###? )[\s\S])*?\bc59eaca\b)(?=(?:(?!\n###? )[\s\S])*?\b212fab2\b)(?=(?:(?!\n###? )[\s\S])*?\b83ae943\b)(?=(?:(?!\n###? )[\s\S])*?\bd23c662\b)(?=(?:(?!\n###? )[\s\S])*?\b9f765da\b)(?=(?:(?!\n###? )[\s\S])*?\bbfe2f34\b)(?=(?:(?!\n###? )[\s\S])*?\ba39d2bd\b)(?=(?:(?!\n###? )[\s\S])*?\b7cf46aa\b)'
+    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\be1ee714\b)(?=(?:(?!\n###? )[\s\S])*?\b5c0ceb4\b)(?=(?:(?!\n###? )[\s\S])*?\bc9835c8\b)(?=(?:(?!\n###? )[\s\S])*?\bdb61e85\b)(?=(?:(?!\n###? )[\s\S])*?\bcba53e9\b)(?=(?:(?!\n###? )[\s\S])*?\b72df134\b)(?=(?:(?!\n###? )[\s\S])*?\b1b837fb\b)(?=(?:(?!\n###? )[\s\S])*?\b83c489f\b)(?=(?:(?!\n###? )[\s\S])*?\b1d9885f\b)(?=(?:(?!\n###? )[\s\S])*?\b11e4f47\b)(?=(?:(?!\n###? )[\s\S])*?\b17691e6\b)'
     match: contains
   - name: ca05-bornes-respectees
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\b(?:0deccb0|d5f01f1|b5808fe)\b'
+    pattern: '\b(?:3d2f1e4|c2d9e12|db46741)\b'
     match: not_contains
   # CA12 : le commit de fusion n'apparaît pas en tant que tel
   - name: ca12-fusion-absente
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\b678e1d7\b'
+    pattern: '\ba45fd17\b'
     match: not_contains
   - name: ca12-chaque-commit-une-seule-fois
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(dce262e|5427b41|2ca3162|c59eaca|212fab2|83ae943|d23c662|9f765da|bfe2f34|a39d2bd|7cf46aa)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(e1ee714|5c0ceb4|c9835c8|db61e85|cba53e9|72df134|1b837fb|83c489f|1d9885f|11e4f47|17691e6)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
     match: not_contains
   - name: ca12-ticket-cite
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bd23c662\b)(?=[^\n]*\bT07\b)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b1b837fb\b)(?=[^\n]*\bT07\b)'
     match: contains
   # CA15 : ni le commit SMS ni son revert ne produisent d'entrée
   - name: ca15-aucune-entree-sms
@@ -129,17 +129,17 @@ graders:
   - name: ca15-commit-annule-sans-entree
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b2ca3162\b)(?=[^\n]*sans entrée)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bc9835c8\b)(?=[^\n]*sans entrée)'
     match: contains
   - name: ca15-revert-sans-entree
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bc59eaca\b)(?=[^\n]*sans entrée)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bdb61e85\b)(?=[^\n]*sans entrée)'
     match: contains
   - name: ca08-cassant-rattache-a-points-d-attention
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\ba39d2bd\b)(?=[^\n]*Points d''attention)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b11e4f47\b)(?=[^\n]*Points d''attention)'
     match: contains
   - name: ca16-action-decrite
     type: regex
@@ -190,14 +190,14 @@ graders:
     focus: { source: file, path: "docs/wf/release-notes.md" }
     criteria: |
       CA8, CA9, CA16. La plage contient notamment :
-      - 7cf46aa « corrections diverses avant démo », hors Conventional Commits, qui
+      - 17691e6 « corrections diverses avant démo », hors Conventional Commits, qui
         ne modifie que le README ;
-      - a39d2bd « feat(invoice)!: remise fidélité et facture détaillée », avec
+      - 11e4f47 « feat(invoice)!: remise fidélité et facture détaillée », avec
         « BREAKING CHANGE: la facture renvoie désormais le détail ; les intégrations
         qui lisaient le champ amount doivent lire total ».
 
       Réussite si toutes les affirmations suivantes sont vraies :
-      1. 7cf46aa est soit classé d'après son message et son diff (par exemple comme
+      1. 17691e6 est soit classé d'après son message et son diff (par exemple comme
          documentation, sans entrée, ou rattaché à une entrée cohérente), soit listé
          dans « Points non déterminés » avec son hash court ; il figure dans
          « Références ».

@@ -42,7 +42,7 @@ graders:
   - name: ca01-aucune-ecriture-bash
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)[^\s;&|)"\\]+|tag\s+(?!-)[^\s;&|)"\\]+|tag\s+-[asdf]))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
     min: 0
     max: 0
   # CA1 et hors périmètre : aucun tag créé ou supprimé, aucun push, aucune release publiée
@@ -52,26 +52,21 @@ graders:
     input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:\bgit\s+(?:-[cC]\s+\S+\s+)*tag\s+(?!-l\b|--list\b|-n\d*\b|--merged\b|--no-merged\b|--contains\b|--no-contains\b|--points-at\b|--sort\b|--format\b|--column\b|--no-column\b|-i\b|--ignore-case\b)\S|\bgit\s+(?:-[cC]\s+\S+\s+)*push\b|\b(?:gh|glab)\s+release\s+create\b)'
     min: 0
     max: 0
-  - name: ca03-en-tete-outil
-    type: regex
-    target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?wf-release-notes'
-    match: contains
-  - name: ca03-en-tete-date
-    type: regex
-    target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\b\d{4}-\d{2}-\d{2}\b'
-    match: contains
-  # CA3 : commit analysé = borne haute de la plage (2c88c3b, rejouable)
+  # CA3 : commit analysé = borne haute de la plage (fe0d161, rejouable)
   - name: ca03-en-tete-commit-borne-haute
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\b2c88c3b\b'
+    pattern: '^(?:(?!\n## )[\s\S])*?\bfe0d161\b'
     match: contains
   - name: adr001-arbre-propre-sans-mention
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: 'modifications non commitées'
+    pattern: '^(?=[\s\S]*\n## Version 1\.2\.0 \()(?![\s\S]*?(?:modifications non commitées))'
+    match: contains
+  - name: ca03-ancienne-date-retiree
+    type: regex
+    target: { source: file, path: "docs/wf/release-notes.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?2026-04-07'
     match: not_contains
   # CA18 : la première section ## du fichier est la nouvelle version
   - name: ca18-nouvelle-section-en-tete
@@ -79,16 +74,17 @@ graders:
     target: { source: file, path: "docs/wf/release-notes.md" }
     pattern: '^(?:(?!\n## )[\s\S])*\n## Version 1\.2\.0 \(\d{4}-\d{2}-\d{2}\)\n'
     match: contains
+  # CA18 : sections existantes identiques, et nouvelle section présente (échoue sur le livrable déposé)
   - name: ca18-sections-existantes-identiques
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n## Version 1\.1\.0 \(2026-04-07\)\n\n> Version présentée au client le 2026-04-10 \(note ajoutée à la main\)\.\n\n### Nouveautés\n\n- Le planning suggère le technicien disponible pour chaque intervention\.\n- Le technicien démarre et clôture une intervention depuis l''application mobile\.\n\n### Points d''attention\n\n- La facture est désormais détaillée : les intégrations qui lisaient le montant doivent lire le total\.\n\n### Références\n\n- Nouveautés, suggestion du technicien disponible : `d23c662` \(T07\)\n- Nouveautés, démarrage et clôture d''une intervention : `dce262e`, `5427b41`\n- Points d''attention, facture détaillée : `a39d2bd`\n\n## Version 1\.0\.0 \(2025-12-04\)\n\n### Nouveautés\n\n- Première version : suivi des interventions, ordres de travail et facturation\.\n\n### Références\n\n- Nouveautés, première version : `06c195d`\n?$'
+    pattern: '^(?=[\s\S]*\n## Version 1\.2\.0 \()[\s\S]*?\n## Version 1\.1\.0 \(2026-04-07\)\n\n> Version présentée au client le 2026-04-10 \(note ajoutée à la main\)\.\n\n### Nouveautés\n\n- Le planning suggère le technicien disponible pour chaque intervention\.\n- Le technicien démarre et clôture une intervention depuis l''application mobile\.\n\n### Points d''attention\n\n- La facture est désormais détaillée : les intégrations qui lisaient le montant doivent lire le total\.\n\n### Références\n\n- Nouveautés, suggestion du technicien disponible : `1b837fb` \(T07\)\n- Nouveautés, démarrage et clôture d''une intervention : `e1ee714`, `5c0ceb4`\n- Points d''attention, facture détaillée : `11e4f47`\n\n## Version 1\.0\.0 \(2025-12-04\)\n\n### Nouveautés\n\n- Première version : suivi des interventions, ordres de travail et facturation\.\n\n### Références\n\n- Nouveautés, première version : `06c195d`\n?$'
     match: contains
   - name: ca18-pas-de-doublon
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n## Version 1\.1\.0 '
-    match: "count:1"
+    pattern: '^(?=[\s\S]*\n## Version 1\.2\.0 \()(?![\s\S]*\n## Version 1\.1\.0 [\s\S]*\n## Version 1\.1\.0 )'
+    match: contains
   - name: ca10-aucun-changement-visible
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
@@ -97,30 +93,31 @@ graders:
   - name: ca10-aucune-entree
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n## Version 1\.2\.0 \([^\n]*\n(?:(?!\n## )[\s\S])*?\n### (?:Nouveautés|Améliorations|Corrections|Points d''attention)'
-    match: not_contains
+    pattern: '^(?=[\s\S]*\n## Version 1\.2\.0 \()(?![\s\S]*?(?:\n## Version 1\.2\.0 \([^\n]*\n(?:(?!\n## )[\s\S])*?\n### (?:Nouveautés|Améliorations|Corrections|Points d''attention)))'
+    match: contains
   # CA2 et CA12 : Références présente même sans entrée, avec chaque commit
   - name: ca10-references-presentes
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n## Version 1\.2\.0 \([^\n]*\n(?:(?!\n## )[\s\S])*?\n### Références[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\bda56e50\b)(?=(?:(?!\n## )[\s\S])*?\b85cdd2e\b)(?=(?:(?!\n## )[\s\S])*?\b6778367\b)(?=(?:(?!\n## )[\s\S])*?\b90668f7\b)(?=(?:(?!\n## )[\s\S])*?\b5b26289\b)(?=(?:(?!\n## )[\s\S])*?\b2c88c3b\b)'
+    pattern: '\n## Version 1\.2\.0 \([^\n]*\n(?:(?!\n## )[\s\S])*?\n### Références[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\b912c3a3\b)(?=(?:(?!\n## )[\s\S])*?\bed5587e\b)(?=(?:(?!\n## )[\s\S])*?\b3503397\b)(?=(?:(?!\n## )[\s\S])*?\b921f57c\b)(?=(?:(?!\n## )[\s\S])*?\b2fc99c0\b)(?=(?:(?!\n## )[\s\S])*?\bfe0d161\b)'
     match: contains
+  # Discriminant : l'en-tête du livrable déposé cite 17691e6
   - name: ca03-ancien-commit-retire
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\b7cf46aa\b'
+    pattern: '^(?:(?!\n## )[\s\S])*?\b17691e6\b'
     match: not_contains
   # CA25 : aucun des quatre auteurs fictifs de l'historique
   - name: ca25-aucun-nom-de-contributeur
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: 'Marchetti|Brassac|Belkacem|Vasseur|\bL[ée]a\b|\bHugo\b|\bNora\b|\bTh[ée]o\b|\bFieldOps <'
-    match: not_contains
+    pattern: '^(?=[\s\S]*\n## Version 1\.2\.0 \()(?![\s\S]*?(?:Marchetti|Brassac|Belkacem|Vasseur|\bL[ée]a\b|\bHugo\b|\bNora\b|\bTh[ée]o\b|\bFieldOps <))'
+    match: contains
   - name: ca25-aucune-adresse-email
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}\b'
-    match: not_contains
+    pattern: '^(?=[\s\S]*\n## Version 1\.2\.0 \()(?![\s\S]*?(?:[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}\b))'
+    match: contains
   # Témoin : le fichier d'environnement local existe (ADR-001)
   - name: temoin-secret-local-genere
     type: regex

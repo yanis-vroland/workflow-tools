@@ -51,7 +51,7 @@ graders:
   - name: ca01-aucune-ecriture-bash
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)[^\s;&|)"\\]+|tag\s+(?!-)[^\s;&|)"\\]+|tag\s+-[asdf]))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
     min: 0
     max: 0
   # CA1 et hors périmètre : aucun tag créé ou supprimé, aucun push, aucune release publiée
@@ -71,11 +71,11 @@ graders:
     target: { source: file, path: "docs/wf/release-notes.md" }
     pattern: '^(?:(?!\n## )[\s\S])*?\b\d{4}-\d{2}-\d{2}\b'
     match: contains
-  # CA3 : commit analysé = borne haute de la plage (b5808fe, rejouable)
+  # CA3 : commit analysé = borne haute de la plage (db46741, rejouable)
   - name: ca03-en-tete-commit-borne-haute
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\bb5808fe\b'
+    pattern: '^(?:(?!\n## )[\s\S])*?\bdb46741\b'
     match: contains
   - name: adr001-arbre-propre-sans-mention
     type: regex
@@ -86,7 +86,7 @@ graders:
   - name: ca03-en-tete-pas-head
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\b5b26289\b'
+    pattern: '^(?:(?!\n## )[\s\S])*?\b2fc99c0\b'
     match: not_contains
   - name: ca02-titre-version
     type: regex
@@ -106,18 +106,18 @@ graders:
   - name: ca05-tous-les-commits-de-la-plage
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\bd5f01f1\b)(?=(?:(?!\n###? )[\s\S])*?\bddd6bb2\b)(?=(?:(?!\n###? )[\s\S])*?\bcd1b7dd\b)(?=(?:(?!\n###? )[\s\S])*?\b66766a8\b)(?=(?:(?!\n###? )[\s\S])*?\bbf04dba\b)(?=(?:(?!\n###? )[\s\S])*?\b804fb80\b)(?=(?:(?!\n###? )[\s\S])*?\bc062680\b)(?=(?:(?!\n###? )[\s\S])*?\bb5808fe\b)'
+    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\bc2d9e12\b)(?=(?:(?!\n###? )[\s\S])*?\b9963dce\b)(?=(?:(?!\n###? )[\s\S])*?\b12a18c6\b)(?=(?:(?!\n###? )[\s\S])*?\be9f92c2\b)(?=(?:(?!\n###? )[\s\S])*?\ba2249f2\b)(?=(?:(?!\n###? )[\s\S])*?\b83295cb\b)(?=(?:(?!\n###? )[\s\S])*?\bec83822\b)(?=(?:(?!\n###? )[\s\S])*?\bdb46741\b)'
     match: contains
-  # CA5 : v1.1.0 (7cf46aa) exclu, rien après v1.2.0
+  # CA5 : v1.1.0 (17691e6) exclu, rien après v1.2.0
   - name: ca05-bornes-respectees
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\b(?:7cf46aa|a39d2bd|da56e50|5b26289)\b'
+    pattern: '\b(?:17691e6|11e4f47|912c3a3|2fc99c0)\b'
     match: not_contains
   - name: ca12-chaque-commit-une-seule-fois
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(d5f01f1|ddd6bb2|cd1b7dd|66766a8|bf04dba|804fb80|c062680|b5808fe)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(c2d9e12|9963dce|12a18c6|e9f92c2|a2249f2|83295cb|ec83822|db46741)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
     match: not_contains
   - name: ca08-fix-dans-corrections
     type: regex
@@ -127,7 +127,7 @@ graders:
   - name: ca08-fix-rattache-a-corrections
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b66766a8\b)(?=[^\n]*Corrections)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\be9f92c2\b)(?=[^\n]*Corrections)'
     match: contains
   - name: ca08-feat-dans-nouveautes
     type: regex
@@ -137,17 +137,17 @@ graders:
   - name: ca08-feat-rattache-a-nouveautes
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bd5f01f1\b)(?=[^\n]*Nouveautés)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bc2d9e12\b)(?=[^\n]*Nouveautés)'
     match: contains
   - name: ca08-test-sans-entree
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bc062680\b)(?=[^\n]*sans entrée)(?=[^\n]*\btest\b)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bec83822\b)(?=[^\n]*sans entrée)(?=[^\n]*\btest\b)'
     match: contains
   - name: ca08-docs-sans-entree
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bb5808fe\b)(?=[^\n]*sans entrée)(?=[^\n]*\bdocs\b)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bdb46741\b)(?=[^\n]*sans entrée)(?=[^\n]*\bdocs\b)'
     match: contains
   - name: ca06-manifeste-cite
     type: regex

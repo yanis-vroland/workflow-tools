@@ -5,7 +5,7 @@
 #     l'eval, puis un commit y retire le champ version de package.json (seul
 #     manifeste de la racine) ;
 #   - le répertoire de l'eval en reçoit un clone de profondeur 3 : les commits
-#     disponibles vont de 90668f7 à ce nouveau commit, aucun tag de version
+#     disponibles vont de 921f57c à ce nouveau commit, aucun tag de version
 #     n'est accessible et la borne basse attendue (v1.2.0) manque à l'historique.
 set -euo pipefail
 

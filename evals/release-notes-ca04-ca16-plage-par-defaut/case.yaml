@@ -51,7 +51,7 @@ graders:
   - name: ca01-aucune-ecriture-bash
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)|tag\s+(?!-)))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:(?<![=<>-])&?>>?\s*(?!(?:\\?["''])?(?:/dev/(?:null|stdout|stderr)\b|&\d|[(=]))(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\()]|(?<=(?:"command"\s*:\s*"|[;&|(]|\\n|\bxargs(?:\s+-\S+)*|-exec|\bsudo|\btime)\s*)(?:tee\s+(?:-[\w-]+\s+)*(?!(?:\\?["''])?/dev/(?:null|stdout|stderr)\b)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\]|(?:mv|cp|rm|rmdir|touch|mkdir|ln|truncate|install|unlink|chmod|chown)\s(?:[^;&|"\\]|\\[^n])*?(?<=\s)(?!-)(?!\d*>)(?!(?:\\?["''])?(?:[^\s;&|"''\\]*/)?docs/wf(?=[/\s;&|"''\\]|$))(?:\\?["''])?[^\s;&|"''\\-]|(?:sed|perl)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*?\s-(?:[a-zA-Z]*i[a-zA-Z.]*|-in-place)(?=[\s=''"\\]|$)(?:(?!docs/wf)(?:[^;&"\\]|\\[^n]))*(?=[;&"]|\\n|$)|(?:(?:fvm\s+)?(?:flutter|dart)\s+(?:pub\s+(?:get|upgrade|add|remove|downgrade)|packages\s+get|create|build|run|test|clean|format|fix|gen-l10n)|(?:npm|pnpm|yarn|bun)\s+(?:install|i|ci|add|update|upgrade|up|uninstall|remove|rm|run|run-script|test|t|start|exec|rebuild|link|init|audit\s+fix)|yarn|pnpm|npx|pnpx|bunx|pip3?\s+install|composer\s+(?:install|update|require)|bundle(?:\s+install)?|docker(?:-compose|\s+compose)?\s+(?:run|up|build|exec|create)|git\s+(?:add|commit|checkout|switch|restore|reset|stash(?!\s+(?:list|show))|clean|mv|rm|init|apply|am|merge|rebase|cherry-pick|pull|fetch|push|worktree\s+add|branch\s+(?!-)[^\s;&|)"\\]+|tag\s+(?!-)[^\s;&|)"\\]+|tag\s+-[asdf]))(?=[\s;&|)]|\\n|"|$)|make(?=\s*(?:[;&|)"]|\\n|$)|\s+[\w.-])))'
     min: 0
     max: 0
   # CA1 et hors périmètre : aucun tag créé ou supprimé, aucun push, aucune release publiée
@@ -71,11 +71,11 @@ graders:
     target: { source: file, path: "docs/wf/release-notes.md" }
     pattern: '^(?:(?!\n## )[\s\S])*?\b\d{4}-\d{2}-\d{2}\b'
     match: contains
-  # CA3 : commit analysé = borne haute de la plage (8302948, rejouable)
+  # CA3 : commit analysé = borne haute de la plage (28e190e, rejouable)
   - name: ca03-en-tete-commit-borne-haute
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '^(?:(?!\n## )[\s\S])*?\b8302948\b'
+    pattern: '^(?:(?!\n## )[\s\S])*?\b28e190e\b'
     match: contains
   # ADR-001 : arbre de travail modifié (--dirty)
   - name: adr001-en-tete-modifications-non-commitees
@@ -113,38 +113,38 @@ graders:
   - name: ca04-tous-les-commits-de-la-plage
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\bda56e50\b)(?=(?:(?!\n###? )[\s\S])*?\b85cdd2e\b)(?=(?:(?!\n###? )[\s\S])*?\b6778367\b)(?=(?:(?!\n###? )[\s\S])*?\b90668f7\b)(?=(?:(?!\n###? )[\s\S])*?\b5b26289\b)(?=(?:(?!\n###? )[\s\S])*?\b9d13761\b)(?=(?:(?!\n###? )[\s\S])*?\b8302948\b)'
+    pattern: '\n### Références[^\n]*\n(?=(?:(?!\n###? )[\s\S])*?\b912c3a3\b)(?=(?:(?!\n###? )[\s\S])*?\bed5587e\b)(?=(?:(?!\n###? )[\s\S])*?\b3503397\b)(?=(?:(?!\n###? )[\s\S])*?\b921f57c\b)(?=(?:(?!\n###? )[\s\S])*?\b2fc99c0\b)(?=(?:(?!\n###? )[\s\S])*?\bd55e3ab\b)(?=(?:(?!\n###? )[\s\S])*?\b28e190e\b)'
     match: contains
-  # CA4 : v1.2.0 (b5808fe) est exclu, rien d'antérieur
+  # CA4 : v1.2.0 (db46741) est exclu, rien d'antérieur
   - name: ca04-borne-basse-exclue
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\b(?:b5808fe|c062680)\b'
+    pattern: '\b(?:db46741|ec83822)\b'
     match: not_contains
   - name: ca04-branche-non-fusionnee-absente
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\b(?:cb54966|7690d7e|a1b5ba7)\b'
+    pattern: '\b(?:098619f|54c62e2|4a5b78b)\b'
     match: not_contains
   - name: ca12-chaque-commit-une-seule-fois
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(da56e50|85cdd2e|6778367|90668f7|5b26289|9d13761|8302948)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?\b(912c3a3|ed5587e|3503397|921f57c|2fc99c0|d55e3ab|28e190e)\b(?:(?!\n###? )[\s\S])*?\b\1\b'
     match: not_contains
   - name: ca12-chore-sans-entree-avec-type
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bda56e50\b)(?=[^\n]*sans entrée)(?=[^\n]*\bchore\b)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b912c3a3\b)(?=[^\n]*sans entrée)(?=[^\n]*\bchore\b)'
     match: contains
   - name: ca12-docs-sans-entree-avec-type
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b6778367\b)(?=[^\n]*sans entrée)(?=[^\n]*\bdocs\b)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b3503397\b)(?=[^\n]*sans entrée)(?=[^\n]*\bdocs\b)'
     match: contains
   - name: ca08-cassant-rattache-a-points-d-attention
     type: regex
     target: { source: file, path: "docs/wf/release-notes.md" }
-    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\b9d13761\b)(?=[^\n]*Points d''attention)(?![^\n]*sans entrée)'
+    pattern: '\n### Références[^\n]*\n(?:(?!\n###? )[\s\S])*?(?<=\n)(?=[^\n]*\bd55e3ab\b)(?=[^\n]*Points d''attention)(?![^\n]*sans entrée)'
     match: contains
   - name: ca16-changement-cassant-decrit
     type: regex
@@ -218,15 +218,15 @@ graders:
     type: llm
     focus: { source: file, path: "docs/wf/release-notes.md" }
     criteria: |
-      CA12 et CA16. La plage couvre 7 commits : da56e50, 85cdd2e, 90668f7, 5b26289
-      et 8302948 (chore), 6778367 (docs), 9d13761 (feat(work-orders)! : retrait de
+      CA12 et CA16. La plage couvre 7 commits : 912c3a3, ed5587e, 921f57c, 2fc99c0
+      et 28e190e (chore), 3503397 (docs), d55e3ab (feat(work-orders)! : retrait de
       l'export CSV des ordres de travail, message sans aucune action décrite).
 
       Réussite si toutes les affirmations suivantes sont vraies :
       1. La sous-section « Références » cite chacun des 7 commits par son hash
          court, exactement une fois.
       2. Chaque commit chore ou docs y est marqué « sans entrée » avec son type.
-      3. 9d13761 est rattaché à l'entrée de « Points d'attention ».
+      3. d55e3ab est rattaché à l'entrée de « Points d'attention ».
       4. Cette entrée décrit le retrait de l'export CSV pour un lecteur non
          développeur et indique « action requise non déterminée », sans inventer
          d'action.

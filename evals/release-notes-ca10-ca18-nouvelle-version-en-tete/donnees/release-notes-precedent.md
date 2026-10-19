@@ -1,6 +1,6 @@
 # Notes de version de FieldOps
 
-Outil : wf-release-notes · Date : 2026-04-07 · Commit : 7cf46aa
+Outil : wf-release-notes · Date : 2026-04-07 · Commit : 17691e6
 
 ## Version 1.1.0 (2026-04-07)
 
@@ -17,9 +17,9 @@ Outil : wf-release-notes · Date : 2026-04-07 · Commit : 7cf46aa
 
 ### Références
 
-- Nouveautés, suggestion du technicien disponible : `d23c662` (T07)
-- Nouveautés, démarrage et clôture d'une intervention : `dce262e`, `5427b41`
-- Points d'attention, facture détaillée : `a39d2bd`
+- Nouveautés, suggestion du technicien disponible : `1b837fb` (T07)
+- Nouveautés, démarrage et clôture d'une intervention : `e1ee714`, `5c0ceb4`
+- Points d'attention, facture détaillée : `11e4f47`
 
 ## Version 1.0.0 (2025-12-04)
 

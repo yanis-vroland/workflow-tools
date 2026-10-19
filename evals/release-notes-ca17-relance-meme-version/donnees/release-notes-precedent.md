@@ -24,8 +24,8 @@ Outil : wf-release-notes · Date : 2026-08-01 · Commit : 0000000
 
 ### Références
 
-- Nouveautés, suggestion du technicien disponible : `d23c662` (T07)
-- Points d'attention, facture détaillée : `a39d2bd`
+- Nouveautés, suggestion du technicien disponible : `1b837fb` (T07)
+- Points d'attention, facture détaillée : `11e4f47`
 
 ## Version 1.0.0 (2025-12-04)
 

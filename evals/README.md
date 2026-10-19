@@ -208,17 +208,17 @@ Spec 009, lancée par `/wf-release-notes`, tous les cas `hors-reseau` (tag `wf-r
 | `release-notes-ca13-ca14-branche-non-fusionnee` | FieldOps, `v1.2.0 feat/export-pdf --version 1.3.0` | CA2 (sous-section omise), CA3, CA5, CA6, CA13, CA14 |
 | `release-notes-ca17-relance-meme-version` | FieldOps et livrable commité (1.2.0 périmée, 1.1.0 retouchée, 1.0.0), `v1.1.0 v1.2.0` | CA17 |
 | `release-notes-ca10-ca18-nouvelle-version-en-tete` | FieldOps et livrable commité (1.1.0 retouchée, 1.0.0), sans argument | CA10, CA18, CA2, CA12 |
-| `release-notes-ca07-ca19-flutter-sans-tag` | application Flutter seule à la racine (`pubspec.yaml` en `1.4.0+42`), tags supprimés | CA7, CA19, CA6, CA12, CA15 |
+| `release-notes-ca07-ca19-flutter-sans-tag` | application Flutter seule à la racine (`pubspec.yaml` en `3.6.0+117`), tags supprimés | CA7, CA19, CA6, CA12, CA15 |
 | `release-notes-ca23-clone-superficiel` | clone de profondeur 3, `package.json` sans `version` | CA23, CA6 (version non déterminée) |
 | `release-notes-ca20-plage-vide` | FieldOps, tag `v1.3.0` sur `HEAD` | CA20 |
 | `release-notes-ca21-reference-inexistante` | FieldOps, `v0.9.0 v1.2.0` | CA21 |
 | `release-notes-ca22-hors-git` | copie de FieldOps sans historique | CA22 |
 
-Hash rejouables vérifiés : en-têtes `8302948`, `b5808fe`, `7cf46aa`, `a1b5ba7`, `2c88c3b`, `427550f`, `1c711c9` (borne haute de chaque cas), et les commits de chaque plage dans « Références ». Une modification de la fixture ou d'un scaffold les change : mettre à jour les graders `ca03-…`, `ca04-…`, `ca05-…`, `ca12-…`.
+Hash rejouables vérifiés : en-têtes `28e190e`, `db46741`, `17691e6`, `4a5b78b`, `fe0d161`, `5366555`, `9986263` (borne haute de chaque cas), et les commits de chaque plage dans « Références ». Une modification de la fixture ou d'un scaffold les change : mettre à jour les graders `ca03-…`, `ca04-…`, `ca05-…`, `ca12-…`.
 
 Les graders de « Références » supposent le format prescrit par la skill : une ligne par entrée avec tous ses hash, une ligne par commit sans entrée, aucun autre hash sur la ligne. Les graders `ca17-…` et `ca18-…` comparent les sections existantes au texte exact de `donnees/release-notes-precedent.md`, jusqu'à la fin du fichier (identité octet pour octet, au saut de ligne final près).
 
-Le correcteur générique d'écriture Bash, repris de wf-doc-projet, ne détecte pas `git tag <nom>` (son motif exige un séparateur juste après `tag`) : un correcteur dédié, `…-aucun-tag-ni-publication`, signale toute création ou suppression de tag, tout `git push` et toute publication de release.
+Le correcteur générique d'écriture Bash, repris de wf-doc-projet, détecte `git tag <nom>`, `git tag -a|-s|-d|-f` et `git branch <nom>` (corrigé dans les cas doc-projet : son motif exigeait un séparateur juste après `tag` ou `branch`). Le correcteur dédié `…-aucun-tag-ni-publication` couvre en plus `git push` et la publication d'une release.
 
 ## Correcteurs
 

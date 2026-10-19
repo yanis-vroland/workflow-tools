@@ -3,7 +3,7 @@
 # aucun tag de version (spec 009, CA7 et CA19) :
 #   - historique complet de FieldOps, tags v1.0.0 à v1.2.0 supprimés ;
 #   - dernier commit « refactor » : seul le contenu de mobile/ est conservé, à la
-#     racine, et le pubspec.yaml passe en version 1.4.0+42 (numéro de build).
+#     racine, et le pubspec.yaml passe en version 3.6.0+117 (numéro de build).
 # Plus de package.json : le seul manifeste de la racine est pubspec.yaml.
 # Sans fichier d'environnement local (--no-secret) : sans le .gitignore de la
 # racine, il apparaîtrait comme fichier non suivi.
@@ -29,7 +29,7 @@ while IFS= read -r -d '' file; do
   g mv -- "$file" "$target"
 done < <(g ls-files -z -- mobile)
 find mobile -depth -type d -empty -exec rmdir {} \;
-sed 's/^version: .*/version: 1.4.0+42/' pubspec.yaml >pubspec.yaml.tmp
+sed 's/^version: .*/version: 3.6.0+117/' pubspec.yaml >pubspec.yaml.tmp
 mv pubspec.yaml.tmp pubspec.yaml
 g add -- pubspec.yaml
 
