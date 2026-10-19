@@ -52,6 +52,9 @@ jobs:
           --tag reseau --judge-model sonnet --ablation none
           --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)"
 
+          --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)"
+          "WebFetch(domain:endoflife.date)" "WebFetch(domain:storage.googleapis.com)"
+
       - name: Evals sans réseau (tag hors-reseau)
         if: success() || failure()
         env:

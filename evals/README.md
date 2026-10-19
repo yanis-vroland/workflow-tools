@@ -11,6 +11,9 @@ Les cas se lancent en deux passes, selon leur tag réseau (voir « Réseau ») :
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag reseau \
   --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)"
 
+  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" \
+  "WebFetch(domain:endoflife.date)" "WebFetch(domain:storage.googleapis.com)"
+
 # Aucun réseau (tag hors-reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag hors-reseau \
   --allow-tools Write Bash
@@ -29,6 +32,8 @@ claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 Dès que `Bash` est accordé, ses commandes tournent dans le bac à sable de Claude Code, dont l'accès réseau est limité aux domaines accordés par `--allow-tools "WebFetch(domain:…)"`. Sans ces autorisations, aucun registre n'est joignable. D'où deux passes :
 
 - tag `reseau` : le cas a besoin des registres (npm, pub.dev) ou de la base d'avis OSV.dev (`api.osv.dev`) ;
+
+- tag `reseau` : le cas a besoin des registres (npm, pub.dev) ou des calendriers de versions (endoflife.date, versions publiées de Flutter sur `storage.googleapis.com`) ;
 - tag `hors-reseau` : le cas tourne sans aucun réseau, y compris ceux qui exigent un registre injoignable.
 
 Chaque cas porte exactement un de ces deux tags ; `.github/scripts/verifier-tags-evals.sh` le vérifie en CI, sinon le cas ne serait jamais lancé.
@@ -215,7 +220,7 @@ Spec 013, lancée par `/wf-montee-version [argument]` (tags `wf-montee-version` 
 
 Tous les cas portent `ca20-ni-installation-ni-execution`, `ca20-ni-branche-ni-commit`, `ca01-aucune-modification-par-bash` et `ca01-curl-sans-ecriture` (motifs repris de `evals/analyse-projet/`).
 
-Réseau : la passe `reseau` n'autorise que `registry.npmjs.org` et `pub.dev`. endoflife.date, les versions publiées de Flutter (`storage.googleapis.com`) et les notes de version hors pub.dev y sont donc injoignables : les correcteurs acceptent alors « non déterminé » (dernière LTS, dernière stable, fin de support) et « non vérifiée » (ruptures), et `ca12-sources-effectivement-consultees` vérifie qu'aucune URL n'est donnée comme source sans avoir été consultée. Les valeurs publiques ne sont jamais figées : dernière version « 18 ou plus » pour react, date de fin de support de Node.js 18 (2025-04-30) acceptée seulement si endoflife.date a répondu.
+Réseau : la passe `reseau` autorise `registry.npmjs.org`, `pub.dev`, `endoflife.date` et `storage.googleapis.com` (versions publiées de Flutter), mais aucun domaine de documentation : les notes de version hors pub.dev y sont injoignables. Les correcteurs acceptent donc « non vérifiée » pour les ruptures, et « non déterminé » pour la dernière LTS, la dernière stable et la fin de support si ces sources ne répondent pas, et `ca12-sources-effectivement-consultees` vérifie qu'aucune URL n'est donnée comme source sans avoir été consultée. Les valeurs publiques ne sont jamais figées : dernière version « 18 ou plus » pour react, date de fin de support de Node.js 18 (2025-04-30) acceptée seulement si endoflife.date a répondu.
 
 Hash attendus dans les en-têtes, rejouables : `5765af5` (FieldOps et livrable de sécurité), `5b26289` (FieldOps seul), `822183b` (monorepo pnpm), `655b970` (relance). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `adr001-en-tete-…`, `ca24-argument-en-tete` et `ca23-en-tete-commit-actualise`.
 
