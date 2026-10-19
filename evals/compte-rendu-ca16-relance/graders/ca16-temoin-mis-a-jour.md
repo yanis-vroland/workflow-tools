@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/compte-rendu/2026-10-07-point-hebdo-fieldops.md" }
-pattern: 'valider le planning de recette'
+pattern: '[Vv]alider le planning de recette'
 match: contains
 ---
 
