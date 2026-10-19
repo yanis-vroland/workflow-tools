@@ -105,6 +105,27 @@ CA15 et CA20 : seul un sous-dossier effectivement suivi par un dépôt qui a des
 
 CA20 : le répertoire de la session est imposé par `claude plugin eval` et le scaffold n'écrit rien au-dessus. Le dépôt est donc construit avec `core.worktree` : répertoire git dans le répertoire de la session, racine de travail dans son parent, dont la session est le sous-dossier (`git rev-parse --show-prefix` non vide). Seul ce sous-dossier est extrait (`sparse-checkout`). L'historique de FieldOps y est réécrit, suivi de 12 commits plus récents dans `plateforme/` (hors du sous-dossier, une cinquième autrice) : dernier commit du dépôt 2026-10-06, du sous-dossier 2026-09-29. Les hash dépendent du nom du répertoire de la session et ne sont pas figés.
 
+### wf-compte-rendu
+
+Spec 007, lancée par `/wf-compte-rendu`, tous les cas `hors-reseau` (tag `wf-compte-rendu` pour ne lancer qu'eux). Chaque grader porte dans son nom l'identifiant du CA qu'il vérifie (`ca07-…`) ; un grader « témoin » prouve que le scénario a eu lieu là où les vérifications d'absence réussiraient sans rien prouver. Les notes propres à un cas (fictives) sont dans son dossier `donnees/`.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `compte-rendu-ca01-point-hebdo` | FieldOps brief, notes `notes/2026-10-07-point-hebdo.md` de la fixture | CA1, CA3 à CA12, CA19, CA20 |
+| `compte-rendu-ca03-ca04-index-existant` | FieldOps complet (code, git, faux secret), deux comptes rendus et leur index, notes hors du projet sans date dans le nom | CA1, CA3 (nom exact), CA4 (ordre de l'index), CA6, CA10, ADR-001 (fichier d'environnement) |
+| `compte-rendu-ca02-sans-argument` | FieldOps brief, aucun argument | CA2 (question posée, rien écrit) |
+| `compte-rendu-ca02-notes-collees` | FieldOps brief, texte des notes dans la commande | CA2 (« notes fournies dans la conversation »), CA4, CA5, CA7, CA9, CA11 |
+| `compte-rendu-ca13-transcription-vtt` | FieldOps brief, transcription `notes/2026-09-30-atelier.vtt` de la fixture | CA13, CA3 (objet tiré du nom de fichier), CA8, CA9, CA11 |
+| `compte-rendu-ca13-ca14-transcription-anglaise` | FieldOps brief, transcription anglaise horodatée `[hh:mm:ss]` en `.txt` | CA13, CA14, CA5, CA7, CA8 |
+| `compte-rendu-ca15-sans-date` | FieldOps brief, notes sans date, nom sans date | CA15 (question posée, rien écrit) |
+| `compte-rendu-ca16-relance` | FieldOps brief, compte rendu existant tiré des mêmes notes, notes complétées | CA16 |
+| `compte-rendu-ca17-autre-reunion-meme-nom` | FieldOps brief, compte rendu du même nom tiré d'autres notes | CA17 (question posée, rien écrit) |
+| `compte-rendu-ca18-chemin-inexistant`, `compte-rendu-ca18-fichier-vide`, `compte-rendu-ca18-format-docx` | FieldOps brief | CA18 |
+
+Valeur déterministe : commit `5b26289` dans `compte-rendu-ca03-ca04-index-existant` (les comptes rendus déposés sont exclus par `.git/info/exclude`, l'arbre reste propre).
+
+Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit ; la suite (réponse de l'utilisateur, suffixe `-2` d'une nouvelle réunion) n'est couverte que par les tests structurels (`tests/skills/wf-compte-rendu.sh`). Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
