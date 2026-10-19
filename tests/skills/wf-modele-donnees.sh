@@ -157,6 +157,25 @@ cite "CA35 fichier introuvable" "fichier introuvable"
 cite "CA35 format non pris en charge" "format non pris en charge"
 cite "CA35 nombre de pages d'un PDF (pdfinfo)" "pdfinfo"
 cite "CA35 texte d'une page de PDF (pdftotext)" "pdftotext -f"
+
+# --- Injection shell ------------------------------------------------------------
+# Un chemin ou un texte venu de l'utilisateur ou du projet n'est jamais inséré
+# entre guillemets doubles dans une commande Bash ($(…), backticks, « " » y
+# seraient interprétés) : guillemets simples après rejet de toute apostrophe, ou
+# entrée standard par un heredoc à délimiteur entre apostrophes.
+if grep -qE '"<[^>"]+>"' <<<"$body"; then
+  ko "aucun texte variable entre guillemets doubles dans une commande ($(grep -oE '"<[^>"]+>"' <<<"$body" | head -n 1))"
+else
+  ok "aucun texte variable entre guillemets doubles dans une commande"
+fi
+cite "PDF : chemin entre guillemets simples (pdfinfo)" "pdfinfo '<fichier>'"
+cite "PDF : chemin entre guillemets simples (pdftotext)" "pdftotext -f N -l N '<fichier>' -"
+cite "PDF : chemin contenant une apostrophe écarté sans commande" "contient une apostrophe"
+cite "chemin relatif calculé par l'entrée standard" "<<'CHEMIN'"
+absent "aucun test -f sur un chemin venu des arguments" "test -f"
+
+# --- Grep et fichiers d'environnement --------------------------------------------
+cite "Grep en mode files_with_matches" "files_with_matches"
 cite "CA37 fichier sans objet signalé, jamais supprimé" "plus lieu d'être"
 cite "CA38 aucune chaîne de connexion recopiée" "chaîne de connexion"
 
@@ -188,6 +207,14 @@ fieldops_values=(
   "Démo Thermique"
   "hourly_rate"
   "local_db"
+  "Villefictive"
+  "Technicien Fictif"
+  "Client Fictif"
+  "Société Exemple"
+  "DATABASE_URL"
+  "projet.sdt"
+  "purge"
+  "MAP_API_KEY"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
