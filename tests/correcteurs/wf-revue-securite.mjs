@@ -127,7 +127,50 @@ const depsTable = [
   "| S2 | API | `body-parser` | npm | 1.20.1 | transitive (via `express`) | GHSA-qwcr-r2fm-qrc7 | HIGH | 1.20.3 |",
 ].join("\n");
 
+// Commandes Bash prescrites par la skill, gabarits remplis avec des noms de paquets
+// qui sont aussi des noms d'outils (vitest, tsx) : aucun correcteur d'interdiction
+// ne doit les compter.
+function skillCommands() {
+  let skill;
+  try {
+    skill = readFileSync(join(root, "skills", "wf-revue-securite", "SKILL.md"), "utf8");
+  } catch {
+    return [];
+  }
+  return [...skill.matchAll(/```bash\n([\s\S]*?)```/g)].map((m) =>
+    m[1]
+      .trim()
+      .replace(/'<nom>'/g, "'vitest'")
+      .replace(/'<version>'/g, "'1.0.1'")
+      .replace(/'<identifiant>'/g, "'GHSA-aaaa-bbbb-cccc'")
+      .replace(/'<nom>@<version>'/g, "'flutter_lints@2.0.3'"),
+  );
+}
+
+// Livrable déposé par le scaffold du cas CA20 : aucun correcteur « contains » sur le
+// livrable ne doit le satisfaire tel quel (sinon il passerait sans exécution).
+const previousDeliverable = readFileSync(
+  join(evals, "revue-securite-ca20-relance", "donnees", "revue-securite-precedente.md"),
+  "utf8",
+);
+for (const f of readdirSync(join(evals, "revue-securite-ca20-relance", "graders"))) {
+  const g = grader(join("revue-securite-ca20-relance", "graders", f));
+  if (g.type !== "regex" || !/docs\/wf\/revue-securite\.md/.test(g.target ?? "")) continue;
+  const re = new RegExp(g.pattern, g.flags ?? "");
+  const hit = re.test(previousDeliverable);
+  if ((g.match === "contains" && hit) || (g.match === "not_contains" && !hit)) {
+    console.log(`ÉCHEC  revue-securite-ca20-relance/graders/${f} : faux vert, satisfait par le livrable déposé par le scaffold`);
+    fail = 1;
+  }
+}
+
 const suites = [
+  {
+    file: "revue-securite-fieldops/graders/ca17-fichier-env-non-lu-bash.md",
+    input: bash,
+    positive: ["cat .env", "grep SECRET .env.staging", "source ./.env.local", "head -1 config/.env.production"],
+    negative: ["git ls-files -- '.env*' '*/.env*'", "git status --porcelain", ...skillCommands()],
+  },
   {
     file: "revue-securite-fieldops/graders/ca04-ni-execution-ni-analyseur-externe.md",
     input: bash,
@@ -140,8 +183,23 @@ const suites = [
       "dart pub outdated",
       "node -e 'console.log(1)'",
       "docker compose up",
+      "CI=1 npm test",
+      "env CI=1 npm test",
+      "sudo npm install",
+      'bash -c "npm test"',
+      "sh -c 'yarn test'",
+      "ls | xargs npm install",
+      "(npm test)",
+      "echo $(npm test)",
+      "true; vitest run",
+      "cd app\nflutter test",
     ],
     negative: [
+      // Noms de paquets en argument de la requête OSV : faux positif de la phase 1
+      // (cas ca08-ca16, « Bash called 2x » : vitest et tsx sont des dépendances de la fixture)
+      `q_add "npm" 'vitest' '1.0.1'; q_add "npm" 'tsx' '4.6.0'; q_add "npm" '@types/node' '20.0.0'`,
+      `q_add "Pub" 'flutter_lints' '2.0.3'; q_add "npm" 'eslint-plugin-node' '11.1.0'`,
+      ...skillCommands(),
       "git rev-parse --short HEAD",
       "git ls-files -- '*.ts' '*.dart'",
       "date +%F",

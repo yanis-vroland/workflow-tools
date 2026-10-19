@@ -10,7 +10,7 @@ execution:
   model: claude-sonnet-5-5
   max_turns: 20
   timeout_seconds: 300
-  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
 
 context:
   scaffold_script: scaffold.sh
