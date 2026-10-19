@@ -19,7 +19,7 @@ Arguments de la commande (vide si aucun) : $ARGUMENTS
 - **Honnêteté** : chaque participant, décision, action, échéance et question du compte rendu figure dans les notes. Rien n'est ajouté depuis une autre source ni deviné (ni connaissance générale, ni autre fichier). Ce que les notes ne disent pas est « non déterminé ».
 - **Données personnelles** : aucune adresse e-mail, aucun numéro de téléphone dans le compte rendu, même dans une citation (coupe ou remplace par « […] »). Les participants sont désignés par leur nom tel qu'écrit dans les notes, suivi de leur rôle si les notes le donnent ; aucun rôle n'est inventé.
 - **Secrets** : un mot de passe, un token, une clé d'API ou tout autre secret présent dans les notes n'est jamais recopié, ni en entier, ni en partie, ni masqué ; l'identifiant de connexion qui l'accompagne non plus. « Points non déterminés » signale le retrait (« Un secret (mot de passe) figurait dans les notes : il a été retiré du compte rendu. »), sans le reproduire.
-- **Langue** : le compte rendu est rédigé en français, quelle que soit la langue des notes. Les noms propres (personnes, sociétés, produits) et les termes techniques (noms de plateformes, de versions, de composants) sont conservés tels quels. Les citations restent dans leur langue d'origine, entre « ».
+- **Langue** : le compte rendu est rédigé en français, quelle que soit la langue des notes. Les noms propres (personnes, sociétés, produits) et les termes techniques (noms de plateformes, de versions, de composants) sont conservés tels quels ; tout le reste est traduit : titre, objet, synthèses, décisions, actions, échéances (« by March 5 » devient « 5 mars »), questions. Une citation entre « », dans sa langue d'origine, n'est permise que dans « Points non déterminés » (passage ambigu) ; ailleurs, reformule en français, sans citer la réplique d'origine.
 - **Désignation de la source** : partout dans le compte rendu, la source est le nom du fichier seul (`notes.md`), sans aucun répertoire, même si les notes sont hors du projet ; jamais un chemin relatif ou absolu. Pour un texte collé : « notes fournies dans la conversation ».
 
 ## Étape 1 : déterminer la source
@@ -72,7 +72,7 @@ Lis le fichier de notes avec Read, et rien d'autre. Formats :
 
 Si les notes et le nom du fichier donnent deux dates différentes, retiens celle des notes et signale l'écart dans « Points non déterminés ».
 
-**Objet de la réunion**, tel qu'écrit dans les notes, sans reformulation, sans développer d'abréviation et sans traduction :
+**Objet de la réunion**, tel qu'écrit dans les notes, sans reformulation, sans développer d'abréviation et sans traduction (il sert au nom du fichier ; dans le titre et la section « Objet » du compte rendu, il est traduit en français si les notes sont dans une autre langue) :
 
 1. la valeur d'une ligne « Objet : » (ou son équivalent dans la langue des notes : « Subject: », « Topic: ») ;
 2. sinon, le titre des notes : un titre Markdown (`# …`), ou la première ligne non vide si elle est courte (10 mots au plus) et n'est ni un élément de liste, ni une ligne de temps, ni un tour de parole, ni `WEBVTT`, ni un numéro. Retire-en la date et les séparateurs qui l'entourent (`—`, `-`, `:`, `|`, `,`) ;
@@ -105,7 +105,7 @@ Liste le dossier avec `ls docs/wf/compte-rendu/` (absent : aucun compte rendu, p
 - **Participants** : les personnes listées comme présentes, ou qui prennent la parole dans une transcription ; chacune par son nom tel qu'écrit, suivi de son rôle s'il est donné (« Nom, rôle »). Aucune coordonnée. Une personne seulement mentionnée (absente, à contacter) n'est pas un participant.
 - **Points abordés** : les sujets traités, regroupés par sujet, en phrases de synthèse. Pour une transcription, les répliques sur un même sujet sont fusionnées : aucun horodatage, aucun verbatim ligne à ligne, pas une ligne par tour de parole.
 - **Décisions** : uniquement ce qui a fait l'objet d'un accord explicite dans les notes (formulation d'accord explicite, en toute langue : « adopté », « accord de tous », « approved »…). Une proposition, une idée, une piste ou un point « à valider » sans accord explicite n'est jamais une décision : il va dans « Questions en suspens ».
-- **Actions** : une ligne par action. Le responsable est la personne que les notes désignent explicitement (nom en tête de l'action, ou orateur qui s'engage à la première personne dans une transcription) ; l'échéance est celle que les notes donnent, recopiée telle qu'écrite (« pour le 05/06 », « d'ici la fin du mois »). Quand les notes ne donnent pas le responsable ou l'échéance, la cellule contient exactement « non déterminé » : n'en déduis jamais (ni du sujet, ni du rôle, ni d'une autre action).
+- **Actions** : une ligne par action. Le responsable est la personne que les notes désignent explicitement (nom en tête de l'action, ou orateur qui s'engage à la première personne dans une transcription) ; l'échéance est celle que les notes donnent, reprise telle qu'écrite (« pour le 05/06 », « d'ici la fin du mois »), seulement traduite en français si les notes sont dans une autre langue, sans en changer la valeur ni la compléter. Quand les notes ne donnent pas le responsable ou l'échéance, la cellule contient exactement « non déterminé » : n'en déduis jamais (ni du sujet, ni du rôle, ni d'une autre action).
 - **Questions en suspens** : les questions restées sans réponse, les propositions sans accord explicite, les points reportés ou à valider. Chaque entrée est une phrase autonome, compréhensible sans les notes : elle est reprise telle quelle par `wf-rapport-avancement`.
 - **Points non déterminés** : tout passage ambigu, cité entre « » (ex. un responsable désigné par un pronom sans antécédent), sans trancher l'ambiguïté ailleurs dans le compte rendu (le responsable reste « non déterminé ») ; le retrait d'un secret ; un écart de dates ; une information attendue absente des notes (aucune liste de participants, par exemple).
 - **Section vide** : les sept sections sont toujours présentes ; une section sans élément contient la seule ligne « Aucun élément. ». Le tableau des actions reste présent : sans action, son en-tête est suivi de la ligne « Aucun élément. ».
@@ -145,7 +145,7 @@ Crée le dossier si besoin (`mkdir -p docs/wf/compte-rendu`), puis écris le com
 
 | Action | Responsable | Échéance |
 |---|---|---|
-| <action> | <nom | non déterminé> | <échéance telle qu'écrite | non déterminé> |
+| <action> | <nom | non déterminé> | <échéance telle qu'écrite, en français | non déterminé> |
 
 ## Questions en suspens
 
