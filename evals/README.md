@@ -196,6 +196,26 @@ Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` me
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
+### wf-publication-store
+
+Spec 015, lancée par `/wf-publication-store`, tous les cas `hors-reseau` (tag `wf-publication-store` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca10-…`). Les cas qui produisent un livrable portent `…-bash-liste-blanche` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'` et `date +%F`.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `publication-store-ca03-fieldops` | FieldOps complet (web à la racine, Flutter dans `mobile/`), propre, faux secret, sans métadonnées ni notes de version | CA1 à CA3, CA6 à CA11, CA15 à CA18, CA21 à CA23, CA26, CA27 |
+| `publication-store-ca04-react-native` | application React Native (`ios/`, `android/`), sans Flutter | CA4 |
+| `publication-store-ca04-expo` | application Expo en flux géré (ni `ios/` ni `android/`) | CA4 |
+| `publication-store-ca04-natif-kotlin` | application Android native (Kotlin, Gradle Kotlin DSL) | CA4 |
+| `publication-store-ca05-sans-mobile` | FieldOps web seul (`build-fieldops-web.sh`) | CA5 |
+| `publication-store-ca12-ca13-ca14-signature` | FieldOps et un commit : fichiers de clés suivis par git, fichiers Firebase, mots de passe de signature en clair, notes de version 1.2.0 sans « Nouveautés » | CA12 à CA14, CA19 (Nouveautés absente), CA20 (versions égales) |
+| `publication-store-ca18-ca19-ca20-ca22-fastlane` | FieldOps et un commit : métadonnées fastlane en français (description courte Android de 126 caractères), notes de version 1.3.0 pour une application en 1.2.0 | CA1, CA18 à CA20, CA22 |
+| `publication-store-ca24-ca25-deux-applications` | hors git, deux applications Flutter : `apps/technicien` (iOS et Android) et `apps/superviseur` (Android seul) | CA6, CA24 à CA26 |
+| `publication-store-ca26-mise-a-jour` | FieldOps `--dirty` et livrable précédent commité, périmé (1.1.0, build 9) | CA26 |
+
+Valeurs déterministes vérifiées : commit `5b26289` (FieldOps complet, CA26), ligne 31 du `build.gradle` réécrit par le scaffold du cas signature (`storePassword` en clair, CA14). Les marqueurs `FIELDOPS_FAUX_KEYPROP_5b17`, `FIELDOPS_FAUX_JKS_4d8e` et `FIELDOPS_FAUX_P8_2c6a` sont dans des fichiers de clés qui ne doivent jamais être ouverts : leur absence de la trace prouve CA12. `FIELDOPS_FAUX_FIREBASE_8e03` et `FIELDOPS_FAUX_MDP_91c2` sont dans des fichiers que l'outil peut lire ou repérer, mais dont il ne recopie aucune valeur : leur absence est vérifiée dans le livrable seulement.
+
+Réseau : la passe `hors-reseau` n'accorde pas WebFetch, la documentation des stores est donc injoignable et les cas vérifient le repli de CA16 (statut « à vérifier », valeur relevée, lien officiel, aucune exigence affirmée). La seconde moitié de CA15 (page lue : exigence citée avec sa date de consultation) n'a pas de cas : elle exigerait une passe `reseau` qui accorde `WebFetch(domain:developer.android.com)` et `WebFetch(domain:developer.apple.com)`, absents de la commande de lancement actuelle.
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
