@@ -3,7 +3,8 @@ name: doc-projet-ca07-mise-a-jour
 description: >-
   Spec 002 (wf-doc-projet), CA7. FieldOps web seul avec un livrable
   docs/wf/doc-projet.md déjà commité : la relance le met à jour au lieu de le
-  dupliquer, conserve la section encore exacte et corrige la section périmée.
+  dupliquer, conserve la section encore exacte et corrige la section périmée,
+  dont la « Configuration » à l'ancienne forme, remplacée par le tableau de CA4.
 tags: [wf-doc-projet, hors-reseau]
 runs: 1
 
@@ -46,6 +47,12 @@ graders:
     target: { source: file, path: "docs/wf/doc-projet.md" }
     pattern: 'npm run serve'
     match: not_contains
+  # L'ancien livrable liste les noms des variables sur une ligne (forme d'avant
+  # l'amendement de CA4) : la mise à jour la remplace par le tableau
+  - name: ca07-ca04-ancienne-liste-remplacee-par-le-tableau
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '\n#{1,6} [^\n]*Configuration[^\n]*\n(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*Variable\s*\|\s*Utilisé pour\s*\|\s*Où la renseigner\s*\|\s*Comment l[’'']obtenir\s*\|'
   - name: ca07-installation-commande-reelle
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
