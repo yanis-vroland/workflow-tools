@@ -169,6 +169,18 @@ const suites = [
     negative: ["/home/cwd/docs/wf/compte-rendu/2026-10-07-point-hebdomadaire-2.md", "/home/cwd/docs/wf/compte-rendu/index.md"],
   },
   {
+    file: "compte-rendu-ca13-ca14-transcription-anglaise/graders/ca14-aucune-replique-anglaise.md",
+    input: text,
+    positive: [
+      "| Rédiger le guide de migration | Tom Becker | October 28 |",
+      "- Livraison en version 1.3 (« We agree: the offline mode ships in release 1.3 »).",
+    ],
+    negative: [
+      "| Rédiger le guide de migration | Tom Becker | 28 octobre |",
+      "- « I can test on Android » : offre de test sans échéance : non déterminé.",
+    ],
+  },
+  {
     file: "compte-rendu-ca13-transcription-vtt/graders/ca13-aucun-horodatage.md",
     input: text,
     positive: ["[00:12:34] Camille", "00:00:04.000 --> 00:00:11.500", "<v Inès Garnier>Bonjour"],
