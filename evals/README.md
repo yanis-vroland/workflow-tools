@@ -123,7 +123,7 @@ Spec 007, lancée par `/wf-compte-rendu`, tous les cas `hors-reseau` (tag `wf-co
 | `compte-rendu-ca17-nouvelle-reunion` | même départ, réponse « nouvelle réunion » donnée après le chemin | CA17 (suffixe `-2`, premier compte rendu intact), CA4 |
 | `compte-rendu-ca18-chemin-inexistant`, `compte-rendu-ca18-fichier-vide`, `compte-rendu-ca18-format-docx` | FieldOps brief | CA18 |
 
-Valeur déterministe : commit `5b26289` dans `compte-rendu-ca03-ca04-index-existant` (les comptes rendus déposés sont exclus par `.git/info/exclude`, l'arbre reste propre ; ils portent un hash factice, `a1b2c3d`, que le nouveau compte rendu ne doit pas reprendre).
+Valeur déterministe : commit `2fc99c0` dans `compte-rendu-ca03-ca04-index-existant` (les comptes rendus déposés sont exclus par `.git/info/exclude`, l'arbre reste propre ; ils portent un hash factice, `a1b2c3d`, que le nouveau compte rendu ne doit pas reprendre).
 
 Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` mesurent ainsi un refus réel. Les interdictions de lecture couvrent Read, Bash (motif sur la commande) et Glob. `tests/correcteurs/wf-compte-rendu.mjs`, lancé par `tests/skills/wf-compte-rendu.sh`, compile tous les motifs, les essaie sur des exemples positifs et négatifs, vérifie que les commandes prescrites par la skill ne déclenchent aucune interdiction, et que la commande du nom de fichier donne les noms attendus.
 

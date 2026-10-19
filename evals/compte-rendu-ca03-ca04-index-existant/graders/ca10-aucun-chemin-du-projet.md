@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/compte-rendu/2026-10-07-point-hebdomadaire.md" }
-pattern: '(src|mobile|lib)/[\w./-]+|docs/specs|package(-lock)?\.json|pubspec\.(yaml|lock)|Dockerfile|README\.md|[\w-]+\.(tsx?|dart|sql)\b'
+pattern: '(src|mobile|lib)/[\w./-]+|docs/specs|package(-lock)?\.json|pubspec\.(yaml|lock)|Dockerfile|README\.md|\.github/|[\w-]+\.ya?ml\b|[\w-]+\.(tsx?|dart|sql)\b'
 match: not_contains
 ---
 

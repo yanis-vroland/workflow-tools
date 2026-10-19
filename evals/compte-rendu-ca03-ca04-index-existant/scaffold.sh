@@ -3,7 +3,7 @@
 # de travail de l'eval, vide au lancement, puis :
 #   - dépose deux comptes rendus déjà produits et leur index dans
 #     docs/wf/compte-rendu/, exclus de git pour que l'arbre reste propre
-#     (le commit analysé reste 5b26289) ;
+#     (le commit analysé reste 2fc99c0) ;
 #   - place les notes de la réunion hors du projet, dans ../reunions/ (le bac à
 #     sable de l'eval autorise la lecture sous le parent du répertoire de session).
 set -euo pipefail

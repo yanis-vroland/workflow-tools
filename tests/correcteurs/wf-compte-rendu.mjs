@@ -118,7 +118,7 @@ const suites = [
     file: "compte-rendu-ca01-point-hebdo/graders/ca11-aucun-telephone.md",
     input: text,
     positive: ["Sophie, 06 00 00 00 00", "tél. 0600000000", "+33 6 00 00 00 00"],
-    negative: ["Échéance : 14/10", "Date : 2026-10-07", "Commit : 5b26289"],
+    negative: ["Échéance : 14/10", "Date : 2026-10-07", "Commit : 2fc99c0"],
   },
   {
     file: "compte-rendu-ca02-sans-argument/graders/ca02-aucune-note-de-la-fixture-lue-par-bash.md",
