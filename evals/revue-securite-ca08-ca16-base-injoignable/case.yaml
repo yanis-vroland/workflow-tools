@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: revue-securite-ca08-ca16-base-injoignable
+description: >-
+  Spec 010, CA8, CA16 et CA17 : base d'avis OSV.dev injoignable (cas lancé
+  sans autorisation WebFetch(domain:…), le bac à sable coupe le réseau des
+  commandes Bash) ; fichier .env.staging suivi par git et fichier
+  d'environnement local, tous deux porteurs d'un marqueur factice.
+tags: [wf-revue-securite, spec-010, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: revue-securite-fieldops
+description: >-
+  Spec 010 (wf-revue-securite) sur FieldOps complet : monorepo web JS/TS et
+  Flutter, arbre propre, faux fichier d'environnement local, dépendance
+  transitive vulnérable et clé littérale factice ajoutées par le scaffold.
+  Nécessite OSV.dev (api.osv.dev). Couvre CA1 à CA6, CA9 à CA15, CA17, CA18 et
+  CA24.
+tags: [wf-revue-securite, spec-010, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 120
+  timeout_seconds: 1800
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

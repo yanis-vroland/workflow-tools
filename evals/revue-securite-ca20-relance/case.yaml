@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: revue-securite-ca20-relance
+description: >-
+  Spec 010, CA20 : FieldOps avec un livrable docs/wf/revue-securite.md déjà
+  commité (S2, S4, S7, S9 présents ; S1, S3, S5, S6, S8, S10, S11 retirés ; S7
+  porte sur un fichier disparu). Relance sans réseau.
+tags: [wf-revue-securite, spec-010, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

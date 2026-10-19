@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: revue-securite-ca23-repertoire-vide
+description: >-
+  Spec 010, CA23 : répertoire vide. L'outil l'indique et n'écrit aucun
+  livrable.
+tags: [wf-revue-securite, spec-010, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh
