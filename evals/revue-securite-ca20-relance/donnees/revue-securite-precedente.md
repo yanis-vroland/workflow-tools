@@ -2,7 +2,7 @@
 
 Outil : wf-revue-securite · Date : 2026-10-01 · Commit : 5b26289 · Dernier identifiant attribué : S11
 
-> **Usage interne.** Ce document décrit des failles potentiellement non corrigées : il ne doit pas être diffusé hors de l'équipe.
+> **Document à usage interne.** Il décrit des failles potentiellement non corrigées : il ne doit pas être diffusé hors de l'équipe.
 
 ## Synthèse
 
