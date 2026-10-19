@@ -196,6 +196,22 @@ Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` me
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
+### wf-chiffrage
+
+Spec 005, lancée par `/wf-chiffrage`, tous les cas `hors-reseau` (tags `wf-chiffrage` et `spec-005` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour, sans quoi les vérifications d'absence réussiraient sans rien prouver. L'entrée par défaut, `docs/wf/cadrage-besoin.md`, est fabriquée par le scaffold selon le contrat de la spec 004 (dossier `donnees/` de chaque cas).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `chiffrage-ca01-cadrage-fieldops-brief` | FieldOps brief (ni code ni git) et cadrage B01 à B07 : un besoin trop imprécis (B07), questions ouvertes et répondues, budget en euros dans une réponse | CA1 à CA14, CA22 |
+| `chiffrage-ca15-ca16-projet-avec-code` | FieldOps complet (git propre, faux secret), cadrage de trois évolutions du back-office et livrable `wf-analyse-projet` à deux risques élevés, dont un sans rapport avec les évolutions | CA15, CA16, CA17, CA23, CA3 (commit `5b26289`), CA1, CA6, CA14 |
+| `chiffrage-ca18-relance` | FieldOps brief, cadrage mis à jour (B03 retiré, B05 modifié, B06 ajouté) et chiffrage précédent (C01 à C09, dernier identifiant attribué C10) | CA18 (cas limite), CA3 |
+| `chiffrage-ca19-sans-cadrage` | FieldOps brief sans cadrage, sans argument | CA19 (cas limite) |
+| `chiffrage-ca20-texte-saisi` | FieldOps brief avec cadrage, texte saisi dans la commande | CA20 (cas limite) |
+| `chiffrage-ca20-aucun-besoin` | FieldOps brief, ordre du jour logistique passé en argument | CA20 (cas limite) |
+| `chiffrage-ca21-ca24-cahier-des-charges-brut` | FieldOps brief, cahier des charges brut sans `Bnn` dans un sous-dossier, avec e-mail et téléphones | CA21, CA24 (cas limites), CA1, CA3, CA9, CA10, CA14 |
+
+CA5, CA6 et CA10 sont vérifiés à la fois par des motifs sur les lignes de tableau (`| Cnn | … |`, valeurs hors pas de 0,5, estimation haute au-delà de 5 jours, tâche de lot sans `Bnn`) et par un juge `llm` ligne à ligne ; CA8 (totaux exacts) ne peut l'être que par un juge, qui refait la somme.
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
