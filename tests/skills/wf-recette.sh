@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2016 # accents graves littéraux (commandes Markdown) dans les motifs
 # Tests structurels de la skill wf-recette (spec 014, ADR-001 et amendement 1).
 #
 # Sans modèle : on vérifie que skills/wf-recette/SKILL.md existe, passe la
@@ -165,6 +166,39 @@ cite "CA20 mention « hors git »" "hors git"
 cite "CA20 mention « modifications non commitées »" "modifications non commitées"
 in_model "CA20 en-tête : outil" "Outil : wf-recette"
 
+# --- Injection shell : la référence n'entre dans une commande qu'après filtrage ------
+
+cite "CA16, CA17 caractères admis dans une référence avant toute commande" \
+  "Si l'argument contient autre chose que des lettres, chiffres, \`.\`, \`_\`, \`/\` et \`-\`, ou commence par \`-\`, ne lance aucune commande avec lui"
+cite "CA16, CA17 référence jamais entre guillemets" "sans guillemets"
+# Aucune commande prescrite (entre accents graves) ne place un texte variable
+# <…> entre guillemets doubles, où $(…) ou des accents graves seraient évalués.
+if grep -qE '`[^`]*"[^"`]*<[^>`]+>[^"`]*"[^`]*`' <<<"$body"; then
+  ko "aucune commande avec un texte variable entre guillemets doubles"
+else
+  ok "aucune commande avec un texte variable entre guillemets doubles"
+fi
+# Seules les commandes de la liste blanche citent <ref>
+unexpected=$(grep -oE '`git [^`]*<ref>[^`]*`' <<<"$body" | sort -u |
+  grep -vxF -e '`git log -1 --format=%h <ref> --`' -e '`git diff --name-only <ref> HEAD`' \
+    -e '`git show <ref>:docs/wf/specs-tickets.md`' || true)
+if [ -z "$unexpected" ]; then
+  ok "CA16 seules les trois commandes prescrites reçoivent la référence"
+else
+  ko "CA16 commande inattendue avec la référence ($unexpected)"
+fi
+
+# --- CA21 : Grep jamais en mode contenu sur un fichier d'environnement -------------
+
+cite "CA21 Grep toujours limité par glob à des extensions de code" \
+  "Avec Grep, passe toujours le paramètre \`glob\` limité à des extensions de code"
+glob_example=$(grep -oE 'Avec Grep[^`]*`glob`[^`]*`[^`]*`' <<<"$body" | head -n 1)
+if grep -qE 'md|env|txt|json|yml|yaml' <<<"${glob_example##*\`glob\`}"; then
+  ko "CA21 le glob d'exemple de Grep n'inclut ni Markdown ni fichier de configuration ($glob_example)"
+else
+  ok "CA21 le glob d'exemple de Grep n'inclut ni Markdown ni fichier de configuration"
+fi
+
 # --- Aucune valeur propre à la fixture FieldOps -----------------------------------
 # Les exemples de la skill restent génériques : sinon les evals sur FieldOps
 # mesureraient la recopie d'un exemple, pas le comportement (surapprentissage).
@@ -181,6 +215,21 @@ fieldops_values=(
   "WorkOrder"
   "SEED_PASSWORD"
   "changeme"
+  "MAP_API_KEY_EXPIRES_AT"
+  "purge"
+  "Express"
+  "connecté"
+  "cache"
+  "centile"
+  "simultanés"
+  "e-mail reçu"
+  "accès refusé"
+  "Planifiée"
+  "En cours"
+  "congé"
+  "créneau"
+  "pagination"
+  "PDF"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
