@@ -10,7 +10,7 @@ Tu prépares, en français, la soumission d'une application mobile Flutter sur l
 ## Règles absolues
 
 - **Écriture** : un seul fichier, `docs/wf/publication-store.md`, écrit avec l'outil Write (qui crée `docs/wf/` au besoin ; pas de `mkdir`). Aucun autre fichier du projet n'est créé, modifié, déplacé ou supprimé : ni la version ni le numéro de build (`pubspec.yaml`, `Info.plist`, `build.gradle`), ni les métadonnées de store (`fastlane/metadata/`), ni le livrable de `wf-release-notes`, qui est seulement lu.
-- **Aucune exécution** : tu ne lances ni build, ni signature, ni téléversement, ni le projet, ni aucun de ses outils (flutter, fvm, dart, xcodebuild, gradle, fastlane, pod…). Bash ne sert qu'à ces quatre commandes, recopiées telles quelles, chacune seule (sans option ajoutée, redirection, variable, sous-shell ni enchaînement) :
+- **Aucune exécution** : tu ne lances ni build, ni signature, ni téléversement, ni le projet, ni aucun de ses outils (flutter, dart, xcodebuild, gradle, fastlane, pod…). Bash ne sert qu'à ces quatre commandes, recopiées telles quelles, chacune seule (sans option ajoutée, redirection, variable, sous-shell ni enchaînement) :
   - `git rev-parse --short HEAD`
   - `git status --porcelain`
   - `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'`
@@ -28,7 +28,7 @@ Tu prépares, en français, la soumission d'une application mobile Flutter sur l
 
 ## Étape 1 : trouver les applications Flutter
 
-Avec Glob, cherche les `pubspec.yaml` du projet (racine et sous-dossiers), hors `build/`, `.dart_tool/`, `.fvm/`, `.symlinks/`, `Pods/`, `node_modules/`. Lis chacun avec Read. Une **application Flutter** est un dossier dont le `pubspec.yaml` déclare la dépendance `flutter` (`flutter:` suivi de `sdk: flutter` sous `dependencies:`) et qui contient un dossier `ios/` ou `android/`. Un paquet Dart ou un plugin sans `ios/` ni `android/` n'en est pas une. Toute autre application du projet (application web, API) est ignorée : elle n'apparaît ni dans l'identité, ni dans les checklists, ni dans les fiches.
+Avec Glob, cherche les `pubspec.yaml` du projet (racine et sous-dossiers), hors `build/`, `.dart_tool/`, `.symlinks/`, `Pods/`, `node_modules/`. Lis chacun avec Read. Une **application Flutter** est un dossier dont le `pubspec.yaml` déclare la dépendance `flutter` (`flutter:` suivi de `sdk: flutter` sous `dependencies:`) et qui contient un dossier `ios/` ou `android/`. Un paquet Dart ou un plugin sans `ios/` ni `android/` n'en est pas une. Toute autre application du projet (application web, API) est ignorée : elle n'apparaît ni dans l'identité, ni dans les checklists, ni dans les fiches.
 
 S'il n'y a aucune application Flutter, détermine ce que contient le projet, sans rien écrire et sans créer de dossier :
 
@@ -81,8 +81,6 @@ Titres de section en `##`, exactement dans cet ordre, sans table des matières. 
 # Préparation de la publication sur les stores de <nom du projet>
 
 Outil : wf-publication-store · Date : AAAA-MM-JJ · Commit : <sha court ou « hors git »>[ · modifications non commitées]
-
-Ce livrable a été établi par lecture des fichiers du projet et de la documentation publique des stores, sans build ni accès aux consoles (App Store Connect, Google Play Console) : leur état n'est pas vérifié.
 
 ## Synthèse
 
@@ -155,7 +153,7 @@ Nouveautés iOS : <n> caractères / limite 4000 ; nouveautés Android : <n> cara
 **Identité de l'application** : pour chaque plateforme présente, le nom affiché, l'identifiant, le numéro de version et le numéro de build, chacun avec le fichier d'où il provient. Une plateforme absente (pas de dossier `ios/` ou `android/`) : « non applicable » dans sa colonne.
 - Nom affiché iOS : `CFBundleDisplayName` de l'`Info.plist`, à défaut `CFBundleName`. Nom affiché Android : `android:label` du manifeste (s'il renvoie à `@string/…`, la valeur de `res/values/strings.xml`).
 - Identifiant iOS (bundle identifier) : `CFBundleIdentifier` de l'`Info.plist` ; s'il vaut `$(PRODUCT_BUNDLE_IDENTIFIER)`, la valeur de `PRODUCT_BUNDLE_IDENTIFIER` dans `project.pbxproj` (configuration Release). Identifiant Android : `applicationId` de `build.gradle` ou `build.gradle.kts`.
-- Version et build : quand l'`Info.plist` renvoie à `$(FLUTTER_BUILD_NAME)` et `$(FLUTTER_BUILD_NUMBER)`, et `build.gradle` à `flutterVersionName` et `flutterVersionCode` (ou `flutter.versionName`, `flutter.versionCode`), ils viennent de la ligne `version:` du `pubspec.yaml` (ex. `version: 1.4.0+27` : version 1.4.0, build 27) ; cite le `pubspec.yaml`. Une valeur écrite en dur dans un fichier natif prime pour sa plateforme : cite ce fichier, et signale l'écart avec le `pubspec.yaml` dans « Points non déterminés ».
+- Version et build : quand l'`Info.plist` et `build.gradle` ne les fixent pas eux-mêmes mais renvoient à des variables fournies par le build Flutter, ils viennent de la ligne `version:` du `pubspec.yaml` (ex. `version: 1.4.0+27` : version 1.4.0, build 27) ; cite le `pubspec.yaml`. Une valeur écrite en dur dans un fichier natif prime pour sa plateforme : cite ce fichier, et signale l'écart avec le `pubspec.yaml` dans « Points non déterminés ».
 - Une valeur introuvable ou non résolue (variable dont la définition n'est pas lisible) porte la mention « non déterminé », avec le fichier cherché.
 
 **Checklist iOS** et **Checklist Android** : un tableau par plateforme (par application s'il y en a plusieurs), aux colonnes exactes `| Élément | Statut | Bloquant | Fichier | Détail |`.
