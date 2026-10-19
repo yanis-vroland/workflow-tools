@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: recette-ca04-specs-fieldops
+description: >-
+  Spec 014 (wf-recette) sur la fixture FieldOps complète, sans argument :
+  specs internes validées et en brouillon, routes sans spec, rôles et données
+  de démonstration, arbre propre, faux fichier d'environnement. Couvre CA1 à
+  CA4, CA7, CA8, CA12 à CA16 (sans argument), CA20, CA21.
+tags: [wf-recette, spec-014, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

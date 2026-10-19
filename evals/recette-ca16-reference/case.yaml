@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: recette-ca16-reference
+description: >-
+  Spec 014 (wf-recette), lancée avec une référence git (/wf-recette v1.3.0).
+  Depuis le tag v1.3.0, seuls la spec 002 et le ticket T02 du livrable
+  wf-specs-tickets ont changé : eux seuls produisent des cas ; l'en-tête ou «
+  Périmètre et sources » indique la référence et son commit. Couvre CA16,
+  CA5, CA7, CA1.
+tags: [wf-recette, spec-014, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

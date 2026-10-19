@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: recette-ca06-depuis-le-code
+description: >-
+  Spec 014 (wf-recette). FieldOps sans aucune spec (docs/specs/ retiré par un
+  commit) ni livrable wf-specs-tickets, avec une modification non commitée :
+  cas déduits du code, source citant le fichier de code, avertissement de
+  validation par le client. Couvre CA6, CA7, CA3, CA8, CA20.
+tags: [wf-recette, spec-014, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

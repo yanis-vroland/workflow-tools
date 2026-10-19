@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: recette-ca18-stack-non-couverte
+description: >-
+  Spec 014 (wf-recette). Projet fictif en Python, sans spec ni livrable
+  wf-specs-tickets : « stack Python non couverte en v1 », aucun cas déduit du
+  code, aucun livrable (CA18).
+tags: [wf-recette, spec-014, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
