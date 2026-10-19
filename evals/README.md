@@ -121,7 +121,9 @@ Spec 012, lancée par `/wf-tests-manquants`, tous les cas `hors-reseau` (tag `wf
 | `tests-manquants-ca22-sans-code-source` | FieldOps brief (documents seuls) | CA22 (cas limite) |
 | `tests-manquants-ca24-projet-volumineux` | FieldOps et `src/legacy/` (2 000 modules générés) | CA24 (cas limite) |
 
-Valeurs dépendant de la date d'exécution : les points chauds attendus en priorité haute (CA9), `src/api/routes/interventions.ts` (6 commits sur 12 mois au 2026-10-19) et `mobile/lib/screens/intervention_list_screen.dart` (4 commits), restent dans la fenêtre de 12 mois glissants avec au moins deux commits jusqu'en février 2027. Au-delà, mettre à jour la fixture ou les graders `ca09-…` et `ca11-commits-decroissants`.
+Points chauds indépendants de la date (CA9, CA11) : le scaffold de `tests-manquants-ca23-fieldops-monorepo` ajoute des commits datés relativement au jour d'exécution (4 sur `src/api/routes/interventions.ts`, 2 sur `mobile/lib/screens/intervention_list_screen.dart`, il y a 1 à 6 jours), qui les gardent dans le top 10 sur 12 mois glissants, dans cet ordre. Le HEAD de ce cas n'est donc pas figé : son en-tête est vérifié sur la forme du hash, et le hash rejouable est vérifié dans `tests-manquants-ca05-rapports-couverture` (`558fca6`).
+
+`tests/correcteurs/wf-tests-manquants.mjs`, lancé par `tests/skills.sh`, compile les motifs de ces cas et confronte chaque commande Bash prescrite par la skill aux correcteurs Bash « max: 0 » : la liste d'extensions de l'inventaire (`(ts|tsx|…|dart|…)`) avait été prise pour un lancement de `tsx` par `ca07-aucun-lanceur-…`.
 
 Le livrable de la relance (CA20) fixe une convention que la spec laisse ouverte : la ligne d'en-tête « Dernier identifiant attribué : M<n> », qui garde la trace des identifiants retirés (même principe que `wf-cadrage-besoin`).
 
