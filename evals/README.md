@@ -105,6 +105,26 @@ CA15 et CA20 : seul un sous-dossier effectivement suivi par un dépôt qui a des
 
 CA20 : le répertoire de la session est imposé par `claude plugin eval` et le scaffold n'écrit rien au-dessus. Le dépôt est donc construit avec `core.worktree` : répertoire git dans le répertoire de la session, racine de travail dans son parent, dont la session est le sous-dossier (`git rev-parse --show-prefix` non vide). Seul ce sous-dossier est extrait (`sparse-checkout`). L'historique de FieldOps y est réécrit, suivi de 12 commits plus récents dans `plateforme/` (hors du sous-dossier, une cinquième autrice) : dernier commit du dépôt 2026-10-06, du sous-dossier 2026-09-29. Les hash dépendent du nom du répertoire de la session et ne sont pas figés.
 
+### wf-tests-manquants
+
+Spec 012, lancée par `/wf-tests-manquants`, tous les cas `hors-reseau` (tag `wf-tests-manquants` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca13-…`). Tous les cas qui produisent un livrable portent `ca07-aucun-lanceur-…` : aucune commande Bash ne lance `npm`, `npx`, `node`, `vitest`, `jest`, `flutter`, `dart`, `python`, `pip`… ni l'option `--coverage`.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `tests-manquants-ca23-fieldops-monorepo` | FieldOps complet (web et Flutter), propre, sans rapport de couverture | CA1 à CA4, CA6 à CA15, CA21, CA23 |
+| `tests-manquants-ca05-rapports-couverture` | FieldOps complet, `integration_test` déclaré, `coverage/coverage-summary.json` et `mobile/coverage/lcov.info` datés du 2026-09-15, antérieurs au dernier commit | CA5, CA4, CA7 |
+| `tests-manquants-ca16-ca18-sans-framework-ni-depot` | projet TypeScript (Vite) sans framework ni fichier de test, hors git | CA16, CA18 (cas limites), CA12 |
+| `tests-manquants-ca17-tout-couvert` | module TypeScript dont chaque branche est testée (Vitest) | CA17 (cas limite) |
+| `tests-manquants-ca19-stack-mixte` | FieldOps complet et un service Python (`relay/`) | CA19 (cas limite) |
+| `tests-manquants-ca20-relance` | FieldOps complet, livrable précédent (M1, M3, M2 ; dernier identifiant M4) et test de M2 écrit depuis | CA20 (cas limite) |
+| `tests-manquants-ca22-repertoire-vide` | répertoire vide | CA22 (cas limite) |
+| `tests-manquants-ca22-sans-code-source` | FieldOps brief (documents seuls) | CA22 (cas limite) |
+| `tests-manquants-ca24-projet-volumineux` | FieldOps et `src/legacy/` (2 000 modules générés) | CA24 (cas limite) |
+
+Valeurs dépendant de la date d'exécution : les points chauds attendus en priorité haute (CA9), `src/api/routes/interventions.ts` (6 commits sur 12 mois au 2026-10-19) et `mobile/lib/screens/intervention_list_screen.dart` (4 commits), restent dans la fenêtre de 12 mois glissants avec au moins deux commits jusqu'en février 2027. Au-delà, mettre à jour la fixture ou les graders `ca09-…` et `ca11-commits-decroissants`.
+
+Le livrable de la relance (CA20) fixe une convention que la spec laisse ouverte : la ligne d'en-tête « Dernier identifiant attribué : M<n> », qui garde la trace des identifiants retirés (même principe que `wf-cadrage-besoin`).
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
