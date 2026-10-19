@@ -90,14 +90,14 @@ const SECTIONS = [
   "Plan d'action",
   "Points non déterminés",
 ];
-const doc = (sections = {}, header = "Outil : wf-audit-web · Date : 2026-10-19 · Commit : b224ed8 · Mode : code seul") =>
+const doc = (sections = {}, header = "Outil : wf-audit-web · Date : 2026-10-19 · Commit : d2e6acb · Mode : code seul") =>
   ["# Audit web du projet", "", header, "", ...SECTIONS.flatMap((s) => [`## ${s}`, "", sections[s] ?? "Aucun constat.", ""])].join("\n");
 
 const constat = (id, lines) => [`### ${id} — Titre du constat`, "", ...lines.map((l) => `- ${l}`), ""].join("\n");
 const a11y = (id, critere, emplacement) =>
   constat(id, ["Niveau : élevé", `Critère : ${critere}`, `Emplacement : ${emplacement}`, "Constat : fait.", "Recommandation : action."]);
 
-const OLD = doc({}, "Outil : wf-audit-web · Date : 2026-09-15 · Commit : 35377d4");
+const OLD = doc({}, "Outil : wf-audit-web · Date : 2026-09-15 · Commit : be04389");
 const NO_DELIVERABLE = "";
 const titleBlocks = (a11yLine, seoLine) =>
   doc({

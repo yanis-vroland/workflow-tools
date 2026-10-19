@@ -35,7 +35,7 @@ mkdir -p docs/wf
 cat >docs/wf/audit-web.md <<'MD'
 # Audit web de FieldOps
 
-Outil : wf-audit-web · Date : 2026-09-15 · Commit : 35377d4
+Outil : wf-audit-web · Date : 2026-09-15 · Commit : be04389
 Dernier identifiant attribué : W6
 
 Cet audit a été établi par lecture du code, sans mesure : il ne vaut pas audit de conformité RGAA.

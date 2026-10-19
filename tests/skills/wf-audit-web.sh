@@ -117,6 +117,8 @@ fieldops_values=(
   "inventaire"
   "purge"
   "MAP_API_KEY"
+  "PRODUCTION_DATABASE_URL"
+  "src/jobs"
   "example.invalid"
 )
 leak_ok=1
