@@ -12,14 +12,16 @@ Référentiel d'accessibilité : **RGAA 4.1**. Le critère WCAG correspondant pe
 ## Règles absolues
 
 - **Écriture** : un seul fichier, `docs/wf/audit-web.md`, écrit avec l'outil Write (qui crée `docs/wf/` au besoin ; pas de `mkdir`). Aucun autre fichier du projet n'est créé, modifié, déplacé ou supprimé : pas de correction du code, pas de rapport Lighthouse enregistré, pas de copie datée de l'audit. Les livrables des autres outils dans `docs/wf/` sont seulement lus.
-- **Bash** : uniquement les commandes suivantes, recopiées telles quelles, chacune seule (sans option ajoutée, redirection, variable, sous-shell ni enchaînement, sauf le tube prévu dans la commande Lighthouse) :
+- **Bash** : uniquement les commandes suivantes, recopiées telles quelles, chacune seule (sans option ajoutée, redirection, variable, sous-shell ni enchaînement, sauf les tubes prévus dans les commandes 5 et 7) :
   1. `git rev-parse --short HEAD`
   2. `git status --porcelain`
   3. `date +%F`
   4. la recherche des images lourdes, lancée depuis la racine du projet :
      `find . \( -name node_modules -o -name .git -o -name dist -o -name build -o -name .next -o -name out -o -name coverage \) -prune -o -type f \( -path '*/public/*' -o -path '*/static/*' -o -path '*/assets/*' \) \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.gif' -o -iname '*.webp' -o -iname '*.avif' -o -iname '*.svg' -o -iname '*.bmp' -o -iname '*.ico' -o -iname '*.tif' -o -iname '*.tiff' \) -size +200000c -exec wc -c {} +`
-  5. en mode URL seulement : `command -v lighthouse`
-  6. en mode URL seulement, si Lighthouse est installé, une seule fois :
+  5. le décompte des gabarits et composants par dossier, lancé depuis la racine du projet (une ligne par dossier : nombre de fichiers, puis dossier) :
+     `find . \( -name node_modules -o -name .git -o -name dist -o -name build -o -name .next -o -name out -o -name coverage \) -prune -o -type f \( -iname '*.html' -o -iname '*.htm' -o -iname '*.tsx' -o -iname '*.jsx' -o -iname '*.vue' -o -iname '*.svelte' -o -iname '*.astro' \) -exec dirname {} + | sort | uniq -c`
+  6. en mode URL seulement : `command -v lighthouse`
+  7. en mode URL seulement, si Lighthouse est installé, une seule fois :
      `lighthouse '<URL>' --output=json --output-path=stdout --quiet --chrome-flags='--headless=new' | node '<dossier de la skill>/scripts/lighthouse-summary.mjs'`
 
   Aucune autre commande, même en lecture (`ls`, `cat`, `curl`…). Tu ne lances ni le projet, ni ses tests, ni son build, ni son installation. Pour lire, utilise Read, Glob et Grep.
@@ -58,7 +60,7 @@ S'il n'y a aucun front web JS/TS, n'écris rien, ne crée aucun dossier, et term
 - **Sans argument** : mode « code seul ».
 - **Avec une URL en argument** (`/wf-audit-web https://…`) : vérifie qu'elle commence par `http://` ou `https://` et ne contient ni espace ni apostrophe ; sinon, audite le code seul et signale l'argument écarté dans « Périmètre et méthode » et « Points non déterminés ». Puis lance `command -v lighthouse` :
   - **Lighthouse absent** (sortie vide ou échec) : ne l'installe pas. Mode « code seul ». « Périmètre et méthode » cite l'URL demandée et indique que Lighthouse est absent du poste ; « Points non déterminés » donne la commande à lancer soi-même pour un audit mesuré : `npm install -g lighthouse` (Lighthouse exige aussi Chrome ou Chromium).
-  - **Lighthouse présent** : lance la commande 6 une seule fois, en remplaçant `<URL>` par l'URL et `<dossier de la skill>` par le chemin absolu du dossier de cette skill, indiqué en tête de ces instructions (« Base directory for this skill »). Si ce chemin n'est pas connu, ne lance rien et traite le cas comme une mesure impossible (même traitement que l'URL injoignable). Le script `scripts/lighthouse-summary.mjs` résume le rapport JSON de Lighthouse sans rien écrire sur le disque :
+  - **Lighthouse présent** : lance la commande 7 une seule fois, en remplaçant `<URL>` par l'URL et `<dossier de la skill>` par le chemin absolu du dossier de cette skill, indiqué en tête de ces instructions (« Base directory for this skill »), tous deux entre apostrophes comme dans la commande. Si ce chemin n'est pas connu ou contient une apostrophe, ne lance rien et traite le cas comme une mesure impossible (même traitement que l'URL injoignable). Le script `scripts/lighthouse-summary.mjs` résume le rapport JSON de Lighthouse sans rien écrire sur le disque :
     - `"status": "unreachable"` : la page n'a pas pu être chargée (URL injoignable, erreur de Lighthouse). Mode « code seul » ; l'URL demandée et la cause sont signalées dans « Périmètre et méthode » et dans « Points non déterminés » ; l'audit est tout de même produit.
     - `"status": "ok"` : mode « code + URL ». Le résumé donne la version de Lighthouse (`lighthouseVersion`), l'heure de la mesure (`fetchTime`, en UTC), le profil d'appareil (`formFactor`, mobile), l'URL demandée (`requestedUrl`) et l'URL finalement auditée (`finalUrl`, `redirected`), les scores sur 100 des quatre catégories (`scores`) et les audits en échec (`issues`, avec les URL des ressources et les extraits HTML en cause).
 
@@ -68,9 +70,11 @@ Si `docs/wf/audit-web.md` existe, lis-le d'abord, en particulier la ligne « Der
 
 ## Étape 6 : lire le code
 
-Pour chaque front audité, liste avec Glob ses documents HTML, gabarits de mise en page et pages (ex. `index.html`, `app/layout.*`, `app/**/page.*`, `pages/**`, `src/app.html`, `layouts/**`), puis ses composants (`.tsx`, `.jsx`, `.vue`, `.svelte`, `.astro`, `.html`), hors `node_modules/` et dossiers de build. Repère les candidats avec Grep (`<img`, `<Image`, `<input`, `<select`, `<textarea`, `<html`, `<title`, `metadata`, `description`…), puis lis chaque fichier concerné avec Read avant d'en tirer un constat : une balise JSX peut s'étendre sur plusieurs lignes, et ses attributs peuvent venir d'une décomposition (`{...props}`) : dans ce cas, le point est « non déterminé ».
+Pour chaque front audité, liste avec Glob ses documents HTML, gabarits de mise en page et pages (documents `*.html`, puis les gabarits et les pages que désignent les conventions de routage par fichiers du framework : Next.js, Nuxt, SvelteKit, Astro…), puis ses composants (`.tsx`, `.jsx`, `.vue`, `.svelte`, `.astro`, `.html`), hors `node_modules/` et dossiers de build. Repère les candidats avec Grep (`<img`, `<Image`, `<input`, `<select`, `<textarea`, `<html`, `<title`, `metadata`, `description`…), puis lis chaque fichier concerné avec Read avant d'en tirer un constat : une balise JSX peut s'étendre sur plusieurs lignes, et ses attributs peuvent venir d'une décomposition (`{...props}`) : dans ce cas, le point est « non déterminé ».
 
-**Projet volumineux** : au-delà de 150 fichiers de gabarits et de composants, lis d'abord les documents racine, les gabarits de mise en page et les pages, puis les composants dossier par dossier, sans dépasser 150 fichiers lus. Chaque dossier dont tous les fichiers n'ont pas été lus figure dans « Points non déterminés », sous la mention « dossiers non lus » (ou « lus en partie »), et aucune conclusion ne porte sur lui : ni constat général, ni affirmation qu'il est exempt de problème. Une correspondance Grep dans un fichier non lu n'est pas un constat.
+**Inventaire** : lance d'abord la commande 5. Elle donne, pour chaque dossier, le nombre exact de gabarits et de composants : c'est la seule source pour compter les fichiers et lister les dossiers, car le résultat de Glob peut être tronqué (au-delà d'une centaine de fichiers) et ne montrerait alors qu'une partie des dossiers.
+
+**Projet volumineux** : au-delà de 150 fichiers de gabarits et de composants (total de la commande 5), lis d'abord les documents racine, les gabarits de mise en page et les pages, puis les composants dossier par dossier, sans dépasser 150 fichiers lus. Chaque dossier de la commande 5 dont tous les fichiers n'ont pas été lus figure dans « Points non déterminés », sous la mention « dossiers non lus » (ou « lus en partie »), un par ligne avec son nombre de fichiers tel que la commande 5 le donne (un dossier parent entièrement non lu peut regrouper ses sous-dossiers, à condition de les nommer tous), et aucune conclusion ne porte sur lui : ni constat général, ni affirmation qu'il est exempt de problème. Une correspondance Grep dans un fichier non lu n'est pas un constat.
 
 ## Règles de constat
 
@@ -106,7 +110,7 @@ Chaque constat d'accessibilité cite le numéro du critère RGAA 4.1 sous la for
 
 Pour chaque audit en échec du résumé (`issues`) :
 - s'il recoupe un constat du code (même problème, même élément), fusionne-les en un seul constat qui cite le fichier et la ligne, et précise « confirmé par Lighthouse » ;
-- sinon, s'il est rattachable à un fichier du projet (ex. une ressource `https://<hôte>/img/x.png` présente dans un dossier `public/` du front, retrouvée avec Glob ; un extrait HTML retrouvé avec Grep puis lu), le constat cite ce fichier ;
+- sinon, s'il est rattachable à un fichier du projet (ex. une ressource `https://<hôte>/medias/photo.webp` présente dans un dossier `public/` du front, retrouvée avec Glob ; un extrait HTML retrouvé avec Grep puis lu), le constat cite ce fichier ;
 - sinon, le constat cite l'URL auditée (ou celle de la ressource) et porte la mention « non rattaché au code ».
 
 ### Points que le code ne peut établir
@@ -139,7 +143,7 @@ Titres de section en `##`, exactement dans cet ordre, sans table des matières. 
 ```markdown
 # Audit web de <nom du projet>
 
-Outil : wf-audit-web · Date : AAAA-MM-JJ · Commit : <sha court ou « hors git »>[ · modifications non commitées] · Mode : <code seul | code + URL>
+Outil : wf-audit-web · Date : AAAA-MM-JJ · Commit : <sha court ou « hors git »>[ · modifications non commitées]
 Dernier identifiant attribué : W<n>
 
 ## Synthèse
