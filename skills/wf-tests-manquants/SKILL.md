@@ -12,7 +12,8 @@ Tu repères les tests qui manquent dans un projet, lancé à sa racine (le répe
 - Écris uniquement `docs/wf/tests-manquants.md` (dossier `docs/wf/` créé au besoin), avec l'outil Write. Aucun autre fichier n'est créé ni modifié, en particulier aucun fichier de test : les squelettes restent dans le livrable, le développeur les copie lui-même. Pas de `sed -i`, de `tee`, de `mkdir` ni de redirection `>` vers un fichier (seul `2>/dev/null` est permis).
 - L'outil ne lance aucun test, ne mesure pas la couverture et n'installe rien : n'exécute aucune commande `npm`, `pnpm`, `yarn`, `npx`, `node`, `tsx`, `vitest`, `jest`, `playwright`, `flutter`, `fvm`, `dart`, `python`, `pip`, aucune option `--coverage`, aucun script du projet. Un rapport de couverture déjà présent est lu, jamais régénéré.
 - Lecture seule sur git : aucune commande qui modifie le dépôt ou sa configuration (add, commit, stash, checkout, reset, fetch, tag, branch…). Aucun accès réseau : n'utilise pas WebFetch.
-- Ne lis jamais un fichier `.env*` autre que `.env.example` (ni Read, ni Grep, ni cat) et ne le cite dans aucune commande ; exclus-les de toute recherche (`--glob '!.env*'`). Le livrable ne contient aucune de leurs valeurs ni aucun secret, même dans un squelette.
+- Ne lis jamais un fichier `.env*` autre que `.env.example` (ni Read, ni Grep, ni cat) et ne le cite dans aucune commande ; exclus-les de toute recherche : l'outil Grep s'utilise toujours avec `glob: "!**/.env*"` (ou en mode `files_with_matches`), car en mode contenu il afficherait leurs lignes ; en Bash, `--glob '!.env*'` ou `--exclude='.env*'`.
+- N'écris dans une commande Bash aucun texte tiré du projet (nom de fichier, de dossier, de fonction, contenu lu) : les commandes ci-dessous s'utilisent telles quelles, et le reste passe par Read, Grep et Glob. Le livrable ne contient aucune de leurs valeurs ni aucun secret, même dans un squelette.
 - Ne recopie aucune adresse e-mail de contributeur ni aucune donnée personnelle : seuls des noms de fichiers, de fonctions et des nombres de commits apparaissent.
 - Toute affirmation s'appuie sur un fichier lu, dont le chemin est cité. Ce qui ne peut pas être établi est marqué « non déterminé » et listé dans « Points non déterminés ». N'invente jamais un nom de fonction, un comportement, une valeur attendue ni une règle métier.
 
@@ -71,12 +72,11 @@ Autre stack : une ligne « <stack> (`<manifeste>`) : stack non couverte en v1, n
 
 Fichiers sans logique exécutable, d'abord : déclarations de types seules (`.d.ts`, fichier qui ne contient que des `interface`, `type`, `enum` ou constantes sans fonction), configuration (`*.config.*`, `.eslintrc.*`…), fichiers générés (`*.g.dart`, `*.freezed.dart`, `*.gr.dart`, `*.mocks.dart`, ou fichier dont l'en-tête porte un commentaire de génération : `GENERATED CODE`, `@generated`, `DO NOT EDIT`, `Code generated`). Ils sont exclus de l'analyse, n'apparaissent jamais dans « Tests manquants », et la sous-section donne leur nombre (« Fichiers exclus (sans logique exécutable) : N »), avec leurs chemins.
 
-Rapport de couverture déjà présent : cherche, à la racine de chaque application, `coverage/lcov.info` (produit notamment par `flutter test --coverage`) et `coverage/coverage-summary.json` (Vitest, Jest). Ils sont souvent ignorés par git : teste leur chemin directement.
+Rapport de couverture déjà présent : cherche, à la racine de chaque application, `coverage/lcov.info` (produit notamment par `flutter test --coverage`) et `coverage/coverage-summary.json` (Vitest, Jest). Ils sont souvent ignorés par git : cherche-les sur le disque, sans écrire aucun nom de dossier du projet dans la commande.
 
 ```bash
-for f in coverage/lcov.info coverage/coverage-summary.json <dossier>/coverage/lcov.info <dossier>/coverage/coverage-summary.json; do
-  [ -f "$f" ] && echo "$f $(date -r "$f" '+%Y-%m-%d %H:%M') $(date -r "$f" +%s)"
-done
+find . -path ./.git -prune -o -path '*/node_modules' -prune -o -type f \( -path '*/coverage/lcov.info' -o -path '*/coverage/coverage-summary.json' \) -print \
+  | while IFS= read -r f; do printf '%s %s %s\n' "$f" "$(date -r "$f" '+%Y-%m-%d %H:%M')" "$(date -r "$f" +%s)"; done
 git log -1 --format='%cd %ct' --date=format:'%Y-%m-%d %H:%M' HEAD   # dernier commit (dans git seulement)
 ```
 
@@ -166,8 +166,6 @@ Les éléments entre chevrons sont à remplacer par les valeurs du projet analys
 
 Outil : wf-tests-manquants · Date : AAAA-MM-JJ · Commit analysé : <hash court>[ · modifications non commitées][ · Sous-dossier : `<préfixe>`]
 Dernier identifiant attribué : M<n>
-
-Établi par lecture des fichiers : aucun test n'a été lancé, aucune couverture n'a été mesurée, aucune dépendance n'a été installée.
 
 (hors dépôt : « Commit analysé : hors git », sans aucun hash)
 
