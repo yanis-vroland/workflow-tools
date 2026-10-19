@@ -168,7 +168,7 @@ Livrables wf- lus : `docs/wf/specs-tickets.md`, `docs/wf/compte-rendu/<fichier>.
 **Points de vigilance** : chaque point cite sa source : commit (hash court), compte rendu (nom du fichier) ou réponse de l'utilisateur. Chaque commit de type `revert` de la période y figure systématiquement (ce qui a été annulé, avec le hash du commit d'annulation). Un changement cassant annoncé (`!` après le type, ou `BREAKING CHANGE`) y figure aussi. N'y mets aucun jugement de qualité ni de dette. S'il n'y a rien : « Aucun point identifié. »
 
 **Décisions attendues** :
-- Comptes rendus de la période présents : chaque entrée de leur section « Questions en suspens », reprise fidèlement, suivie du nom du fichier du compte rendu source.
+- Comptes rendus de la période présents : chaque entrée de leur section « Questions en suspens », reprise fidèlement, suivie du nom du fichier du compte rendu source. Si ces sections sont toutes vides : « aucune identifiée ».
 - Sans compte rendu dans la période : « aucune identifiée » (tu demanderas les décisions attendues dans le message final, voir « Fin »).
 
 **Points non déterminés** : liste à puces de ce qui n'a pas pu être établi : historique incomplet (clone superficiel) avec la période réellement couverte, commits indescriptibles avec leur hash court et la raison, livrables `wf-` illisibles ou hors contrat. S'il n'y a rien : « - Aucun. »
