@@ -184,7 +184,8 @@ fieldops_values=(
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
-  if grep -qF -- "$value" <<<"$body"; then
+  # Mot entier : « changeme » ne doit pas être trouvé dans « changements ».
+  if grep -qwF -- "$value" <<<"$body"; then
     ko "aucune valeur de FieldOps dans la skill (« $value » présent)"
     leak_ok=0
   fi
