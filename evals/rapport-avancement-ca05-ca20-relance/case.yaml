@@ -1,0 +1,109 @@
+schema_version: "1.1"
+name: rapport-avancement-ca05-ca20-relance
+description: >-
+  Spec 008, CA5 et CA20 : FieldOps complet avec un rapport précédent commité
+  (période du 2026-08-01 au 2026-09-25). Lancé sans argument, l'outil couvre du
+  2026-09-26 à la date du jour et réécrit le fichier au lieu de le dupliquer.
+  Couvre aussi CA3 (en-tête mis à jour).
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+# HEAD : ca67095 (commit du rapport précédent, 2026-10-02). Commits de la
+# nouvelle période : main 90668f7, 5b26289, ca67095 ; feat/export-pdf 7690d7e,
+# a1b5ba7. Hors période (déjà couverts par le rapport précédent) : 6778367,
+# cb54966, b5808fe, da56e50, 85cdd2e.
+graders:
+  # --- CA20 : mise à jour du même fichier, sans doublon ------------------------------------
+  - name: ca20-livrable-reecrit
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*docs/wf/rapport-avancement\.md"'
+    min: 1
+  - name: ca20-aucun-autre-fichier-cree
+    type: regex
+    target: files
+    pattern: '^(?!docs/wf/rapport-avancement\.md$|\.git/).+$'
+    flags: m
+    match: not_contains
+  - name: ca20-aucune-ecriture-hors-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/rapport-avancement\.md")'
+    min: 0
+    max: 0
+  - name: ca20-un-seul-titre-de-rapport
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '(?:^|\n)# [^\n]*'
+    match: "count:1"
+  - name: ca20-une-seule-synthese
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '(?:^|\n)##? [^\n]*Synth[èe]se'
+    match: "count:1"
+
+  # --- CA5 : période déduite du rapport précédent ---------------------------------------------
+  - name: ca05-periode-commence-au-lendemain
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?2026-09-26[^\n]*\b(?:2026-1[0-2]|20(?:2[7-9]|[3-9]\d)-(?:0[1-9]|1[0-2]))-\d\d\b'
+    match: contains
+  - name: ca05-ancienne-periode-retiree
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?(?:2026-08-01|2026-09-25)'
+    match: not_contains
+  - name: ca05-aucune-question-sur-la-periode
+    type: llm
+    focus: last_message
+    criteria: >-
+      PASS si le dernier message ne demande pas à l'utilisateur quelle période
+      couvrir (il peut en revanche demander les prochaines étapes ou les
+      décisions attendues) et indique que le rapport a été mis à jour. FAIL si
+      l'outil demande la période.
+  - name: ca05-sources-de-la-nouvelle-periode
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*90668f7)(?=[\s\S]*5b26289)(?=[\s\S]*ca67095)(?=[\s\S]*7690d7e)(?=[\s\S]*a1b5ba7)'
+    match: contains
+  - name: ca05-commits-de-l-ancienne-periode-retires
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '6778367|cb54966|b5808fe|da56e50|85cdd2e'
+    match: not_contains
+
+  # --- CA3 : en-tête mis à jour ----------------------------------------------------------------
+  - name: ca03-en-tete-commit-actuel
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bca67095'
+    match: contains
+  - name: ca03-en-tete-aucun-livrable-lu
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\baucun\b'
+    flags: i
+    match: contains
+
+  # --- Garde-fous communs --------------------------------------------------------------------------
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git (?:rev-parse|status|log|show|for-each-ref) |git symbolic-ref --short refs/remotes/origin/HEAD"|date \+%F"))'
+    min: 0
+    max: 0
+  - name: ca01-bash-sans-enchainement-ni-redirection
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:;|&&|\|\||>|<|\$\(|`|\\n|--output|\|(?! tail -n 1"))'
+    min: 0
+    max: 0

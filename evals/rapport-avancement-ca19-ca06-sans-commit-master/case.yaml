@@ -1,0 +1,58 @@
+schema_version: "1.1"
+name: rapport-avancement-ca19-ca06-sans-commit-master
+description: >-
+  Spec 008, CA19 et CA6 (repli sur master) : FieldOps complet dont la branche
+  principale s'appelle « master ». Période du 2026-10-01 au 2026-10-05, sans
+  aucun commit (ni sur master, ni sur la branche non fusionnée). Le livrable est
+  produit, « Réalisé » et la « Synthèse » disent qu'aucune modification n'a été
+  intégrée.
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca19-livrable-cree
+    type: file_exists
+    path: "docs/wf/rapport-avancement.md"
+  - name: ca19-realise-aucune-modification
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*R[ée]alis[ée][^\n]*\n(?:(?!\n##? )[\s\S])*?Aucune modification int[ée]gr[ée]e sur la p[ée]riode'
+    flags: i
+    match: contains
+  - name: ca19-synthese-le-dit
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*Synth[èe]se[^\n]*\n(?:(?!\n##? )[\s\S])*?aucune (?:modification|nouvelle)'
+    flags: i
+    match: contains
+  - name: ca19-aucun-travail-invente
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*En cours[^\n]*\n(?:(?!\n##? )[\s\S])*?\bPDF\b'
+    flags: i
+    match: not_contains
+  - name: ca06-repli-sur-master
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bmaster\b'
+    match: contains
+  - name: ca03-en-tete-periode
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?2026-10-01(?:(?!\n##? [^\n]*Synth)[\s\S])*?2026-10-05'
+    match: contains
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git (?:rev-parse|status|log|show|for-each-ref) |git symbolic-ref --short refs/remotes/origin/HEAD"|date \+%F"))'
+    min: 0
+    max: 0

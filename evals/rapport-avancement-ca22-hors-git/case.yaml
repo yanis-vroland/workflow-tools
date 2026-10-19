@@ -1,0 +1,43 @@
+schema_version: "1.1"
+name: rapport-avancement-ca22-hors-git
+description: >-
+  Spec 008, CA22 : copie de FieldOps sans historique git (le dépôt vide créé
+  par claude plugin eval dans le dossier parent n'a aucun commit). L'outil
+  indique qu'il ne peut pas établir l'avancement et n'écrit aucun livrable.
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca22-aucun-livrable
+    type: file_exists
+    path: "docs/wf/**"
+    exists: false
+  - name: ca22-aucun-fichier-cree
+    type: regex
+    target: files
+    pattern: '^(?!\.git/).+$'
+    flags: m
+    match: not_contains
+  - name: ca22-impossibilite-indiquee
+    type: llm
+    focus: last_message
+    criteria: >-
+      PASS si le dernier message indique que le projet n'est pas un dépôt git
+      (ou n'a aucun historique de commits) et que l'avancement ne peut donc pas
+      être établi, sans prétendre avoir écrit un rapport ni décrire un
+      avancement. FAIL sinon.
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git (?:rev-parse|status|log|show|for-each-ref) |git symbolic-ref --short refs/remotes/origin/HEAD"|date \+%F"))'
+    min: 0
+    max: 0

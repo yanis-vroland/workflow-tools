@@ -1,0 +1,55 @@
+schema_version: "1.1"
+name: rapport-avancement-ca23-clone-superficiel
+description: >-
+  Spec 008, CA23 : clone superficiel de FieldOps (3 derniers commits de main,
+  du 2026-09-22 au 2026-09-29), période demandée du 2026-09-01 au 2026-09-30.
+  « Points non déterminés » signale l'historique incomplet et la période
+  réellement couverte (à partir du 2026-09-22).
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca23-livrable-cree
+    type: file_exists
+    path: "docs/wf/rapport-avancement.md"
+  - name: ca23-historique-incomplet-signale
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n##? )[\s\S])*?(?:superficiel|tronqu|incomplet|partiel|shallow)'
+    flags: i
+    match: contains
+  - name: ca23-periode-reellement-couverte
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n##? )[\s\S])*?2026-09-22'
+    match: contains
+  - name: ca23-shallow-verifie
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"git rev-parse --is-shallow-repository"'
+    min: 1
+  - name: ca23-commits-disponibles-dans-sources
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*6778367)(?=[\s\S]*90668f7)(?=[\s\S]*5b26289)'
+    match: contains
+  - name: ca23-aucun-commit-invente
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '85cdd2e'
+    match: not_contains
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git (?:rev-parse|status|log|show|for-each-ref) |git symbolic-ref --short refs/remotes/origin/HEAD"|date \+%F"))'
+    min: 0
+    max: 0

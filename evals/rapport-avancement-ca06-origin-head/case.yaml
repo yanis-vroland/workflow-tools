@@ -1,0 +1,66 @@
+schema_version: "1.1"
+name: rapport-avancement-ca06-origin-head
+description: >-
+  Spec 008, CA6 : clone de FieldOps dont origin/HEAD désigne la branche
+  « principale » ; une branche locale « main » existe mais est restée sur
+  v1.0.0. Période du 2026-09-20 au 2026-09-30. L'outil suit origin/HEAD. Couvre
+  aussi CA10 avec une branche connue seulement comme branche distante.
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+# Sur principale, dans la période : 6778367, 90668f7, 5b26289 (tous internes).
+# Sur origin/feat/export-pdf : cb54966, 7690d7e, a1b5ba7. La branche locale
+# main (v1.0.0, 0deccb0) n'a aucun commit dans la période.
+graders:
+  - name: ca06-livrable-cree
+    type: file_exists
+    path: "docs/wf/rapport-avancement.md"
+  - name: ca06-branche-principale-en-tete
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?\bprincipale\b(?:(?!\n##? [^\n]*Synth)[\s\S])*?\n##? [^\n]*Synth'
+    match: contains
+  - name: ca06-origin-head-consulte
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"git symbolic-ref --short refs/remotes/origin/HEAD"'
+    min: 1
+  - name: ca06-commits-de-principale-dans-sources
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*6778367)(?=[\s\S]*90668f7)(?=[\s\S]*5b26289)'
+    match: contains
+  - name: ca06-realise-non-vide
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*R[ée]alis[ée][^\n]*\n(?:(?!\n##? )[\s\S])*?Travaux techniques internes[^\n]*(?<![\d,.])\b3\b(?![\d,.])'
+    flags: i
+    match: contains
+  - name: ca10-branche-distante-en-cours
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*En cours[^\n]*\n(?:(?!\n##? )[\s\S])*?\bPDF\b'
+    flags: i
+    match: contains
+  - name: ca10-branche-main-pas-en-cours
+    type: llm
+    focus: { source: file, path: "docs/wf/rapport-avancement.md" }
+    criteria: >-
+      PASS si la section « En cours » ne contient qu'une entrée, l'export PDF
+      des interventions, et ne présente pas la branche « main » ni la branche
+      « principale » comme un travail en cours. FAIL sinon.
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git (?:rev-parse|status|log|show|for-each-ref) |git symbolic-ref --short refs/remotes/origin/HEAD"|date \+%F"))'
+    min: 0
+    max: 0

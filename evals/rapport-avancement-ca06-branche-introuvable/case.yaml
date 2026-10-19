@@ -1,0 +1,44 @@
+schema_version: "1.1"
+name: rapport-avancement-ca06-branche-introuvable
+description: >-
+  Spec 008, CA6 (cas limite) : FieldOps complet dont la seule branche longue
+  s'appelle « develop » (ni origin/HEAD, ni main, ni master). L'outil demande la
+  branche principale et n'écrit aucun livrable.
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca06-aucun-livrable
+    type: file_exists
+    path: "docs/wf/**"
+    exists: false
+  - name: ca06-aucun-fichier-cree
+    type: regex
+    target: files
+    pattern: '^(?!\.git/).+$'
+    flags: m
+    match: not_contains
+  - name: ca06-branche-principale-demandee
+    type: llm
+    focus: last_message
+    criteria: >-
+      PASS si le dernier message indique qu'aucune branche principale n'a été
+      trouvée (ni origin/HEAD, ni main, ni master) et demande à l'utilisateur
+      laquelle utiliser, sans prétendre avoir écrit un rapport. Il peut citer
+      les branches existantes. FAIL si l'outil choisit lui-même une branche
+      (par exemple develop) et produit le rapport.
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git (?:rev-parse|status|log|show|for-each-ref) |git symbolic-ref --short refs/remotes/origin/HEAD"|date \+%F"))'
+    min: 0
+    max: 0

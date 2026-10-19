@@ -1,0 +1,42 @@
+schema_version: "1.1"
+name: rapport-avancement-ca05-sans-periode
+description: >-
+  Spec 008, CA5 (cas limite) : FieldOps complet, aucun rapport précédent, lancé
+  sans période. L'outil demande la période et n'écrit aucun livrable.
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca05-aucun-livrable
+    type: file_exists
+    path: "docs/wf/**"
+    exists: false
+  - name: ca05-aucun-fichier-cree
+    type: regex
+    target: files
+    pattern: '^(?!\.git/).+$'
+    flags: m
+    match: not_contains
+  - name: ca05-periode-demandee
+    type: llm
+    focus: last_message
+    criteria: >-
+      PASS si le dernier message demande à l'utilisateur la période à couvrir
+      (date de début et date de fin), en indiquant le format attendu ou la
+      syntaxe de la commande, et ne prétend pas avoir écrit un rapport. FAIL si
+      l'outil choisit lui-même une période ou annonce un rapport.
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git (?:rev-parse|status|log|show|for-each-ref) |git symbolic-ref --short refs/remotes/origin/HEAD"|date \+%F"))'
+    min: 0
+    max: 0
