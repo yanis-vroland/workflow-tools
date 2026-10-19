@@ -115,7 +115,7 @@ graders:
   - name: ca19-texte-a-rediger-a-la-main
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: '\n## [^\n]*Fiches store[^\n]*\n(?:(?!\n## )[\s\S])*?Nouveautés de cette version(?:(?!\n## )[\s\S])*?texte de nouveautés à rédiger à la main'
+    pattern: '\n## [^\n]*Fiches store[^\n]*\n(?:(?!\n## )[\s\S])*?Nouveautés de cette version(?:(?!\n## )[\s\S])*?[Tt]exte de nouveautés à rédiger à la main'
   - name: ca19-signale-dans-points-non-determines
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }

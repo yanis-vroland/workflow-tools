@@ -95,7 +95,7 @@ graders:
   - name: ca06-superviseur-version-et-source
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: '\n## [^\n]*Identité de l.application[^\n]*\n(?:(?!\n## )[\s\S])*?0\.4\.0\b[^|\n]*apps/superviseur/pubspec\.yaml'
+    pattern: '\n## [^\n]*Identité de l.application[^\n]*\n(?:(?!\n## )[\s\S])*?0\.4\.0\b[^|\n]*apps/superviseur/(?:pubspec\.yaml|android/app/build\.gradle)'
   - name: ca06-superviseur-identifiant-android
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }

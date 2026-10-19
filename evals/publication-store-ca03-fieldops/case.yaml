@@ -13,7 +13,7 @@ execution:
   model: claude-sonnet-5-5
   max_turns: 80
   timeout_seconds: 1200
-  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill, WebFetch]
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
 
 context:
   scaffold_script: scaffold.sh
@@ -134,22 +134,35 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?=(?:(?!\n## )[\s\S])*?1024)(?=(?:(?!\n## )[\s\S])*?AppIcon\.appiconset)(?=(?:(?!\n## )[\s\S])*?UsageDescription)(?=(?:(?!\n## )[\s\S])*?(?:IPHONEOS_DEPLOYMENT_TARGET|[Cc]ible de déploiement))(?=(?:(?!\n## )[\s\S])*?DEVELOPMENT_TEAM)(?=(?:(?!\n## )[\s\S])*?PrivacyInfo\.xcprivacy)'
-  - name: ca08-statuts-ios-selon-le-correcteur
-    type: llm
-    focus: { source: file, path: "docs/wf/publication-store.md" }
-    criteria: >-
-      Dans la fixture, mobile/ios/ ne contient que Runner/Info.plist : aucun
-      AppIcon.appiconset, aucun PrivacyInfo.xcprivacy, aucun
-      Runner.xcodeproj/project.pbxproj. Dans la section « Checklist iOS », PASS
-      si toutes les conditions sont vraies : (1) l'icône 1024×1024 a le statut
-      « à faire » ; (2) le manifeste de confidentialité PrivacyInfo.xcprivacy a
-      le statut « à faire » ; (3) l'équipe de signature (DEVELOPMENT_TEAM) n'a
-      pas le statut « OK » et sa colonne Fichier cite le chemin cherché (un
-      fichier project.pbxproj) ; (4) la cible de déploiement minimale n'a pas le
-      statut « OK » et son détail dit qu'elle n'a pas pu être déterminée ; (5)
-      la description d'usage de la localisation (NSLocationWhenInUseUsageDescription)
-      a le statut « OK ». FAIL si l'une est fausse, ou si une valeur absente des
-      fichiers est inventée (numéro d'équipe, version iOS minimale).
+  # Statuts iOS : la fixture n'a ni AppIcon.appiconset, ni PrivacyInfo.xcprivacy,
+  # ni Runner.xcodeproj/project.pbxproj (regex plutôt qu'un juge llm, bruité
+  # sur ce long livrable).
+  - name: ca08-icone-1024-a-faire
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)\|(?=[^\n]*1024)(?=[^\n]*\|\s*à faire\s*\|)'
+  - name: ca08-manifeste-confidentialite-a-faire
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)\|(?=[^\n]*(?:PrivacyInfo\.xcprivacy|[Mm]anifeste de confidentialité))(?=[^\n]*\|\s*à faire\s*\|)'
+  - name: ca08-equipe-de-signature-chemin-cherche
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)\|(?=[^\n]*(?:DEVELOPMENT_TEAM|[ÉE]quipe de signature))(?=[^\n]*project\.pbxproj)(?![^\n]*\|\s*OK\s*\|)'
+  - name: ca08-cible-minimale-non-determinee
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)\|(?=[^\n]*(?:IPHONEOS_DEPLOYMENT_TARGET|[Cc]ible de déploiement))(?=[^\n]*non déterminé)(?![^\n]*\|\s*OK\s*\|)'
+  - name: ca08-description-localisation-ok
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)\|(?=[^\n]*NSLocationWhenInUseUsageDescription)(?=[^\n]*\|\s*OK\s*\|)'
+  # Aucune version iOS minimale ni identifiant d'équipe inventés
+  - name: ca08-aucune-valeur-ios-inventee
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: 'IPHONEOS_DEPLOYMENT_TARGET\s*=|DEVELOPMENT_TEAM\s*=|platform :ios'
+    match: not_contains
 
   # --- CA9 : checklist Android ------------------------------------------------------
   - name: ca09-elements-android-presents

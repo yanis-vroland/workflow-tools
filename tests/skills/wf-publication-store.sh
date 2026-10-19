@@ -196,6 +196,38 @@ cite "CA26 mention « hors git »" "hors git"
 cite "CA26 mention « modifications non commitées »" "modifications non commitées"
 cite "CA27 seul .env.example peut être lu" ".env.example"
 
+# --- Commandes Bash fixes, sans texte venu du projet (injection shell) -------------
+# La liste blanche est la liste à puces qui suit « Bash ne sert qu'à » : exactement
+# les quatre commandes attendues, aucune avec $, backtick ou guillemet double.
+
+expected_commands=(
+  "git rev-parse --short HEAD"
+  "git status --porcelain"
+  "git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'"
+  "date +%F"
+)
+commands=()
+while IFS= read -r line; do
+  commands+=("$line")
+done < <(awk '/Bash ne sert qu.à/ { in_list = 1; next }
+  in_list && /^  - `.*`$/ { sub(/^  - `/, ""); sub(/`$/, ""); print; next }
+  in_list && /^- / { exit }' <<<"$body")
+if [ "${commands[*]-}" != "${expected_commands[*]}" ]; then
+  ko "liste blanche Bash (attendu : ${expected_commands[*]} ; obtenu : ${commands[*]-})"
+else
+  inject=0
+  for command in "${commands[@]}"; do
+    case $command in
+      *'$'* | *'`'* | *'"'*) inject=1 ;;
+    esac
+  done
+  if [ "$inject" -eq 1 ]; then
+    ko "liste blanche Bash sans \$, backtick ni guillemet double"
+  else
+    ok "liste blanche Bash : quatre commandes fixes, sans texte interpolé"
+  fi
+fi
+
 # --- Aucune valeur propre à la fixture FieldOps -----------------------------------
 # Les exemples de la skill restent génériques : sinon les evals sur FieldOps
 # mesureraient la recopie d'un exemple, pas le comportement (surapprentissage).
@@ -209,6 +241,16 @@ fieldops_values=(
   "targetSdkVersion 33"
   "minSdkVersion 21"
   "NSCameraUsageDescription"
+  "NSPhotoLibraryUsageDescription"
+  "fvm"
+  "flutterVersion"
+  "FLUTTER_BUILD"
+  "upload-keystore"
+  "AuthKey"
+  "technicien"
+  "superviseur"
+  "ImageSource"
+  "Geolocator"
 )
 leak_ok=1
 for value in "${fieldops_values[@]}"; do

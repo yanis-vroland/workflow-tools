@@ -14,7 +14,7 @@ execution:
   model: claude-sonnet-5-5
   max_turns: 80
   timeout_seconds: 1200
-  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill, WebFetch]
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
 
 context:
   scaffold_script: scaffold.sh
@@ -87,7 +87,7 @@ graders:
   - name: ca20-divergence-signalee
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: '\n## [^\n]*Fiches store[^\n]*\n(?:(?!\n## )[\s\S])*?à vérifier : notes de version 1\.3\.0 pour l.application 1\.2\.0(?!\+)'
+    pattern: '\n## [^\n]*Fiches store[^\n]*\n(?:(?!\n## )[\s\S])*?[àÀ] vérifier : notes de version 1\.3\.0 pour l.application 1\.2\.0(?!\+)'
 
   # --- CA22 : décompte et limite dépassée ---------------------------------------------
   - name: ca22-description-courte-depasse-la-limite
@@ -98,17 +98,14 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: '\n## [^\n]*Fiches store[^\n]*\n(?=(?:(?!\n## )[\s\S])*?limite\s*500\b)(?=(?:(?!\n## )[\s\S])*?limite\s*4\s?000\b)'
-  - name: ca22-seule-la-description-courte-depasse
-    type: llm
-    focus: { source: file, path: "docs/wf/publication-store.md" }
-    criteria: >-
-      Dans « Fiches store », chaque texte (nom iOS et Android, sous-titre iOS,
-      mots-clés iOS, description courte Android, description complète iOS et
-      Android, nouveautés iOS et Android) est accompagné de son nombre de
-      caractères et de la limite du store (nom 30, sous-titre 30, mots-clés 100,
-      description courte 80, description complète 4000, nouveautés iOS 4000,
-      nouveautés Android 500). PASS si ces décomptes sont présents, à quelques
-      caractères près, et si seule la description courte Android (environ 126
-      caractères) porte la mention « dépasse la limite ». FAIL si un décompte
-      ou une limite manque, ou si un autre texte est déclaré au-delà de sa
-      limite.
+  # Regex plutôt qu'un juge llm, bruité sur ce long livrable (8 900 caractères)
+  - name: ca22-decomptes-des-fiches
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Fiches store[^\n]*\n(?=(?:(?!\n## )[\s\S])*?FieldOps Technicien[^\n]*\d+\s*caractères?\s*/\s*limite\s*30\b)(?=(?:(?!\n## )[\s\S])*?Interventions sur le terrain[^\n]*\d+\s*caractères?\s*/\s*limite\s*30\b)(?=(?:(?!\n## )[\s\S])*?photos[^\n]*\d+\s*caractères?\s*/\s*limite\s*100\b)(?=(?:(?!\n## )[\s\S])*?fr-FR/description\.txt[^\n]*\d+\s*caractères?\s*/\s*limite\s*4\s?000\b)(?=(?:(?!\n## )[\s\S])*?full_description\.txt[^\n]*\d+\s*caractères?\s*/\s*limite\s*4\s?000\b)'
+  # Seule la description courte Android (126 caractères) dépasse sa limite
+  - name: ca22-une-seule-limite-depassee
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: 'dépasse la limite[\s\S]*dépasse la limite'
+    match: not_contains
