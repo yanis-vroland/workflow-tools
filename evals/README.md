@@ -196,6 +196,26 @@ Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` me
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
+### wf-audit-web
+
+Spec 011, lancée par `/wf-audit-web [URL]`, tous les cas `hors-reseau` (tag `wf-audit-web` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca06-…`) ; les correcteurs `…-temoin-…` vérifient que le scénario a bien été mis en place. Les motifs des correcteurs sont vérifiés sans modèle par `tests/correcteurs/wf-audit-web.mjs` (lancé par `tests/skills.sh`), y compris contre les commandes Bash prescrites par la skill.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `audit-web-fieldops` | FieldOps complet (web et Flutter), propre, faux secret, image de 259 523 octets ajoutée dans `public/img/` | CA1 à CA13, CA21, CA25, CA28, hors-périmètre sécurité |
+| `audit-web-ca23-plusieurs-fronts` | FieldOps web seul, portail Next.js (`portail/`) et gabarits PHP (`legacy-php/`) | CA23, CA22, CA6 (`<Image>`), CA7 (`<textarea>`, faux positifs), CA9 (titre sans meta description) |
+| `audit-web-ca24-relance` | FieldOps web seul, audit précédent commité (W1 à W4, dernier identifiant W6), puis W2 corrigé | CA24 |
+| `audit-web-ca16-ca17-ca19-url-sans-lighthouse` | FieldOps web seul, URL `https://fieldops.example.invalid/interventions` en argument | CA17, CA19, CA3 et CA11 en mode URL |
+| `audit-web-ca20-api-seule` | API Express seule, hors git | CA20 (aucun livrable) |
+| `audit-web-ca20-flutter-seule` | application Flutter de FieldOps seule, hors git | CA20 (aucun livrable) |
+| `audit-web-ca26-sans-code-source` | FieldOps brief (documents seuls) | CA26 (aucun livrable) |
+| `audit-web-ca26-repertoire-vide` | répertoire vide | CA26 (aucun livrable) |
+| `audit-web-ca27-projet-volumineux` | FieldOps web seul et 2 000 composants générés sous `src/web/legacy/` | CA27 |
+
+Hash de commit attendus dans les en-têtes, rejouables : `b224ed8` (`audit-web-fieldops`), `0a79cbd` (`audit-web-ca23-plusieurs-fronts`), `475123a` (`audit-web-ca24-relance`), `35377d4` (URL). Une modification de la fixture les change : mettre à jour les graders `adr001-en-tete`.
+
+Mode URL : le réseau n'est pas simulable et Lighthouse n'est installé ni sur les postes ni sur les runners de la CI. Le cas URL exerce donc le chemin « Lighthouse absent » (CA17) ; son témoin `ca17-temoin-lighthouse-absent` échoue si Lighthouse est trouvé, auquel cas le cas exercerait CA16 (URL `.invalid` injoignable) et ses correcteurs CA17 ne prouveraient rien. CA14, CA15, CA16 et CA18 (scores, version, profil, heure, problèmes rattachés ou non au code, page injoignable, redirection) ne sont pas couverts par une eval : la lecture du rapport Lighthouse par `skills/wf-audit-web/scripts/lighthouse-summary.mjs` est testée par `tests/skills/wf-audit-web.sh` sur des rapports synthétiques, et la rédaction du livrable à partir de ce résumé reste à vérifier à la main, sur un poste avec Lighthouse : `claude --plugin-dir .` puis `/wf-audit-web <URL d'un site public>` dans un projet web, en contrôlant les scores, la version, le profil mobile, l'heure, les URL demandée et auditée, puis avec une URL redirigée et une URL injoignable.
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
