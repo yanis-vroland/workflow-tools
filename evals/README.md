@@ -243,3 +243,18 @@ Spec 010, lancée par `/wf-revue-securite` (tag `wf-revue-securite` pour ne lanc
 - CA14 : « aucun caractère de la valeur » est vérifié sur la valeur entière et ses fragments distinctifs (`dev-secret`, `FAUX_JETON`, `c41d`), pas lettre par lettre.
 - CA21 (contrat lu par `wf-montee-version`) est vérifié par les tests structurels (`tests/skills/wf-revue-securite.sh`), pas par une eval.
 - Les motifs des graders sont compilés et vérifiés sur des exemples positifs et négatifs par `tests/correcteurs/wf-revue-securite.mjs`, lancé par `tests/skills.sh`.
+
+### wf-modele-donnees
+
+Spec 017, lancée par `/wf-modele-donnees`, tous les cas `hors-reseau` (tags `wf-modele-donnees` et `spec-017`). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour. Les données propres à un cas sont dans son dossier `donnees/`. Livraison en trois PR (niveau A, puis B, puis C) : cette version couvre le niveau A et les CA communs.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `modele-donnees-ca17-brief-niveau-a` | FieldOps brief, brief et notes d'appel en argument | CA17, CA1 à CA9, CA12 à CA15 |
+| `modele-donnees-ca18-cadrage-sans-argument` | FieldOps brief et `docs/wf/cadrage-besoin.md` (contrat de la spec 004), sans argument | CA18, CA1, CA2, CA4 |
+| `modele-donnees-ca10-ca11-relance-niveau-a` | FieldOps brief et livrable de niveau A : réponse à Q01 et décision D01 saisies, question bloquante Q03 vide, identifiants retirés | CA10, CA11, CA1 |
+| `modele-donnees-ca33-sans-argument` | FieldOps brief, ni argument, ni cadrage, ni livrable | CA33 (cas limite) |
+| `modele-donnees-ca34-niveau-invalide` | FieldOps brief, `--niveau z` | CA34 (cas limite, valeur invalide) |
+| `modele-donnees-ca35-ca38-sources-ecartees` | FieldOps brief, fichier introuvable et `.docx` en argument, fichier d'environnement avec chaîne de connexion et faux secret | CA35, CA38 (cas limites) |
+
+Non couverts par une eval à ce stade : CA16 (aucun fichier non Markdown au niveau A) et CA37 (aucun fichier à signaler avant les niveaux B et C), couverts par les tests structurels et repris avec les niveaux suivants.
