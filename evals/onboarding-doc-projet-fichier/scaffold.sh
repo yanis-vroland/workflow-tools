@@ -22,7 +22,7 @@ mkdir -p docs/wf
 cat >docs/wf/doc-projet.md <<'MD'
 # Documentation du projet FieldOps
 
-Outil : wf-doc-projet · Date : 2026-09-30 · Commit : 5b26289
+Outil : wf-doc-projet · Date : 2026-09-30 · Commit : 2fc99c0
 
 ## Vue d'ensemble
 

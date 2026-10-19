@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Spec 001, CA12 : livrable déjà présent. Une analyse précédente (2026-10-01,
-# commit 5b26289, dernier commit de main de la fixture) a produit
+# commit 2fc99c0, dernier commit de main de la fixture) a produit
 # docs/wf/analyse-projet.md, que l'utilisateur a commité. La relance doit mettre
 # à jour ce fichier (date et commit d'en-tête) au lieu d'en créer un autre.
 #
@@ -15,7 +15,7 @@ mkdir -p docs/wf
 cat >docs/wf/analyse-projet.md <<'MD'
 # Analyse du projet
 
-Outil : wf-analyse-projet · Date : 2026-10-01 · Commit analysé : 5b26289
+Outil : wf-analyse-projet · Date : 2026-10-01 · Commit analysé : 2fc99c0
 
 ## Synthèse
 

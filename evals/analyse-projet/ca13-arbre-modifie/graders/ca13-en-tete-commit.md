@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/analyse-projet.md" }
-pattern: '^(?:(?!\n#+ [^\n]*Synthèse)[\s\S])*?5b26289'
+pattern: '^(?:(?!\n#+ [^\n]*Synthèse)[\s\S])*?2fc99c0'
 match: contains
 ---
 

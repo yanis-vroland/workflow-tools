@@ -121,12 +121,12 @@ graders:
   - name: ca04-aucune-valeur-dans-configuration
     type: regex
     target: { source: file, path: "docs/wf/doc-projet/configuration.md" }
-    pattern: '\bchangeme\b|postgres://|(?:maps|mail|payments)\.example\.invalid|no-reply@|\b(?:NODE_ENV|PORT|DATABASE_URL|POSTGRES_PASSWORD|JWT_SECRET|MAP_API_URL|MAP_API_KEY|MAIL_API_URL|MAIL_API_KEY|MAIL_FROM|PAYMENT_API_URL|PAYMENT_API_KEY|PAYMENT_WEBHOOK_SECRET|SEED_PASSWORD)=\S|\bAPI_URL=[^\s<]|10\.0\.2\.2|localhost:3000'
+    pattern: '\bchangeme\b|postgres://|(?:maps|mail|payments)\.example\.invalid|no-reply@|\b(?:NODE_ENV|PORT|DATABASE_URL|POSTGRES_PASSWORD|JWT_SECRET|MAP_API_URL|MAP_API_KEY|MAP_API_KEY_EXPIRES_AT|MAIL_API_URL|MAIL_API_KEY|MAIL_FROM|PAYMENT_API_URL|PAYMENT_API_KEY|PAYMENT_WEBHOOK_SECRET|SEED_PASSWORD)=\S|\b2027-03-31\b|\bAPI_URL=[^\s<]|10\.0\.2\.2|localhost:3000'
     match: not_contains
   - name: ca04-aucune-valeur-dans-installation
     type: regex
     target: { source: file, path: "docs/wf/doc-projet/installation.md" }
-    pattern: '\bchangeme\b|postgres://|(?:maps|mail|payments)\.example\.invalid|no-reply@|\b(?:NODE_ENV|PORT|DATABASE_URL|POSTGRES_PASSWORD|JWT_SECRET|MAP_API_URL|MAP_API_KEY|MAIL_API_URL|MAIL_API_KEY|MAIL_FROM|PAYMENT_API_URL|PAYMENT_API_KEY|PAYMENT_WEBHOOK_SECRET|SEED_PASSWORD)=\S|\bAPI_URL=[^\s<]|10\.0\.2\.2|localhost:3000'
+    pattern: '\bchangeme\b|postgres://|(?:maps|mail|payments)\.example\.invalid|no-reply@|\b(?:NODE_ENV|PORT|DATABASE_URL|POSTGRES_PASSWORD|JWT_SECRET|MAP_API_URL|MAP_API_KEY|MAP_API_KEY_EXPIRES_AT|MAIL_API_URL|MAIL_API_KEY|MAIL_FROM|PAYMENT_API_URL|PAYMENT_API_KEY|PAYMENT_WEBHOOK_SECRET|SEED_PASSWORD)=\S|\b2027-03-31\b|\bAPI_URL=[^\s<]|10\.0\.2\.2|localhost:3000'
     match: not_contains
   - name: ca04-marqueur-du-faux-secret-absent-de-la-session
     type: regex
@@ -208,11 +208,11 @@ graders:
       n'est pas un jugement.
 
   # --- CA8 : en-tête de index.md (outil, date, commit) sur arbre propre ------------
-  # 5b26289 : HEAD de tests/fixtures/build-fieldops.sh, rejouable
+  # 2fc99c0 : HEAD de tests/fixtures/build-fieldops.sh, rejouable
   - name: ca08-en-tete-outil-date-commit
     type: regex
     target: { source: file, path: "docs/wf/doc-projet/index.md" }
-    pattern: '^(?=(?:[^\n]*\n){0,15}[^\n]*wf-doc-projet)(?=(?:[^\n]*\n){0,15}[^\n]*\b5b26289)(?=(?:[^\n]*\n){0,15}[^\n]*\d{4}-\d{2}-\d{2})'
+    pattern: '^(?=(?:[^\n]*\n){0,15}[^\n]*wf-doc-projet)(?=(?:[^\n]*\n){0,15}[^\n]*\b2fc99c0)(?=(?:[^\n]*\n){0,15}[^\n]*\d{4}-\d{2}-\d{2})'
   - name: ca08-arbre-propre-sans-mention
     type: regex
     target: { source: file, path: "docs/wf/doc-projet/index.md" }

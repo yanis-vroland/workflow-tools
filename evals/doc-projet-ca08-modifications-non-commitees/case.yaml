@@ -20,16 +20,16 @@ graders:
   - name: ca08-livrable-cree
     type: file_exists
     path: "docs/wf/doc-projet.md"
-  # 35377d4 : HEAD de tests/fixtures/build-fieldops-web.sh, identique avec --dirty
+  # be04389 : HEAD de tests/fixtures/build-fieldops-web.sh, identique avec --dirty
   - name: ca08-en-tete-outil-date-commit
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '^(?=(?:[^\n]*\n){0,15}[^\n]*wf-doc-projet)(?=(?:[^\n]*\n){0,15}[^\n]*\b35377d4)(?=(?:[^\n]*\n){0,15}[^\n]*\d{4}-\d{2}-\d{2})'
+    pattern: '^(?=(?:[^\n]*\n){0,15}[^\n]*wf-doc-projet)(?=(?:[^\n]*\n){0,15}[^\n]*\bbe04389)(?=(?:[^\n]*\n){0,15}[^\n]*\d{4}-\d{2}-\d{2})'
   # Mention sur la ligne d'en-tête, après le commit
   - name: ca08-mention-apres-le-commit-dans-l-en-tete
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '^(?:[^\n]*\n){0,15}[^\n]*\b35377d4\b[^\n]*modifications non commitées'
+    pattern: '^(?:[^\n]*\n){0,15}[^\n]*\bbe04389\b[^\n]*modifications non commitées'
     flags: i
   - name: ca01-aucune-ecriture-hors-docs-wf
     type: tool_used

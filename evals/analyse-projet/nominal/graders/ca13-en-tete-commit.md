@@ -1,8 +1,8 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/analyse-projet.md" }
-pattern: '^(?:(?!\n#+ [^\n]*Synthèse)[\s\S])*?5b26289'
+pattern: '^(?:(?!\n#+ [^\n]*Synthèse)[\s\S])*?2fc99c0'
 match: contains
 ---
 
-CA13 : l'en-tête indique le commit analysé (5b26289, dernier commit de main de la fixture, déterministe).
+CA13 : l'en-tête indique le commit analysé (2fc99c0, dernier commit de main de la fixture, déterministe).

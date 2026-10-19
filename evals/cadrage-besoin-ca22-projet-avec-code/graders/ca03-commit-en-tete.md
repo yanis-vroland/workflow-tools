@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/cadrage-besoin.md" }
-pattern: '5b26289'
+pattern: '2fc99c0'
 match: contains
 ---
 
