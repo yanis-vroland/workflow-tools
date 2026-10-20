@@ -11,6 +11,8 @@ Les cas se lancent en deux passes, selon leur tag réseau (voir « Réseau ») :
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag reseau \
   --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)"
 
+  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:developer.android.com)" "WebFetch(domain:developer.apple.com)"
+
 # Aucun réseau (tag hors-reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag hors-reseau \
   --allow-tools Write Bash
@@ -29,6 +31,8 @@ claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 Dès que `Bash` est accordé, ses commandes tournent dans le bac à sable de Claude Code, dont l'accès réseau est limité aux domaines accordés par `--allow-tools "WebFetch(domain:…)"`. Sans ces autorisations, aucun registre n'est joignable. D'où deux passes :
 
 - tag `reseau` : le cas a besoin des registres (npm, pub.dev) ou de la base d'avis OSV.dev (`api.osv.dev`) ;
+
+- tag `reseau` : le cas a besoin des registres (npm, pub.dev) ou de la documentation officielle des stores (developer.android.com, developer.apple.com) ;
 - tag `hors-reseau` : le cas tourne sans aucun réseau, y compris ceux qui exigent un registre injoignable.
 
 Chaque cas porte exactement un de ces deux tags ; `.github/scripts/verifier-tags-evals.sh` le vérifie en CI, sinon le cas ne serait jamais lancé.
@@ -198,7 +202,7 @@ Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vé
 
 ### wf-publication-store
 
-Spec 015, lancée par `/wf-publication-store`, tous les cas `hors-reseau` (tag `wf-publication-store` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca10-…`). Les cas qui produisent un livrable portent `…-bash-liste-blanche` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'` et `date +%F`.
+Spec 015, lancée par `/wf-publication-store`, tous les cas `hors-reseau` sauf `publication-store-ca15-documentation-lue` (tag `wf-publication-store` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca10-…`). Les cas qui produisent un livrable portent `…-bash-liste-blanche` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'` et `date +%F`.
 
 | Cas | Projet de départ | CA |
 |---|---|---|
@@ -206,15 +210,17 @@ Spec 015, lancée par `/wf-publication-store`, tous les cas `hors-reseau` (tag `
 | `publication-store-ca04-react-native` | application React Native (`ios/`, `android/`), sans Flutter | CA4 |
 | `publication-store-ca04-expo` | application Expo en flux géré (ni `ios/` ni `android/`) | CA4 |
 | `publication-store-ca04-natif-kotlin` | application Android native (Kotlin, Gradle Kotlin DSL) | CA4 |
+| `publication-store-ca04-natif-swift` | application iOS native (Swift, projet Xcode) | CA4 |
 | `publication-store-ca05-sans-mobile` | FieldOps web seul (`build-fieldops-web.sh`) | CA5 |
 | `publication-store-ca12-ca13-ca14-signature` | FieldOps et un commit : fichiers de clés suivis par git, fichiers Firebase, mots de passe de signature en clair, notes de version 1.2.0 sans « Nouveautés » | CA12 à CA14, CA19 (Nouveautés absente), CA20 (versions égales) |
 | `publication-store-ca18-ca19-ca20-ca22-fastlane` | FieldOps et un commit : métadonnées fastlane en français (description courte Android de 126 caractères), notes de version 1.3.0 pour une application en 1.2.0 | CA1, CA18 à CA20, CA22 |
 | `publication-store-ca24-ca25-deux-applications` | hors git, deux applications Flutter : `apps/technicien` (iOS et Android) et `apps/superviseur` (Android seul) | CA6, CA24 à CA26 |
+| `publication-store-ca15-documentation-lue` (`reseau`) | FieldOps complet, documentation des stores joignable | CA15 (page lue, date de consultation) |
 | `publication-store-ca26-mise-a-jour` | FieldOps `--dirty` et livrable précédent commité, périmé (1.1.0, build 9) | CA26 |
 
-Valeurs déterministes vérifiées : commit `2fc99c0` (FieldOps complet, CA26), ligne 31 du `build.gradle` réécrit par le scaffold du cas signature (`storePassword` en clair, CA14). Les marqueurs `FIELDOPS_FAUX_KEYPROP_5b17`, `FIELDOPS_FAUX_JKS_4d8e` et `FIELDOPS_FAUX_P8_2c6a` sont dans des fichiers de clés qui ne doivent jamais être ouverts : leur absence de la trace prouve CA12. `FIELDOPS_FAUX_FIREBASE_8e03` et `FIELDOPS_FAUX_MDP_91c2` sont dans des fichiers que l'outil peut lire ou repérer, mais dont il ne recopie aucune valeur : leur absence est vérifiée dans le livrable seulement.
+Valeurs déterministes vérifiées : commit `2fc99c0` (FieldOps complet, CA26), ligne 31 du `build.gradle` réécrit par le scaffold du cas signature (`storePassword` en clair, CA14). Les marqueurs `FIELDOPS_FAUX_KEYPROP_5b17`, `FIELDOPS_FAUX_JKS_4d8e` et `FIELDOPS_FAUX_P8_2c6a` sont dans des fichiers de clés qui ne doivent jamais être ouverts : leur absence de la trace prouve CA12. Les fichiers Firebase (`google-services.json`, `GoogleService-Info.plist`, marqueur `FIELDOPS_FAUX_FIREBASE_8e03`) et FlutterFire (`lib/firebase_options.dart`, marqueur `FIELDOPS_FAUX_FLUTTERFIRE_3a9d`) ne sont jamais ouverts non plus (choix plus prudent que CA12) : leurs marqueurs sont vérifiés absents de la trace et du livrable. `FIELDOPS_FAUX_MDP_91c2` est dans `build.gradle`, que l'outil lit : son absence est vérifiée dans le livrable seulement.
 
-Réseau : la passe `hors-reseau` n'accorde pas WebFetch, la documentation des stores est donc injoignable et les cas vérifient le repli de CA16 (statut « à vérifier », valeur relevée, lien officiel, aucune exigence affirmée). La seconde moitié de CA15 (page lue : exigence citée avec sa date de consultation) n'a pas de cas : elle exigerait une passe `reseau` qui accorde `WebFetch(domain:developer.android.com)` et `WebFetch(domain:developer.apple.com)`, absents de la commande de lancement actuelle.
+Réseau : la passe `hors-reseau` n'accorde pas WebFetch, la documentation des stores est donc injoignable et les cas vérifient le repli de CA16 (statut « à vérifier », valeur relevée, lien officiel, aucune exigence affirmée). La seconde moitié de CA15 (page lue : exigence citée avec sa date de consultation) est couverte par `publication-store-ca15-documentation-lue`, tagué `reseau` : ce cas exige que la passe `reseau` accorde en plus `WebFetch(domain:developer.android.com)` et `WebFetch(domain:developer.apple.com)` (commande ci-dessus et `.github/workflows/evals.yml`). Ses correcteurs ne figent aucune exigence publique (ADR-001) : ils vérifient le statut « à vérifier », le lien officiel et la mention « consulté le AAAA-MM-JJ ».
 
 ## Correcteurs
 
