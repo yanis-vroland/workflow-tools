@@ -200,7 +200,7 @@ Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vé
 
 Spec 016, lancée par `/wf-passation`, tous les cas `hors-reseau` (tag `wf-passation`). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca08-…`).
 
-Tous les cas portent `ca01-commandes-autorisees` : Bash ne sert qu'aux commandes en lecture de la skill (`git rev-parse --short HEAD`, `git status --porcelain`, `date +%F`, `git symbolic-ref refs/remotes/origin/HEAD`, `git show-ref --verify refs/heads/main|master`, `git branch -a --no-merged …`, `git rev-list --count …`, `git log -1 --format=%cs …`), ce qui exclut aussi toute récupération distante (`git fetch`, hors périmètre).
+Tous les cas portent `ca01-commandes-autorisees` : Bash ne sert qu'aux commandes en lecture de la skill (`git rev-parse --short HEAD`, `git status --porcelain`, `date +%F`, `git symbolic-ref refs/remotes/origin/HEAD`, `git show-ref --verify refs/heads/main|master`, `git branch -a --no-merged=…`, `git rev-list --count --end-of-options …`, `git log -1 --format=%cs --end-of-options …`, aucun argument commençant par `-`), ce qui exclut aussi toute récupération distante (`git fetch`, hors périmètre) et toute option injectée par un nom de référence.
 
 | Cas | Projet de départ | CA |
 |---|---|---|
