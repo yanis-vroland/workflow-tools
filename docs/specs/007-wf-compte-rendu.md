@@ -53,9 +53,9 @@ Couverts par CA2, CA8 et CA11 à CA20.
 
 - La limite de 5 mots pour l'objet dans le nom de fichier (CA3) est une proposition, à ajuster après les premiers essais.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA1 : le texte collé n'est enregistré dans aucun fichier, et rien n'est écrit tant que la source, la date de la réunion et le nom du compte rendu ne sont pas établis.
 - CA2 : sans argument, l'outil ne cherche ni ne liste aucun fichier de notes dans le projet ; il demande la source. Un argument qui n'est pas un fichier existant et ne ressemble pas à un chemin (une seule ligne sans espace, contenant un `/` ou se terminant par une extension) est le texte des notes, collé dans la commande ; un texte collé vide revient à l'absence d'argument.
