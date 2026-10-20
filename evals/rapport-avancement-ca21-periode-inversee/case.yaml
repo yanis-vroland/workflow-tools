@@ -38,6 +38,6 @@ graders:
   - name: ca21-aucun-historique-lu
     type: tool_used
     tool: Bash
-    input_match: '"command"\s*:\s*"git (?:log|show) '
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*git (?:log|show) '
     min: 0
     max: 0

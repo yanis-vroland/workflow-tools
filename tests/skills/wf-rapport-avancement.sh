@@ -171,7 +171,11 @@ cite "CA18 diff sans les fichiers d'environnement" ":(exclude,glob)**/.env*"
 
 cite "CA19 mention « Aucune modification intégrée sur la période »" \
   "Aucune modification intégrée sur la période"
-cite "CA21 période invalide" "invalide"
+cite "CA21 période invalide" "**Période invalide**"
+cite "CA21 date mal formée ou absente du calendrier" "une date mal formée ou qui n'existe pas au calendrier"
+cite "CA21 date de fin antérieure" "une date de fin antérieure à la date de début"
+cite "CA21 date de début dans le futur" "une date de début postérieure à la date du jour"
+cite "CA21 aucun livrable" "N'écris rien, ne lis pas l'historique"
 cite "CA23 clone superficiel" "git rev-parse --is-shallow-repository"
 cite "CA24 diff consulté" "git show"
 
@@ -182,30 +186,68 @@ absent "Aucun champ auteur demandé à git (%an)" "%an"
 absent "Aucun champ auteur demandé à git (%ae)" "%ae"
 absent "Aucun appel à git shortlog" "git shortlog"
 
-# --- Injection shell : aucune valeur insérée entre guillemets doubles --------------
-# Les valeurs <…> viennent du projet ou de l'utilisateur : entre guillemets
-# doubles, $(…) ou une apostrophe inverse seraient interprétés. Les commandes
-# git de la skill (blocs bash et spans `git …`) ne mettent donc jamais un
-# <placeholder> entre guillemets doubles, et citent toujours <branche> entre
-# apostrophes.
+# --- Injection shell et injection d'option git -------------------------------------
+# Les valeurs <…> (dates, branches, hash, identifiants de tickets) viennent du
+# projet ou de l'utilisateur. Elles ne s'écrivent que dans le corps d'un
+# heredoc à délimiteur entre apostrophes (jamais interprété par le shell), sont
+# validées par bash avant tout appel git, et chaque git log ou git show porte
+# --end-of-options devant la révision (un nom commençant par « - » serait
+# sinon lu comme une option, ex. --output=<fichier>).
 
-commands=$(
-  awk '/^```bash$/ { b = 1; next } b && /^```$/ { b = 0; next } b' <<<"$body"
-  # shellcheck disable=SC2016 # apostrophes inverses littérales (spans Markdown)
-  grep -oE '`git [^`]+`' <<<"$body" | tr -d '`'
-)
-if grep -E '"[^"]*<[^>"]+>[^"]*"' <<<"$commands" >/dev/null; then
-  ko "injection : valeur <…> entre guillemets doubles dans une commande ($(grep -E '"[^"]*<[^>"]+>[^"]*"' <<<"$commands" | head -n 1))"
-else
-  ok "injection : aucune valeur <…> entre guillemets doubles dans une commande"
+delim="WF_VALEURS_3b9e"
+# Lignes de commande des blocs bash, hors corps des heredocs
+bash_lines=$(awk -v d="$delim" '
+  /^```bash$/ { b = 1; next }
+  b && /^```$/ { b = 0; h = 0; next }
+  b && h && $0 == d { h = 0; next }
+  b && h { next }
+  b { print; if (index($0, "<<")) h = 1 }
+' <<<"$body")
+# shellcheck disable=SC2016 # apostrophes inverses littérales (spans Markdown)
+inline_git=$(grep -oE '`git [^`]+`' <<<"$body" | tr -d '`')
+
+if [ -z "$bash_lines" ]; then
+  ko "injection : blocs bash présents"
 fi
-if grep -E "(^|[^'.])<branche>" <<<"$commands" >/dev/null; then
-  ko "injection : <branche> sans apostrophes dans une commande ($(grep -E "(^|[^'.])<branche>" <<<"$commands" | head -n 1))"
+if grep -E '<[[:alpha:]][^<>]*>' <<<"$bash_lines$inline_git" >/dev/null; then
+  ko "injection : valeur <…> hors du corps d'un heredoc ($(grep -E '<[[:alpha:]][^<>]*>' <<<"$bash_lines$inline_git" | head -n 1))"
 else
-  ok "injection : <branche> toujours entre apostrophes"
+  ok "injection : valeurs <…> seulement dans le corps des heredocs"
 fi
-cite "injection : nom contenant une apostrophe jamais inséré" "apostrophe"
+if grep -E '<<' <<<"$bash_lines" | grep -vF "<<'$delim'" >/dev/null; then
+  ko "injection : heredoc sans délimiteur entre apostrophes ($(grep -E '<<' <<<"$bash_lines" | grep -vF "<<'$delim'" | head -n 1))"
+else
+  ok "injection : heredocs à délimiteur entre apostrophes"
+fi
+if [ "$(grep -cF "<<'$delim'" <<<"$bash_lines")" -ge 3 ]; then
+  ok "injection : un heredoc par bloc de commandes (au moins 3)"
+else
+  ko "injection : moins de 3 blocs à heredoc"
+fi
+if grep -E 'git (log|show) ' <<<"$bash_lines$inline_git" | grep -vF -- '--end-of-options' >/dev/null; then
+  ko "option git : git log ou git show sans --end-of-options ($(grep -E 'git (log|show) ' <<<"$bash_lines$inline_git" | grep -vF -- '--end-of-options' | head -n 1))"
+else
+  ok "option git : --end-of-options devant chaque révision"
+fi
+
+# Validations bash exactes, et règles citées mot pour mot
+cite "injection : format de date vérifié" "date_ok='^[0-9]{4}-[0-9]{2}-[0-9]{2}\$'"
+cite "injection : format de branche vérifié" "branche_ok='^[A-Za-z0-9._/+][A-Za-z0-9._/+-]*\$'"
+cite "injection : branche commençant par un tiret refusée" "\$branche == -*"
+cite "injection : branche non fusionnée commençant par un tiret refusée" "\$autre == -*"
+cite "injection : hash vérifié" '^[0-9a-f]{7,40}$'
+cite "injection : identifiant de ticket vérifié" '^T[0-9]+$'
+cite "option git : règle du tiret" \
+  "Une valeur qui commence par \`-\` n'est jamais insérée dans une commande"
+cite "injection : règle de l'apostrophe et du heredoc" \
+  "Une valeur ne s'écrit que dans le corps du heredoc"
+cite "injection : branche refusée signalée" "branche non lue : nom refusé"
 cite "Grep non utilisé (fichiers d'environnement)" "n'utilise pas Grep"
+
+# --- CA4 : bornes de la période indépendantes du fuseau de la machine ------------
+cite "CA4 borne de début élargie au fuseau le plus en avance" "00:00:00 +1400"
+cite "CA4 borne de fin élargie au fuseau le plus en retard" "23:59:59 -1200"
+cite "CA4 filtre final sur la date de commit (%cs)" "d <= \$2 && \$2 <= f"
 
 # --- Aucune valeur propre à la fixture FieldOps -----------------------------------
 # Les exemples de la skill restent génériques : sinon les evals sur FieldOps
@@ -244,13 +286,48 @@ fieldops_values=(
   "facture"
   "TVA"
 )
+
+# Valeurs extraites automatiquement des cas d'eval (case.yaml, scaffold.sh,
+# prompt.md, donnees/) : hash, dates, identifiants de tickets, et mots d'au
+# moins 6 lettres des motifs des correcteurs absents du texte de la spec 008
+# (les mots de la spec, comme les noms de sections, sont légitimes).
+# Mots légitimes : ceux de la spec 008 et de l'ADR-001 (consignes communes), et
+# les noms d'options git que la skill doit écrire.
+spec="$root/docs/specs/008-wf-rapport-avancement.md"
+adr="$root/docs/adr/001-conventions-communes-des-outils.md"
+git_words="shallow"
+case_files=$(find "$root"/evals/rapport-avancement-* -type f \( -name case.yaml -o -name scaffold.sh -o -name prompt.md -o -path '*/donnees/*' \))
+if [ -z "$case_files" ]; then
+  ko "anti-fuite : aucun fichier de cas d'eval trouvé"
+fi
+case_text=$(while IFS= read -r f; do cat "$f"; done <<<"$case_files")
+extracted=$(
+  grep -oE '\b[0-9a-f]{7,40}\b' <<<"$case_text" | grep -E '[a-f]' | grep -E '[0-9]'
+  grep -oE '\b[0-9]{4}-[0-9]{2}-[0-9]{2}\b' <<<"$case_text"
+  grep -oE '\bT[0-9]{2,}\b' <<<"$case_text"
+  grep -E '^ *pattern:' <<<"$case_text" | grep -oE '[[:alpha:]]{6,}' |
+    while IFS= read -r word; do
+      grep -qiF -- "$word" "$spec" "$adr" - <<<"$git_words" || echo "$word"
+    done
+)
+if [ -z "$extracted" ]; then
+  ko "anti-fuite : aucune valeur extraite des cas (extraction cassée)"
+fi
+while IFS= read -r value; do
+  [ -n "$value" ] && fieldops_values+=("$value")
+done < <(sort -u <<<"$extracted")
+
+# Comparaison insensible à la casse et aux guillemets (« », ", ', `)
+# shellcheck disable=SC2001 # classe de caractères multioctets, plus lisible avec sed
+plain_body=$(sed -e "s/[«»\"'\`]//g" <<<"$body")
 leak_ok=1
 for value in "${fieldops_values[@]}"; do
-  if grep -qiF -- "$value" <<<"$body"; then
-    ko "aucune valeur de FieldOps dans la skill (« $value » présent)"
+  plain_value=$(sed -e "s/[«»\"'\`]//g" -e 's/^ *//' -e 's/ *$//' <<<"$value")
+  if grep -qiF -- "$plain_value" <<<"$plain_body"; then
+    ko "aucune valeur de FieldOps ni des cas dans la skill (« $value » présent)"
     leak_ok=0
   fi
 done
-[ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
+[ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps ni des cas dans la skill (${#fieldops_values[@]} valeurs)"
 
 exit $fail
