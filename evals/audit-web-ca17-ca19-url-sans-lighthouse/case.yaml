@@ -1,5 +1,5 @@
 schema_version: "1.1"
-name: audit-web-ca16-ca17-ca19-url-sans-lighthouse
+name: audit-web-ca17-ca19-url-sans-lighthouse
 description: >-
   Spec 011, mode URL sans mesure possible : FieldOps web seul lancé avec
   https://fieldops.example.invalid/interventions (domaine .invalid, jamais
