@@ -116,14 +116,17 @@ Spec 014, lancée par `/wf-recette` (ou `/wf-recette <référence>`), tous les c
 | `recette-ca06-depuis-le-code` | FieldOps sans `docs/specs/` (retiré par un commit), `--dirty` | CA6, CA7, CA3, CA8, CA20 (modifications non commitées) |
 | `recette-ca09-ca10-relance` | FieldOps et cahier précédent commité : statuts et commentaires saisis, sources disparues, identifiant déjà retiré | CA9, CA10, CA8, CA14, CA3 |
 | `recette-ca16-reference` | FieldOps, livrable `wf-specs-tickets` étiqueté `v1.3.0`, puis spec 002 et ticket T02 modifiés ; `/wf-recette v1.3.0` | CA16, CA5, CA1, CA20 |
+| `recette-ca09-ca16-hors-campagne` | FieldOps, tag `v1.3.0`, puis cahier commité avec saisies dans le tableau et sous « Cas hors campagne », puis spec 001 modifiée ; `/wf-recette v1.3.0` | CA9 (saisies des cas hors campagne réintégrées ou reconduites), CA16, CA8, CA3, CA20 |
 | `recette-ca17-reference-inconnue` | FieldOps et cahier précédent commité ; `/wf-recette v9.9.9` | CA17 (cas limite), CA21 |
 | `recette-ca18-stack-non-couverte` | projet Python sans spec | CA18 (cas limite) |
 | `recette-ca19-repertoire-vide` | répertoire vide | CA19 (cas limite) |
 | `recette-ca19-sans-code-source` | FieldOps brief (documents seuls) | CA19 (cas limite) |
 
-Tous les cas portent un correcteur `…-aucune-commande-hors-liste` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F` et, avec une référence, `git log -1 --format=%h <ref> --`, `git diff --name-only <ref> HEAD` et `git show <ref>:docs/wf/specs-tickets.md` (liste blanche). CA14 (synthèse exacte) est jugé par un correcteur `llm`, qui recompte le tableau.
+Tous les cas portent un correcteur `…-aucune-commande-hors-liste` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F` et, avec une référence, `git log -1 --format=%h <ref> --`, `git diff --name-only <ref> HEAD` et `git show <ref>:docs/wf/specs-tickets.md` (liste blanche). Les juges `llm` sont réservés à ce qu'une regex ne vérifie pas : CA14 (synthèse exacte, le juge recompte le tableau), CA11 (raisons des critères non recettables), CA10 (fonctionnalités retirées) et les messages de fin des cas sans livrable. Les motifs sont compilés et vérifiés sur des exemples par `tests/correcteurs/wf-recette.mjs`, lancé par `tests/skills/wf-recette.sh`.
 
-Hash rejouables des scaffolds, vérifiés dans les en-têtes : `2fc99c0` (FieldOps complet), `54ff0b9` (CA5), `dd66a1d` (CA6), `355fc68` (CA9-CA10), `19c4ec9` (CA16, HEAD) et `85e1db9` (CA16, commit de `v1.3.0`). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `ca20-entete-commit` et `ca16-reference-et-commit`.
+Dans les cas où le scaffold dépose un cahier précédent (CA9-CA10, CA9-CA16), chaque correcteur que ce cahier satisferait de lui-même exige aussi que sa date (2026-09-15) ait disparu.
+
+Hash rejouables des scaffolds, vérifiés dans les en-têtes : `2fc99c0` (FieldOps complet), `54ff0b9` (CA5), `dd66a1d` (CA6), `355fc68` (CA9-CA10), `19c4ec9` (CA16, HEAD), `85e1db9` (CA16, commit de `v1.3.0`) et `d9945a4` (CA9-CA16). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `ca20-entete-commit` et `ca16-reference-et-commit`.
 
 Limite : `file_exists` ne voit que les fichiers créés pendant l'exécution. Dans les cas où un cahier précédent est commité (CA9-CA10, CA17), l'écriture est vérifiée par l'outil Write (`tool_used`) et par un témoin de date, pas par `file_exists`.
 
