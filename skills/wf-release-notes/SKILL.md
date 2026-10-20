@@ -187,7 +187,8 @@ Plage : de `<bas>` (exclu) à `<haut>` (inclus), <n> commits[, hors commits de f
 
 ### Points d'attention
 
-- <Changement cassant.> Action requise : <action décrite par le commit | action requise non déterminée>.
+- <Changement cassant.> Action requise : <action décrite par le commit>.
+- <Changement cassant, sans action décrite> : action requise non déterminée.
 
 ### Références
 
