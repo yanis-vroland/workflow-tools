@@ -55,3 +55,11 @@ La revue de l'heuristique de couverture a montré des noms de fichiers qu'elle t
 
 - CA5 : le nom d'un fichier source ou de test est pris littéralement, quels que soient les caractères qu'il contient (parenthèses, crochets, points, tiret initial…). Un fichier importé par un test reste couvert même si son nom contient un caractère spécial ; un fichier de test dont le nom commence par un tiret est lu comme un fichier, jamais comme une option de commande ; un point du nom ne correspond qu'à un point.
 - CA10 : un fichier `.env*` est exclu de l'inventaire des fichiers source même si son nom finit par une extension de code (ex. `.env.test.js`, qui ressemble à un fichier de test) : il n'est donc jamais lu, ni par la recherche des imports de la couverture, ni par aucune autre étape.
+
+## Amendement 2 (proposé)
+
+Précisions issues d'une revue de sécurité et des evals, à valider. Chacune complète le CA indiqué.
+
+- CA3 : un nom de paquet lu dans un manifeste ou un lockfile qui n'est pas un nom valide de son registre (npm : minuscules, chiffres, `.`, `_`, `-`, portée `@…/` ; pub : minuscules, chiffres, `_`) n'est jamais écrit dans une commande ni interrogé ; il figure dans « Points non déterminés » avec la mention « nom de paquet invalide, non vérifié ».
+- CA3 : un nom de paquet valide n'est jamais recopié dans le texte d'une commande : il est transmis au shell par un heredoc à délimiteur entre apostrophes, vérifié à nouveau par le shell (un refus du shell vaut nom invalide), puis employé seulement comme variable.
+- CA18 : hors de « Points non déterminés », un dossier non lu n'est cité que pour dire qu'il n'a pas été lu ou qu'il est exclu d'un décompte ; aucun risque de « Dette et risques » ni aucun signal de « Sécurité » ne porte sur lui.
