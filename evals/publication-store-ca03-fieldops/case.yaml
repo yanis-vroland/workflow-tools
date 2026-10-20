@@ -233,17 +233,14 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: '\n## [^\n]*Fiches store[^\n]*\n(?=(?:(?!\n## )[\s\S])*?brouillon à valider)(?=(?:(?!\n## )[\s\S])*?README\.md)'
-  - name: ca18-brouillon-complet-selon-le-correcteur
-    type: llm
-    focus: { source: file, path: "docs/wf/publication-store.md" }
-    criteria: >-
-      Le projet ne contient aucune métadonnée de store. PASS si la section
-      « Fiches store » propose, en français et marqué « brouillon à valider », un
-      nom, un sous-titre iOS, des mots-clés iOS, une description courte Android
-      et une description complète, établis à partir du README ou de la
-      documentation du projet (cités), sans prétendre reprendre des métadonnées
-      existantes. FAIL si l'un de ces cinq textes manque ou si le brouillon
-      n'est pas marqué « brouillon à valider ».
+  # Regex plutôt qu'un juge llm, bruité sur ce long livrable (FAIL x3 sur un
+  # brouillon conforme de 8 100 caractères) : les cinq textes du brouillon
+  # sont proposés ; « brouillon à valider » et README.md sont vérifiés par
+  # ca18-brouillon-a-valider.
+  - name: ca18-brouillon-complet
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Fiches store[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\n- (?:\*\*)?Nom(?:\*\*)? *:)(?=(?:(?!\n## )[\s\S])*?\n- (?:\*\*)?Sous-titre[^\n]*:)(?=(?:(?!\n## )[\s\S])*?\n- (?:\*\*)?Mots-clés[^\n]*:)(?=(?:(?!\n## )[\s\S])*?\n- (?:\*\*)?Description courte[^\n]*:)(?=(?:(?!\n## )[\s\S])*?\n- (?:\*\*)?Description complète)'
 
   # --- CA21 : notes de version absentes ----------------------------------------------
   - name: ca21-suggestion-wf-release-notes

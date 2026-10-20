@@ -117,6 +117,19 @@ const suites = [
     negative: ["`IPHONEOS_DEPLOYMENT_TARGET` non déterminé", "`DEVELOPMENT_TEAM` : fichier absent", "`platform :ios` du Podfile : absent"],
   },
   {
+    grader: "publication-store-ca03-fieldops/ca18-brouillon-complet",
+    input: doc,
+    positive: [
+      {
+        "Fiches store":
+          "brouillon à valider\n\n### iOS\n\n- Nom : « A » — 1 caractères / limite 30\n- Sous-titre : « B » — 1 caractères / limite 30\n- Mots-clés : « c » — 1 caractères / limite 100\n- Description complète (`README.md`) — 1 caractères / limite 4000 :\n\n### Android\n\n- Description courte : « D » — 1 caractères / limite 80",
+      },
+    ],
+    negative: [
+      { "Fiches store": "brouillon à valider\n\n- Nom : « A »\n- Sous-titre : « B »\n- Description courte : « D »\n- Description complète : « E »" },
+    ],
+  },
+  {
     grader: "publication-store-ca03-fieldops/ca16-aucune-exigence-inventee",
     input: (t) => t,
     positive: ["exigence : niveau 35 (consulté le 2026-10-19)"],

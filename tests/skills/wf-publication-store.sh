@@ -92,6 +92,8 @@ cite "CA4 mention « non couvert en v1 »" "non couvert en v1"
 cite "CA4 React Native détecté" "React Native"
 cite "CA4 Expo détecté" "Expo"
 cite "CA4 natif Swift/Xcode détecté" "Xcode"
+# Un projet Xcode est un dossier : Glob ne le trouve que par un fichier qu'il contient
+cite "CA4 projet Xcode repéré par son project.pbxproj" "**/*.xcodeproj/project.pbxproj"
 cite "CA4 natif Kotlin/Gradle détecté" "Kotlin"
 cite "CA5 message « aucune application mobile »" "Aucune application mobile"
 
