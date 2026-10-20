@@ -133,6 +133,19 @@ cite "CA10 lot unique mineur et correctif" "lot unique"
 cite "CA11 livrable de sécurité lu" "docs/wf/revue-securite.md"
 cite "CA11 section lue" "Dépendances vulnérables"
 cite "CA11 première version corrigée" "première version corrigée"
+cite "CA11 contrat spec 010 : application de l'entrée (CA24)" "l'application concernée"
+cite "CA11 contrat spec 010 : base d'avis injoignable (CA8)" "non déterminé (base d'avis injoignable)"
+
+# --- CA8, CA9 : gabarits de vérification d'une cible pub et cible sans version --------
+
+# shellcheck disable=SC2016 # motif littéral : on cherche le texte « $p/versions/$v »
+if grep -qE 'pub\.dev/api/packages/\$p/versions/\$v' <<<"$(awk '/^```bash$/ { b = 1; next } b && /^```$/ { b = 0 } b' <<<"$body")"; then
+  ok "CA9 gabarit de vérification d'une version pub (/versions/<x.y.z>)"
+else
+  ko "CA9 gabarit de vérification d'une version pub (/versions/<x.y.z>) absent des blocs bash"
+fi
+cite "CA8 cible passée sans version" "sans version"
+cite "CA8 dépendance entraînée seulement si le registre l'exige" "n'est entraînée que si les métadonnées du registre"
 
 # --- CA12 à CA14 : ruptures --------------------------------------------------------
 
@@ -227,14 +240,63 @@ fieldops_values=(
   "PRODUCTION_DATABASE_URL"
   "apps/web"
 )
-leak_ok=1
+
+# Valeurs dérivées automatiquement de la fixture FieldOps, des scaffolds et des
+# correcteurs des cas : noms des dépendances déclarées, versions x.y.z, chemins
+# de fichiers (avec un dossier). Une nouvelle valeur ajoutée à un cas est donc
+# couverte sans mettre à jour la liste ci-dessus.
+fixture="$root/tests/fixtures/fieldops"
+cases_dir="$root/evals"
+derived=$(
+  {
+    # Dépendances npm (« "nom": "^x" ») et pub (« nom: ^x ») de la fixture et des scaffolds
+    cat "$fixture/package.json" "$fixture/mobile/pubspec.yaml" "$cases_dir"/montee-version-*/scaffold.sh |
+      grep -oE '^[[:space:]]*"[^"]+": "[~^]?[0-9]|^[[:space:]]+[a-z0-9_]+: [~^]?[0-9]' |
+      sed -E 's/^[[:space:]]*"?([^":]+)"?: .*/\1/'
+    # Versions x.y.z des manifestes, lockfiles, scaffolds et correcteurs
+    cat "$fixture/package.json" "$fixture/package-lock.json" "$fixture/mobile/pubspec.yaml" \
+      "$fixture/mobile/pubspec.lock" "$fixture/mobile/.fvmrc" "$fixture/.nvmrc" \
+      "$cases_dir"/montee-version-*/scaffold.sh "$cases_dir"/montee-version-*/graders/*.md |
+      grep -oE '\b[0-9]+\.[0-9]+\.[0-9]+\b'
+    # Chemins avec un dossier : fichiers de la fixture, fichiers créés par les scaffolds
+    (cd "$fixture" && find . -type f -path './*/*' | sed 's|^\./||')
+    grep -hoE '(cat >|mkdir -p )[A-Za-z0-9_./ -]+' "$cases_dir"/montee-version-*/scaffold.sh |
+      sed -E 's/^(cat >|mkdir -p )//' | tr ' ' '\n' | grep '/'
+  } | grep -vE '^(docs/wf(/|$)|\.fvm/fvm_config\.json$)' |
+    grep -vxE 'path|http|flutter|flutter_test|version|tsx' | sort -u
+)
+# leak_scan <texte> : affiche les valeurs dérivées présentes dans le texte (casse ignorée)
+leak_scan() {
+  local text=$1 value escaped
+  while IFS= read -r value; do
+    [ -n "$value" ] || continue
+    # shellcheck disable=SC2001,SC2016 # échappement des métacaractères de la valeur
+    escaped=$(sed 's/[.[\*^$()+?{}|\\]/\\&/g' <<<"$value")
+    if grep -qiE -- "(^|[^A-Za-z0-9_@./-])${escaped}([^A-Za-z0-9_-]|$)" <<<"$text"; then
+      printf '%s\n' "$value"
+    fi
+  done <<<"$derived"
+}
 for value in "${fieldops_values[@]}"; do
-  if grep -qF -- "$value" <<<"$body"; then
-    ko "aucune valeur des fixtures dans la skill (« $value » présent)"
-    leak_ok=0
+  if grep -qiF -- "$value" <<<"$body"; then
+    leak_hits+=$'\n'"$value"
   fi
 done
-[ "$leak_ok" -eq 1 ] && ok "aucune valeur des fixtures dans la skill"
+leak_hits+=$'\n'"$(leak_scan "$body")"
+leak_hits=$(grep -v '^$' <<<"${leak_hits:-}" | sort -u)
+if [ "$(wc -l <<<"$derived")" -lt 30 ]; then
+  ko "aucune valeur des fixtures dans la skill : moins de 30 valeurs dérivées, extraction cassée"
+elif [ -n "$leak_hits" ]; then
+  ko "aucune valeur des fixtures dans la skill ($(tr '\n' ' ' <<<"$leak_hits"))"
+else
+  ok "aucune valeur des fixtures dans la skill ($(wc -l <<<"$derived" | tr -d ' ') valeurs dérivées et ${#fieldops_values[@]} fixes, casse ignorée)"
+fi
+# Contrôle par mutation de la détection
+if [ -n "$(leak_scan "Exemple : Geolocator, SRC/Web/Main.tsx, 0.13.6.")" ] && [ -n "$(leak_scan "dépendance dayjs")" ]; then
+  ok "aucune valeur des fixtures : mutation détectée (casse ignorée)"
+else
+  ko "aucune valeur des fixtures : mutation non détectée"
+fi
 
 # --- Blocs bash de la skill : syntaxe valide -----------------------------------------
 
@@ -247,20 +309,50 @@ else
   ko "blocs bash syntaxiquement valides ($out)"
 fi
 
-# --- Injection shell : valeurs à substituer entre apostrophes seulement ----------------
-# Toute valeur venue du projet ou de l'utilisateur (paramètre <…> à remplacer) doit
-# être dans un segment entre apostrophes : hors apostrophes ou entre guillemets
-# doubles, un $(…) ou un ` dans l'argument serait exécuté. Les arguments de la
-# commande (`$ARGUMENTS`, `$1`…) ne sont jamais interpolés.
-# shellcheck disable=SC2001 # suppression multiligne de tous les segments entre apostrophes
-unquoted=$(sed "s/'[^']*'//g" <<<"$blocks" | grep -nE '<[A-Za-z@][^<>]*>' || true)
+# --- Injection shell : valeurs à substituer dans un heredoc seulement -----------------
+# Toute valeur venue du projet ou de l'utilisateur (paramètre <…> à remplacer) passe
+# par le corps d'un heredoc à délimiteur entre apostrophes, jamais par la ligne de
+# commande : même entre apostrophes, un nom qui contient une apostrophe
+# (x'$(touch pwned)') ferme la chaîne et exécute la suite. Le corps d'un tel
+# heredoc n'est jamais interprété. Les arguments de la commande (`$ARGUMENTS`,
+# `$1`…) ne sont jamais interpolés.
+# heredoc_check <blocs> : affiche chaque ligne fautive (paramètre hors heredoc,
+# heredoc à délimiteur non protégé) et « heredoc » s'il y a au moins un heredoc protégé
+heredoc_check() {
+  awk '
+    in_doc { if ($0 == delim) in_doc = 0; next }
+    {
+      line = $0
+      gsub(/<<</, "", line)
+      if (match(line, /<<-?[ \t]*\047[A-Za-z0-9_]+\047/)) {
+        d = substr(line, RSTART, RLENGTH); sub(/^<<-?[ \t]*\047/, "", d); sub(/\047$/, "", d)
+        sub(/<<-?[ \t]*\047[A-Za-z0-9_]+\047/, "", line)
+        delim = d; in_doc = 1; print "heredoc"
+      } else if (line ~ /<<-?[ \t]*["A-Za-z0-9_]/) {
+        print "heredoc non protégé : " $0
+      }
+      if (line ~ /<[A-Za-z@][^<>]*>/) print "paramètre hors heredoc : " $0
+    }
+  ' <<<"$1"
+}
+inj=$(heredoc_check "$blocks")
 # shellcheck disable=SC2016 # motif littéral : on cherche le texte « $ARGUMENTS »
-if [ -n "$unquoted" ]; then
-  ko "injection shell : paramètre <…> hors apostrophes dans un bloc bash ($unquoted)"
+if grep -qv '^heredoc$' <<<"$inj"; then
+  ko "injection shell : $(grep -v '^heredoc$' <<<"$inj" | head -3 | tr '\n' ' ')"
+elif ! grep -qx 'heredoc' <<<"$inj"; then
+  ko "injection shell : aucun heredoc à délimiteur entre apostrophes dans les blocs bash"
 elif grep -qE '\$ARGUMENTS|\$\{?[0-9@*]' <<<"$blocks"; then
   ko "injection shell : argument de la commande interpolé dans un bloc bash"
 else
-  ok "injection shell : paramètres des blocs bash entre apostrophes seulement"
+  ok "injection shell : paramètres des blocs bash dans des heredocs protégés seulement"
+fi
+# Auto-test du contrôle (sans dépendre de la skill)
+if heredoc_check "for p in '<paquet>'; do echo \"\$p\"; done" | grep -qv '^heredoc$' &&
+  heredoc_check "$(printf 'cat <<FIN\n<paquet>\nFIN')" | grep -qv '^heredoc$' &&
+  ! heredoc_check "$(printf "while read -r p; do echo \"\$p\"; done <<'WF_X'\n<paquet>\nWF_X\ngrep x <<<\"\$out\"")" | grep -qv '^heredoc$'; then
+  ok "injection shell : auto-test du contrôle (apostrophes et heredoc non protégé refusés, heredoc protégé accepté)"
+else
+  ko "injection shell : auto-test du contrôle"
 fi
 cite "injection shell : valeur non conforme jamais dans une commande" "n'entre jamais dans une commande"
 cite "Grep en mode contenu : glob ou fichier unique imposé" "jamais un dossier sans \`glob\`"

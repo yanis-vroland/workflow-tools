@@ -44,7 +44,7 @@ Analyse statique de l'état courant du code, sans test d'intrusion ni exécution
 
 ## Dépendances vulnérables
 
-- **S3** : `express`, npm, version installée 4.18.2 (`package-lock.json`), directe. Avis CVE-2024-29041 (GHSA-rv95-896h-c2vc), sévérité publiée : moyenne. Première version corrigée : 4.19.2.
+- **S3** : application web (racine), `express`, npm, version installée 4.18.2 (`package-lock.json`), directe. Avis CVE-2024-29041 (GHSA-rv95-896h-c2vc), sévérité publiée : moyenne. Première version corrigée : 4.19.2.
 
 ## Constats dans le code
 

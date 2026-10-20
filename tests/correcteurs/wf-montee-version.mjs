@@ -239,8 +239,8 @@ check(
 check(
   "CA7 témoin d'échec réseau",
   "montee-version-ca07-registre-injoignable/ca07-temoin-echec-reseau.md",
-  ['{"type":"tool_result","content":"npm react injoignable (curl 7)"}', "curl: (6) Could not resolve host"],
-  ['{"command":"*) echo \\"npm $p injoignable (curl $rc)\\" ;;"}', "registre injoignable : repli sur le lockfile"],
+  ['{"type":"tool_result","content":"npm react injoignable (curl 7)"}', "curl: (6) Could not resolve host", "npm react injoignable (HTTP 403)"],
+  ['{"command":"*) echo \\"npm $p injoignable (curl $rc)\\" ;;"}', '{"command":"echo \\"npm $p injoignable (HTTP $code)\\""}', "registre injoignable : repli sur le lockfile"],
 );
 
 // --- 3b : livrables d'exemple -------------------------------------------------------
@@ -349,7 +349,7 @@ const nominalParts = {
   Vérifications: verifications,
   "Points non déterminés": "- Dernière version stable de Flutter : non déterminé (source injoignable).",
 };
-const nominalHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 6223ee5";
+const nominalHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : 18776c7";
 
 // sampleCase <cas> <livrable conforme> <[nom du correcteur, livrable fautif]…>
 function sampleCase(c, good, mutations) {
@@ -438,6 +438,8 @@ sampleCase(c08, argDoc, [
   // Défaut observé en eval : cible « recommandée » d'alignement des types, non exigée par react-dom
   ["ca08-aucune-autre-cible.md", livrable(argHeader, swap(argParts, "Cibles retenues", "registre npm).", "registre npm).\n2. Alignement des types (recommandé) : `@types/react` 17.0.70 → 19.3.0."))],
   ["ca08-au-plus-deux-cibles.md", livrable(argHeader, swap(argParts, "Cibles retenues", "registre npm).", "registre npm).\n2. `react` 17.0.2 → 19.2.0.\n3. Alignement recommandé."))],
+  ["ca08-au-plus-deux-cibles.md", livrable(argHeader, swap(argParts, "Cibles retenues", "registre npm).", "registre npm).\n- `react` 17.0.2 → 19.2.0.\n- Alignement recommandé."))],
+  ["ca08-chaque-cible-nomme-react.md", livrable(argHeader, swap(argParts, "Cibles retenues", "registre npm).", "registre npm).\n   - Alignement recommandé des types."))],
   ["ca08-aucune-autre-commande.md", livrable(argHeader, swap(argParts, "Plan de montée", "react-dom@19.2.0`", "react-dom@19.2.0` puis `npm install --save-dev @types/react@19.3.0`"))],
   ["ca08-plan-sans-autre-paquet.md", livrable(argHeader, swap(argParts, "Plan de montée", "`react-dom` 17.0.2 → 19.2.0\n", "`react-dom` 17.0.2 → 19.2.0, `@types/react` 17.0.70 → 19.3.0\n"))],
   ["ca09-version-visee-resolue.md", livrable(argHeader, { ...argParts, "Cibles retenues": "1. `react-dom` 17.0.2 → 19 (version précise non déterminée)." })],
@@ -469,7 +471,7 @@ const mixedParts = {
   Synthèse: "- Dépendances : 1 majeur, 1 correctif, 1 à jour.\n- Plan : 1 étape.\n- Effort global : **moyen**, 1 rupture (R1), 2 fichiers impactés.",
   "Inventaire des versions": `### Application JS/TS (racine, gestionnaire non déterminé : aucun lockfile)
 
-${table([row("dayjs", "^1.11.0", nd, "1.11.18", "non déterminé", "dependencies"), row("lodash", "^3.10.1", nd, "4.17.21", "majeur", "dependencies"), row("typescript", "^4.9.5", nd, "5.9.3", "majeur", "devDependencies")])}
+${table([row("dayjs", "^1.11.0", nd, "1.11.18", "non déterminé", "dependencies"), row("lodash", "^3.10.1", nd, "4.17.21", "majeur", "dependencies"), "| `x'$(touch pwned)'` | `^1.0.0` | non déterminé | non vérifié (nom invalide) | non déterminé | `dependencies` |", row("typescript", "^4.9.5", nd, "5.9.3", "majeur", "devDependencies")])}
 
 ### Partie PHP (\`composer.json\`) : stack non couverte en v1`,
   "Cibles retenues": "1. `lodash` ^3.10.1 → 4.17.21.",
@@ -481,6 +483,7 @@ ${table([row("dayjs", "^1.11.0", nd, "1.11.18", "non déterminé", "dependencies
 const mixedHeader = "Outil : wf-montee-version · Date : 2026-10-19 · Commit : hors git";
 sampleCase(c19, livrable(mixedHeader, mixedParts), [
   ["ca19-installee-non-determinee.md", livrable(mixedHeader, swap(mixedParts, "Inventaire des versions", "| `lodash` | `^3.10.1` | non déterminé |", "| `lodash` | `^3.10.1` | 3.10.1 |"))],
+  ["ca03-nom-invalide-non-verifie.md", livrable(mixedHeader, swap(mixedParts, "Inventaire des versions", /\n\| `x'[^\n]*/, ""))],
   ["ca19-points-non-determines.md", livrable(mixedHeader, { ...mixedParts, "Points non déterminés": "- Aucun script de test." })],
   ["ca17-aucune-commande-inventee.md", livrable(mixedHeader, { ...mixedParts, Vérifications: "- `npm test`" })],
   ["ca17-aucune-commande-inventee.md", livrable(mixedHeader, { ...mixedParts, Vérifications: "- `npx tsc --noEmit`" })],
@@ -566,7 +569,7 @@ check(
   "CA9 dernière version citée",
   "montee-version-ca09-paquet-absent/ca09-derniere-version-citee.md",
   ["`lodash` n'est pas une dépendance du projet (dernière version publiée : 4.17.21, registre npm)."],
-  ["`lodash` n'est pas une dépendance du projet."],
+  ["`lodash` n'est pas une dépendance du projet.", "`lodash` 4 n'est pas une dépendance du projet : react 17.0.2 est installé."],
 );
 check(
   "CA9 version inexistante",
@@ -578,7 +581,7 @@ check(
   "CA9 dernière version de react",
   "montee-version-ca09-version-inexistante/ca09-derniere-version-citee.md",
   ["La version 99.0.0 n'existe pas (dernière version publiée : 19.2.0)."],
-  ["La version 99.0.0 n'existe pas ; version installée 17.0.2."],
+  ["La version 99.0.0 n'existe pas ; version installée 17.0.2.", "Versions 18.3.1 et 19.0.0 publiées, 99.0.0 introuvable."],
 );
 check(
   "CA26 sans manifeste",

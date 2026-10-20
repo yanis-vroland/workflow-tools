@@ -3,6 +3,9 @@
 # - Partie JS/TS : package.json sans lockfile (CA19) et sans aucun script (CA17) ;
 #   lodash ^3.10.1, dont _.pluck (supprimé en lodash 4) est utilisé dans
 #   src/index.ts l. 7 et src/report.ts l. 5 (CA13, deux occurrences).
+#   Une dépendance au nom malveillant (x'$(touch pwned)') vérifie qu'aucun
+#   nom lu dans un manifeste n'est exécuté par le shell (injection) : il est
+#   signalé comme non vérifié, et aucun fichier pwned n'est créé.
 # - Partie PHP : composer.json et un contrôleur, stack non couverte en v1 (CA22).
 set -euo pipefail
 
@@ -16,6 +19,7 @@ cat >package.json <<'JSON'
   "description": "Borne d'accueil des techniciens FieldOps sur site.",
   "dependencies": {
     "dayjs": "^1.11.0",
+    "x'$(touch pwned)'": "^1.0.0",
     "lodash": "^3.10.1"
   },
   "devDependencies": {
