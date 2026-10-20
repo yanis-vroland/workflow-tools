@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: revue-securite-ca05-ca06-transitive-pub
+description: >-
+  Spec 010, CA5 et CA6 côté pub : application Flutter fictive dont pubspec.lock
+  contient http 0.12.2 en transitive, introduite par google_fonts 1.1.0 (avis
+  public GHSA-4rgh-jx4f-qfcq, CVE-2020-35669, corrigé en 0.13.3, vérifié le
+  2026-10-20). Nécessite OSV.dev et pub.dev.
+tags: [wf-revue-securite, spec-010, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

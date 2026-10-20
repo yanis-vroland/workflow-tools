@@ -1,8 +1,7 @@
 ---
-type: regex
-target: files
-pattern: 'package-lock\.json|pnpm-lock\.yaml|yarn\.lock'
-match: not_contains
+type: file_exists
+path: "package-lock.json"
+exists: false
 ---
 
-Témoin : aucun lockfile n'est créé pendant la session.
+Témoin : le projet n'a pas de lockfile pendant l'exécution (retiré par le scaffold, et pas recréé).
