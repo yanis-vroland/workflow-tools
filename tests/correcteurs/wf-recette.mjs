@@ -153,6 +153,7 @@ expect(C9, "ca09-hors-campagne-rec-007-reconduit", doc([], horsCampagne([rec007.
 expect(C9, "ca09-hors-campagne-rec-007-reconduit", doc([], horsCampagne([rec007])).replace("2026-10-20", "2026-09-15"), false, "cahier déposé non réécrit");
 expect(C9, "ca09-rec-006-reintegre", doc([row("REC-006", "docs/specs/001-interventions.md#CA1", "conforme", "Validé en démo du 10/09")]), true, "cas réintégré");
 expect(C9, "ca09-rec-006-reintegre", doc([row("REC-008", "docs/specs/001-interventions.md#CA1")]), false, "nouvel identifiant");
+expect(C9, "ca09-rec-006-reintegre", doc([row("REC-006", "docs/specs/001-interventions.md#CA1", "conforme", "Validé en démo du 10/09.")]), false, "commentaire réintégré avec le point final de l'entrée");
 expect(C9, "ca09-un-seul-cas-pour-001-ca1", doc([row("REC-008", "docs/specs/001-interventions.md#CA1")]), true, "nouvel identifiant pour 001#CA1");
 
 if (failures === 0) console.log(`OK     correcteurs wf-recette : ${Object.keys(compiled).length} motifs compilés, listes blanches et exemples vérifiés`);

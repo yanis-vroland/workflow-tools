@@ -140,6 +140,10 @@ cite "CA9 un cas hors campagne qui rentre dans le périmètre revient au tableau
   "revient au tableau avec son ID, son Statut et son Commentaire"
 cite "CA9 un cas hors campagne toujours hors périmètre est reconduit tel quel" \
   "reconduit tel quel sous « Cas hors campagne »"
+# Le point qui termine une entrée de liste n'appartient pas au commentaire :
+# sinon un commentaire réintégré au tableau gagne un point (« … 10/09. »).
+cite "CA9 le point final d'une entrée hors campagne ne fait pas partie du commentaire" \
+  "le point qui termine l'entrée ne fait pas partie du commentaire"
 
 # --- CA11, CA12 : couverture ------------------------------------------------------
 
