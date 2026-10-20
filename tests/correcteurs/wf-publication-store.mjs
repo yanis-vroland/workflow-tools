@@ -167,6 +167,18 @@ const suites = [
     negative: [{ Synthèse: "- **non prêt** (a (`apps/technicien`))\n- **non prêt** (b (`apps/superviseur`))", "Points non déterminés": "- superviseur : prêt à soumettre ?" }],
   },
   {
+    grader: "publication-store-ca24-ca25-deux-applications/ca26-hors-git-sans-mention-de-modifications",
+    input: (t) => t,
+    positive: ["# T\n\nOutil : wf-publication-store · Date : 2026-10-19 · Commit : hors git · modifications non commitées\n\n## Synthèse\n"],
+    negative: ["# T\n\nOutil : wf-publication-store · Date : 2026-10-19 · Commit : hors git\n\n## Synthèse\n\n## Points non déterminés\n\n- Hors git : pas de mention « modifications non commitées ».\n"],
+  },
+  {
+    grader: "publication-store-ca24-ca25-deux-applications/ca26-hors-git-ni-status-ni-ls-files",
+    input: bash,
+    positive: ["git status --porcelain", "git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'"],
+    negative: ["git rev-parse --short HEAD", "date +%F"],
+  },
+  {
     grader: "publication-store-ca15-documentation-lue/ca15-target-sdk-lu-et-date",
     input: doc,
     positive: [{ "Checklist Android": `${header}\n${row(["targetSdk", "à vérifier", "oui", "`build.gradle`", "33 ; exigence : 35, https://developer.android.com/x (consulté le 2026-10-19)"])}` }],

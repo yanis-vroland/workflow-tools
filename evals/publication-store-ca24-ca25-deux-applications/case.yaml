@@ -117,9 +117,20 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: '^(?:(?!\n## )[\s\S])*?hors git'
+  # La mention est interdite dans l'en-tête (avant le premier titre ##), là où
+  # CA26 la place ; une phrase qui en parle ailleurs n'est pas une mention.
   - name: ca26-hors-git-sans-mention-de-modifications
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: 'modifications non commitées'
+    pattern: '^(?:(?!\n## )[\s\S])*?modifications non commitées'
     flags: i
     match: not_contains
+  # Hors git (le dépôt parent créé par `claude plugin eval` n'a aucun commit),
+  # ni `git status` ni `git ls-files` ne sont lancés : leur sortie listerait le
+  # projet entier comme non suivi.
+  - name: ca26-hors-git-ni-status-ni-ls-files
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"git (?:status|ls-files)'
+    min: 0
+    max: 0
