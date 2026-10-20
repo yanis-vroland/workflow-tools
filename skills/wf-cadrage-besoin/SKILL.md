@@ -22,28 +22,28 @@ Arguments de la commande (vide si aucun) : $ARGUMENTS
 - **Désignation des sources** : dans la ligne « Sources lues » de l'en-tête, chaque source est désignée par son chemin relatif à la racine du projet, y compris si elle est hors du projet (`../briefs/brief.md`) ; jamais par un chemin absolu, qui exposerait l'arborescence de la machine. Un argument absolu est converti en chemin relatif à la racine du projet (répertoire courant) par le bloc des sources de l'étape 1. Partout ailleurs dans le livrable, une source est désignée par son nom de fichier seul (`brief.md`), sans répertoire.
 - **Chemins de source et shell** : un chemin de source (argument, ou source de l'en-tête à la relance) n'est jamais recopié dans le texte d'une commande, ni entre guillemets doubles, ni entre apostrophes : bash l'analyserait avant toute vérification, et un nom piégé (`$(…)`, accent grave, apostrophe) s'exécuterait. Avant tout appel au shell, écarte sans l'ouvrir ni le citer dans aucune commande, avec la raison « nom de fichier refusé (caractère spécial), jamais lu » :
   - un chemin qui contient `$`, un accent grave, un guillemet `"`, une barre oblique inverse ou un caractère de contrôle ;
-  - un argument sur plusieurs lignes, ou qui contient le délimiteur d'un heredoc ci-dessous (`WF_SOURCES_7c3e`, `WF_PDF_7c3e`).
+  - un chemin de source (argument ou en-tête) sur plusieurs lignes, ou qui contient le délimiteur d'un heredoc ci-dessous (`WF_SOURCES_7c3e`, `WF_PDF_7c3e`), même sans autre caractère refusé : recopié dans le corps du heredoc, il le fermerait avant la fin et les lignes suivantes s'exécuteraient comme des commandes.
 
   Les autres chemins (une apostrophe ou un tiret initial sont admis) ne passent au shell que par le corps des heredocs ci-dessous, à délimiteur entre apostrophes, un chemin par ligne, tel quel : le shell les vérifie à nouveau (sortie « refusé » : source écartée pour la même raison), préfixe par `./` un chemin relatif (un nom qui commence par `-` n'est pas pris pour une option), puis ne les emploie qu'en variable entre guillemets doubles. Le fichier refusé est nommé dans le message, et dans « Points non déterminés » si un livrable est écrit ; il n'entre pas dans « Sources lues ».
 
 ## Étape 1 : déterminer les sources
 
 1. Vérifie avec Bash (`test -f`) si `docs/wf/cadrage-besoin.md` existe. S'il existe, lis-le avec Read : c'est une relance (étape 5).
-2. Analyse les arguments (un chemin contenant des espaces est entre guillemets). Un argument au nom de fichier d'environnement (`.env*`) est écarté d'emblée, sans test ni commande qui le cite ; il compte comme un chemin. Un argument au nom refusé (règle « Chemins de source et shell ») est écarté de même ; il compte comme un chemin. Pour les autres, en un seul appel de Bash (et de même pour les sources de l'en-tête à la relance), avec un chemin par ligne dans le corps du heredoc :
+2. Analyse les arguments (un chemin contenant des espaces est entre guillemets). Un argument au nom de fichier d'environnement (`.env*`) est écarté d'emblée, sans test ni commande qui le cite ; il compte comme un chemin. Un argument au nom refusé (règle « Chemins de source et shell ») est écarté de même ; il compte comme un chemin. Pour les autres, en un seul appel de Bash (et de même pour les sources de l'en-tête à la relance), lance le bloc des sources ci-dessous, avec un chemin par ligne dans le corps du heredoc à la place de `<chemin>`. Recopie le bloc tel quel, **sans indentation** : chaque chemin et la ligne de fin `WF_SOURCES_7c3e` commencent en début de ligne (indentée, la ligne de fin ne fermerait pas le heredoc, et des espaces s'ajouteraient devant chaque chemin).
 
-   ```bash
-   while IFS= read -r src; do
-     case $src in
-       '') continue ;;
-       *[\$\`\"\\]*|*[[:cntrl:]]*) printf 'refusé : %s\n' "$src"; continue ;;
-       /*|./*|../*) p=$src ;;
-       *) p=./$src ;;
-     esac
-     if [ -f "$p" ]; then printf 'fichier : '; python3 -I -c 'import os, sys; print(os.path.relpath(sys.argv[1]))' "$p"; else printf 'introuvable : %s\n' "$src"; fi
-   done <<'WF_SOURCES_7c3e'
-   <chemin>
-   WF_SOURCES_7c3e
-   ```
+```bash
+while IFS= read -r src; do
+  case $src in
+    '') continue ;;
+    *[\$\`\"\\]*|*[[:cntrl:]]*) printf 'refusé : %s\n' "$src"; continue ;;
+    /*|./*|../*) p=$src ;;
+    *) p=./$src ;;
+  esac
+  if [ -f "$p" ]; then printf 'fichier : '; python3 -I -c 'import os, sys; print(os.path.relpath(sys.argv[1]))' "$p"; else printf 'introuvable : %s\n' "$src"; fi
+done <<'WF_SOURCES_7c3e'
+<chemin>
+WF_SOURCES_7c3e
+```
 
    La ligne `fichier :` donne le chemin relatif à la racine du projet, à reporter dans « Sources lues ». Puis :
    - **Aucun argument et aucun livrable** : indique la syntaxe attendue et arrête-toi sans rien écrire :
@@ -63,24 +63,25 @@ Arguments de la commande (vide si aucun) : $ARGUMENTS
 ## Étape 2 : lire les sources
 
 - Markdown et texte : Read. Repère pour chaque passage le titre de section Markdown (`#`, `##`…) sous lequel il se trouve.
-- PDF : jamais avec Read (il montrerait les pages en images). Avec Bash uniquement, un appel par PDF, son chemin seul dans le corps du heredoc : le bloc donne le nombre de pages (`pdfinfo`, ligne `Pages:`), puis le texte de chaque page N sous la ligne `--- page N ---` (`pdftotext -f N -l N`). Une page est « sans texte » si son texte est vide ou ne contient que des espaces. La sortie « poppler absent » signifie que poppler n'est pas installé.
+- PDF : jamais avec Read (il montrerait les pages en images). Avec Bash uniquement, un appel par PDF, son chemin seul dans le corps du heredoc : le bloc donne le nombre de pages (`pdfinfo`, ligne `Pages:`), puis le texte de chaque page N sous la ligne `--- page N ---` (`pdftotext -f N -l N`). Une page est « sans texte » si son texte est vide ou ne contient que des espaces. La sortie « poppler absent » signifie que poppler n'est pas installé. Recopie le bloc PDF ci-dessous tel quel, **sans indentation** (le chemin et la ligne de fin `WF_PDF_7c3e` en début de ligne), le chemin à la place de `<chemin>`.
 
-  ```bash
-  IFS= read -r src <<'WF_PDF_7c3e'
-  <chemin>
-  WF_PDF_7c3e
-  case $src in
-    ''|*[\$\`\"\\]*|*[[:cntrl:]]*) echo "nom de fichier refusé (caractère spécial), jamais lu" ;;
-    *)
-      case $src in /*|./*|../*) p=$src ;; *) p=./$src ;; esac
-      if ! command -v pdfinfo >/dev/null || ! command -v pdftotext >/dev/null; then echo "poppler absent (pdfinfo ou pdftotext introuvable)"
-      else
-        n=$(pdfinfo "$p" | awk '/^Pages:/ { print $2 }'); echo "Pages: ${n:-0}"
-        i=1; while [ "$i" -le "${n:-0}" ]; do echo "--- page $i ---"; pdftotext -f "$i" -l "$i" "$p" -; i=$((i + 1)); done
-      fi ;;
-  esac
-  ```
+```bash
+IFS= read -r src <<'WF_PDF_7c3e'
+<chemin>
+WF_PDF_7c3e
+case $src in
+  ''|*[\$\`\"\\]*|*[[:cntrl:]]*) echo "nom de fichier refusé (caractère spécial), jamais lu" ;;
+  *)
+    case $src in /*|./*|../*) p=$src ;; *) p=./$src ;; esac
+    if ! command -v pdfinfo >/dev/null || ! command -v pdftotext >/dev/null; then echo "poppler absent (pdfinfo ou pdftotext introuvable)"
+    else
+      n=$(pdfinfo "$p" | awk '/^Pages:/ { print $2 }'); echo "Pages: ${n:-0}"
+      i=1; while [ "$i" -le "${n:-0}" ]; do echo "--- page $i ---"; pdftotext -f "$i" -l "$i" "$p" -; i=$((i + 1)); done
+    fi ;;
+esac
+```
 
+- PDF, suite :
   - Si toutes les pages sont sans texte, le PDF n'a pas de texte extractible (document scanné, par exemple) : écarte-le, sans chercher à voir ni à transcrire ce que montrent ses pages.
   - Sinon, exploite le texte des pages qui en ont, et cite chaque passage avec le numéro de la page dont pdftotext l'a extrait. Les pages sans texte sont signalées dans « Points non déterminés ».
 - Une source se cite ainsi : `nom.md, « Titre de section »` ; `nom.pdf, page N` ; `nom.txt` (ou `nom.md` sans titre de section s'il n'en a pas) ; `réponse saisie à la question Qnn` pour une réponse au client.
