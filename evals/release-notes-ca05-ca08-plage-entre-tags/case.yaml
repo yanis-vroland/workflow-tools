@@ -189,8 +189,10 @@ graders:
       CA8. Plage v1.1.0..v1.2.0 de FieldOps : feat « prise en charge d'iOS », feat
       « envoi du compte rendu au client à la clôture », feat « acompte en ligne sur
       un ordre de travail », feat « cache local des interventions », feat
-      « suppression d'une intervention annulée », fix « TVA calculée après remise et
-      déplacement », test et docs.
+      « suppression d'une intervention annulée et purge nocturne des clôturées »,
+      fix « TVA calculée après remise et déplacement », test et docs. La purge
+      nocturne des interventions clôturées fait partie de ce feat : elle n'est pas
+      une invention.
 
       Réussite si toutes les affirmations suivantes sont vraies :
       1. « Nouveautés » couvre les cinq fonctionnalités (éventuellement regroupées
