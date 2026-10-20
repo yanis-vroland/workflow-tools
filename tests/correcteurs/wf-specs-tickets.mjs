@@ -140,6 +140,9 @@ check(`${C14}/ca21-env-non-lu-par-bash`, json({ command: "date +%F" }), false, "
 check(`${CD}/ca03-commit-et-modifications-non-commitees`, doc(H.replace("2fc99c0", "2fc99c0, modifications non commitées")), true, "mention présente");
 check(`${CD}/ca03-commit-et-modifications-non-commitees`, d + "\nmodifications non commitées\n", false, "mention hors de la ligne de commit");
 
+check(`${C16}/ca16-livrable-present-et-redate`, doc(H01), true, "livrable réécrit avec une nouvelle date");
+check(`${C16}/ca16-livrable-present-et-redate`, doc(H01.replace("2026-10-20", "2026-10-10")), false, "date du livrable précédent");
+check(`${C16}/ca16-livrable-present-et-redate`, "", false, "livrable absent");
 check(`${C16}/ca16-tickets-supprimes-non-reattribues`, d.replace("### T02 : B", "### T03 : B"), true, "T03 réattribué");
 check(`${C16}/ca16-tickets-supprimes-non-reattribues`, d.replace("### T02 : B", "### T07 : B"), false, "nouvel identifiant T07");
 check(`${C16}/ca16-critere-supprime-non-reattribue`, d.replace("### T01 : A", "### T09 : A").replace("### T02 : B", "### T02 : B\n\n- CA2 : x"), true, "CA2 réattribué dans T02");
