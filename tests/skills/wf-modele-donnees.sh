@@ -249,6 +249,14 @@ cite "CA32 fichier de migration Drift" "migration-drift.dart"
 cite "CA34 --niveau c sans schéma détecté" "aucun schéma détecté"
 cite "CA36 au niveau C, différences et impacts sans migration" "aucun fichier de migration"
 
+# Exemples du niveau C sans lien avec la fixture (colonnes techniques absentes
+# du schéma existant, valeur par défaut d'une colonne ajoutée)
+# shellcheck disable=SC2016 # accents graves littéraux
+absent "exemple d'écart aux conventions sans lien avec la fixture" 'pas de `created_at`'
+# shellcheck disable=SC2016 # accents graves littéraux
+absent "conventions du schéma existant sans exemple tiré de la fixture" 'présence ou non de `created_at`'
+absent "exemple de colonne obligatoire sans valeur concrète" "DEFAULT 'standard'"
+
 # --- Plus aucun niveau annoncé non disponible ----------------------------------
 
 absent "les trois niveaux sont livrés" "non disponible dans cette version"
