@@ -110,6 +110,7 @@ fi
 # --- CA4 à CA9 : contenu du modèle -------------------------------------------
 
 cite "CA4 élément sans source marqué « supposé »" "supposé"
+cite "CA4 chaque relation a sa propre source, même quand sa règle est sourcée" "même quand sa règle"
 if grep -qF -- "erDiagram" <<<"$model"; then
   ok "CA5 bloc Mermaid erDiagram dans le modèle"
 else
