@@ -210,9 +210,22 @@ Modifications non commitées : aucune.
 `;
 
 const fieldops = graders["passation-fieldops"] ?? {};
+let checked = 0;
 for (const [name, g] of Object.entries(fieldops)) {
   if (g.type !== "regex" || !g.target?.includes("passation.md")) continue;
+  checked++;
   if (!passes(g, good)) fail(`passation-fieldops/${name} échoue sur un livrable conforme`);
+}
+if (checked < 40) fail(`passation-fieldops : ${checked} correcteurs regex vérifiés, au moins 40 attendus`);
+
+// Variantes conformes : paramètre qui remplace aussi le schéma de l'adresse
+const variants = [
+  ["ca23-webhook-parametre", good.replace("https://<serveur>/hooks", "<serveur-de-déploiement>/hooks")],
+];
+for (const [name, text] of variants) {
+  const g = fieldops[name];
+  if (!g) fail(`passation-fieldops/${name} absent`);
+  else if (!passes(g, text)) fail(`passation-fieldops/${name} échoue sur une variante conforme`);
 }
 
 // Chaque mutation doit faire échouer le correcteur nommé
@@ -241,10 +254,13 @@ const scaffold = readFileSync(join(evals, "passation-ca15-relance", "scaffold.sh
 const old = /cat >docs\/wf\/passation\.md <<'MD'\n([\s\S]*?)\nMD\n/.exec(scaffold)?.[1];
 if (!old) fail("passation-ca15-relance : dossier déposé introuvable dans scaffold.sh");
 else {
+  let n = 0;
   for (const [name, g] of Object.entries(graders["passation-ca15-relance"] ?? {})) {
     if (g.type !== "regex" || !/conserve|mis-a-jour|a-faire/.test(name)) continue;
+    n++;
     if (passes(g, "\n" + old)) fail(`passation-ca15-relance/${name} réussit déjà sur le dossier déposé (faux vert)`);
   }
+  if (n < 8) fail(`passation-ca15-relance : ${n} correcteurs de conservation vérifiés, au moins 8 attendus`);
 }
 
 if (failures === 0) console.log("OK     correcteurs wf-passation");
