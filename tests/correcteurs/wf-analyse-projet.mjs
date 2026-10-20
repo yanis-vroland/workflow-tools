@@ -411,6 +411,7 @@ const suites = [
       doc("En-tête", { "Points non déterminés": "- Registre injoignable." }),
       // Mention présente, mais pour un autre nom, ou sans le nom piégé sur sa ligne
       doc("En-tête", { "Points non déterminés": "- `WF_NPM_5e1a` : nom de paquet invalide, non vérifié." }),
+      doc("En-tête", { "Points non déterminés": "- `touch pwned` : nom de paquet invalide, non vérifié." }),
       doc("En-tête", { "Points non déterminés": "- Dépendance `x'$(touch pwned)'`.\n- Un nom de paquet invalide, non vérifié." }),
     ],
   },
