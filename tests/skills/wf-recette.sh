@@ -97,7 +97,7 @@ fi
 header_line="| ID | Fonctionnalité | Préconditions | Étapes | Résultat attendu | Source | Statut | Commentaire |"
 in_model "CA3 en-tête du tableau des cas, colonnes dans l'ordre" "$header_line"
 in_model "CA3 identifiant REC-001" "REC-001"
-cite "CA3 identifiants uniques" "unique"
+cite "CA3 identifiants uniques" "vérifie que chaque identifiant est unique dans le livrable"
 
 # --- CA4, CA5, CA13 : forme de la colonne Source -----------------------------------
 
@@ -117,9 +117,10 @@ cite "CA6 avertissement : validation par le client" "validés par le client"
 
 # --- CA8 : statuts admis --------------------------------------------------------
 
-for status in "à tester" "conforme" "non conforme" "bloqué"; do
-  cite "CA8 statut « $status »" "$status"
-done
+cite "CA8 statuts admis, et eux seuls" \
+  "les seuls statuts admis sont « à tester », « conforme », « non conforme » et « bloqué »"
+cite "CA8 l'outil n'attribue que « à tester »" \
+  "Tu n'attribues jamais toi-même un autre statut que « à tester »"
 
 # --- CA9 et CA10 : relance -------------------------------------------------------
 
@@ -149,9 +150,10 @@ in_model "CA12 sous-section « Fonctionnalités sans spec »" "Fonctionnalités 
 # Ordre des sous-sections de « Couverture » dans le modèle
 cov=$(awk '/^## Couverture/ { in_cov = 1; next } in_cov && /^## / { exit } in_cov' <<<"$model")
 cov_titles=$(grep -E '^### ' <<<"$cov" | sed 's/^### //' | tr '\n' '|')
-if [ "$cov_titles" = "Critères non recettables manuellement|Fonctionnalités sans spec|Cas retirés|" ] ||
-  [ "$cov_titles" = "Critères non recettables manuellement|Fonctionnalités sans spec|Cas hors campagne|Cas retirés|" ]; then
-  ok "CA10 à CA12 sous-sections ### de « Couverture »"
+# « Cas hors campagne » est obligatoire : il porte les saisies des cas hors du
+# périmètre d'une campagne sur référence (CA9, CA16).
+if [ "$cov_titles" = "Critères non recettables manuellement|Fonctionnalités sans spec|Cas hors campagne|Cas retirés|" ]; then
+  ok "CA9 à CA12 sous-sections ### de « Couverture », « Cas hors campagne » compris"
 else
   ko "CA10 à CA12 sous-sections ### de « Couverture » (obtenu : $cov_titles)"
 fi
@@ -182,8 +184,29 @@ in_model "CA20 en-tête : outil" "Outil : wf-recette"
 
 # --- Injection shell : la référence n'entre dans une commande qu'après filtrage ------
 
-cite "CA16, CA17 caractères admis dans une référence avant toute commande" \
-  "Si l'argument contient autre chose que des lettres, chiffres, \`.\`, \`_\`, \`/\` et \`-\`, ou commence par \`-\`, ne lance aucune commande avec lui"
+# La skill donne l'expression des références admises ; on l'applique à des
+# exemples : les formes usuelles passent, tout caractère qui permettrait une
+# injection ou une option est rejeté.
+ref_re=$(grep -oE 'Référence admise si elle vérifie l.expression `[^`]+`' <<<"$body" | sed -E 's/.*`([^`]+)`$/\1/')
+if [ -z "$ref_re" ]; then
+  ko "CA16, CA17 expression des références admises absente"
+else
+  ref_ok=1
+  for ref in v1.3.0 HEAD~3 'v1.2.0^' main feat/T07-planning 5b26289 release-2.0; do
+    [[ $ref =~ $ref_re ]] || {
+      ko "CA16 référence usuelle « $ref » rejetée par $ref_re"
+      ref_ok=0
+    }
+  done
+  # shellcheck disable=SC2088 # tilde littéral voulu
+  for ref in '-x' '--output=f' '$(id)' '`id`' 'a"b' "a'b" 'a b' 'a;b' 'a|b' 'a:b' '~/x' '^x' 'a$b' 'a{1}' 'a*' 'a&b' 'a>b'; do
+    [[ $ref =~ $ref_re ]] && {
+      ko "CA17 référence dangereuse « $ref » admise par $ref_re"
+      ref_ok=0
+    }
+  done
+  [ "$ref_ok" -eq 1 ] && ok "CA16, CA17 expression des références admises ($ref_re)"
+fi
 cite "CA16, CA17 référence jamais entre guillemets" "sans guillemets"
 # Aucune commande prescrite (entre accents graves) ne place un texte variable
 # <…> entre guillemets doubles, où $(…) ou des accents graves seraient évalués.
@@ -213,46 +236,55 @@ else
   ok "CA21 le glob d'exemple de Grep n'inclut ni Markdown ni fichier de configuration"
 fi
 
-# --- Aucune valeur propre à la fixture FieldOps -----------------------------------
-# Les exemples de la skill restent génériques : sinon les evals sur FieldOps
-# mesureraient la recopie d'un exemple, pas le comportement (surapprentissage).
+# --- Aucune valeur propre à la fixture FieldOps ni aux cas d'eval --------------------
+# Les exemples de la skill restent génériques : sinon les evals mesureraient la
+# recopie d'un exemple, pas le comportement (surapprentissage). Les valeurs sont
+# dérivées à l'exécution de la fixture et des cas, pour suivre leurs évolutions ;
+# une valeur que la spec 014 ou la spec 006 (contrat) impose est admise. Tout le
+# fichier est contrôlé, frontmatter compris.
 
-fieldops_values=(
-  "FieldOps"
-  "001-interventions"
-  "002-ordres-de-travail"
-  "003-export-pdf"
-  "technicians.ts"
-  "seed.ts"
-  "dispatcher"
-  "Intervention"
-  "WorkOrder"
-  "SEED_PASSWORD"
-  "changeme"
-  "MAP_API_KEY_EXPIRES_AT"
-  "purge"
-  "Express"
-  "connecté"
-  "cache"
-  "centile"
-  "simultanés"
-  "e-mail reçu"
-  "accès refusé"
-  "Planifiée"
-  "En cours"
-  "congé"
-  "créneau"
-  "pagination"
-  "PDF"
+fixture="$root/tests/fixtures/fieldops"
+leak_values=(FieldOps WorkOrder Intervention SEED_PASSWORD changeme MAP_API_KEY_EXPIRES_AT
+  PRODUCTION_DATABASE_URL Express connecté cache centile simultanés "e-mail reçu" "accès refusé")
+while IFS= read -r v; do leak_values+=("$v"); done < <(
+  {
+    # noms des specs, routes, écrans, modules et workflows de la fixture
+    find "$fixture/docs/specs" "$fixture/src" "$fixture/mobile/lib" "$fixture/.github" -type f 2>/dev/null |
+      sed -E 's#.*/##; s#\.md$##'
+    # arguments des commandes des cas
+    sed -nE 's#^/wf-recette[[:space:]]+##p' "$root"/evals/recette-*/prompt.md
+    # empreintes et identifiants des correcteurs
+    cat "$root"/evals/recette-*/graders/*.md | grep -oE '\b[0-9a-f]{7}\b|REC-[0-9]{3}|T[0-9]{2}-CA[0-9]+'
+    # libellés entre « » des scaffolds et des specs de la fixture
+    cat "$root"/evals/recette-*/scaffold.sh "$fixture"/docs/specs/*.md | grep -oE '« [^»]+ »' | sed -E 's/^« //; s/ »$//'
+  } | sort -u
 )
-leak_ok=1
-for value in "${fieldops_values[@]}"; do
+specs_text=$(cat "$root/docs/specs/014-wf-recette.md" "$root/docs/specs/006-wf-specs-tickets.md")
+skill_text=$(cat "$skill")
+leaks=()
+for value in "${leak_values[@]}"; do
+  [ -n "$value" ] || continue
+  grep -qwF -- "$value" <<<"$specs_text" && continue
+  # Titres du modèle du livrable (ex. « Cas hors campagne », cité par un scaffold
+  # qui dépose un cahier existant) : imposés par la skill elle-même.
+  grep -qxE -- "#{1,3} $value" <<<"$model" && continue
   # Mot entier : « changeme » ne doit pas être trouvé dans « changements ».
-  if grep -qwF -- "$value" <<<"$body"; then
-    ko "aucune valeur de FieldOps dans la skill (« $value » présent)"
-    leak_ok=0
-  fi
+  if grep -qwF -- "$value" <<<"$skill_text"; then leaks+=("$value"); fi
 done
-[ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
+if [ "${#leaks[@]}" -eq 0 ]; then
+  ok "aucune valeur de la fixture ni des cas d'eval dans la skill (${#leak_values[@]} valeurs contrôlées)"
+else
+  ko "aucune valeur de la fixture ni des cas d'eval dans la skill (présentes : ${leaks[*]})"
+fi
+
+# --- Correcteurs des evals : motifs compilés et vérifiés sur des exemples ------------
+
+if ! command -v node >/dev/null; then
+  ko "node introuvable : correcteurs des evals non vérifiés (tests/correcteurs/wf-recette.mjs)"
+elif node "$root/tests/correcteurs/wf-recette.mjs"; then
+  ok "correcteurs des evals recette-* (tests/correcteurs/wf-recette.mjs)"
+else
+  ko "correcteurs des evals recette-* (tests/correcteurs/wf-recette.mjs)"
+fi
 
 exit $fail

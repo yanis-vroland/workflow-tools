@@ -5,5 +5,5 @@ pattern: '\n\|\s*REC-\d{3}\s*\|(?:[^|\n]*\|){4}[^|\n]*src/web/pages/NewIntervent
 match: contains
 ---
 
-CA6 : au moins un cas est déduit de la formulaire de création d une intervention, et sa colonne Source cite le
+CA6 : au moins un cas est déduit du formulaire de création d’une intervention, et sa colonne Source cite le
 fichier de code `src/web/pages/NewIntervention.tsx`.
