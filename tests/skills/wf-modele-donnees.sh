@@ -176,6 +176,16 @@ cite "PDF : chemin contenant une apostrophe écarté sans commande" "contient un
 cite "chemin relatif calculé par l'entrée standard" "<<'CHEMIN'"
 absent "aucun test -f sur un chemin venu des arguments" "test -f"
 
+# shellcheck disable=SC2016 # accents graves littéraux
+cite "PDF : chemin relatif préfixé par ./ (option)" 'préfixe `./`'
+cite "chemin relatif : argument multiligne refusé avant le heredoc" "sur plusieurs lignes"
+cite "relance : source hors du projet signalée sans relecture" "hors du projet n'est pas relue"
+# Exemples d'encadrés « À décider » sans lien avec les données des cas (états,
+# adresses ou sites, désactivation, niveau intermédiaire)
+for value in "historiser" "changements d'état" "adresses par client" "désactivation" "un seul champ d'état" "niveau intermédiaire"; do
+  absent "exemple d'encadré sans lien avec les cas (« $value »)" "$value"
+done
+
 # --- Grep et fichiers d'environnement --------------------------------------------
 cite "Grep en mode files_with_matches" "files_with_matches"
 cite "CA37 fichier sans objet signalé, jamais supprimé" "plus lieu d'être"
@@ -194,37 +204,76 @@ for section in "Schéma physique" "Preuve par les cas d'usage" "Évolution"; do
   fi
 done
 
-# --- Aucune valeur propre à la fixture FieldOps -----------------------------------
-# Les exemples de la skill restent génériques : sinon les evals sur FieldOps
-# mesureraient la recopie d'un exemple, pas le comportement.
+# --- Aucune valeur propre à la fixture ni aux données des cas -----------------
+# Les exemples de la skill restent génériques : sinon les evals mesureraient la
+# recopie d'un exemple, pas le comportement. Le contrôle porte sur le fichier
+# entier (frontmatter compris). Liste fixe (valeurs de FieldOps et des
+# sources) et liste générée depuis les données des cas (evals/modele-donnees-*/
+# donnees/, prompts) et les motifs et chemins des graders : identifiants en
+# snake_case et noms de fichiers, hors noms imposés par la spec ou l'ADR-001 et
+# noms d'outils que la skill doit citer.
 
-fieldops_values=(
-  "FieldOps"
-  "intervention"
-  "technicien"
-  "technician"
-  "work_order"
-  "dispatcher"
-  "chaudière"
-  "Démo Thermique"
-  "hourly_rate"
-  "local_db"
-  "Villefictive"
-  "Technicien Fictif"
-  "Client Fictif"
-  "Société Exemple"
-  "DATABASE_URL"
-  "projet.sdt"
-  "purge"
-  "MAP_API_KEY"
+# Sous-chaînes, insensibles à la casse
+fixed_substrings=(
+  "FieldOps" "intervention" "technicien" "technician" "work_order" "dispatcher"
+  "chaudière" "Démo Thermique" "hourly_rate" "local_db" "Villefictive"
+  "Technicien Fictif" "Client Fictif" "Société Exemple" "DATABASE_URL"
+  "projet.sdt" "purge" "MAP_API_KEY" "priorit" "urgente" "visit_report"
+  "legacy_code" "équipement" "evolution-interventions" "Sophie" "Renaud"
+  "Marc Olivier"
 )
-leak_ok=1
-for value in "${fieldops_values[@]}"; do
-  if grep -qiF -- "$value" <<<"$body"; then
-    ko "aucune valeur de FieldOps dans la skill (« $value » présent)"
-    leak_ok=0
+# Mots entiers, insensibles à la casse
+fixed_words=("report" "site" "sites")
+# Noms imposés par la spec ou l'ADR-001, et outils que la skill doit nommer
+allowed_generated=(
+  index.md cadrage-besoin.md schema.sql donnees-test.sql requetes.sql
+  migration.sql schema.prisma package.json migration-sqflite.dart
+  migration-drift.dart local_database.dart tables.dart database.dart
+  created_at updated_at file_path input_match pg_restore drift_dev
+)
+
+generated_terms() {
+  {
+    cat "$root"/evals/modele-donnees-*/donnees/* "$root"/evals/modele-donnees-*/prompt.md 2>/dev/null
+    grep -h -E '^(path|pattern|input_match):' "$root"/evals/modele-donnees-*/graders/*.md 2>/dev/null
+  } | grep -oE '[A-Za-z]+(_[A-Za-z]+)+|[A-Za-z0-9_-]+\.(md|sql|ts|dart|json|prisma|docx)' |
+    sort -u | grep -vxF -f <(printf '%s\n' "${allowed_generated[@]}")
+}
+
+# leaks <fichier> : affiche chaque terme interdit présent dans le fichier
+leaks() {
+  local file=$1 term
+  for term in "${fixed_substrings[@]}"; do
+    grep -qiF -- "$term" "$file" && echo "$term"
+  done
+  for term in "${fixed_words[@]}"; do
+    grep -qiwF -- "$term" "$file" && echo "$term"
+  done
+  while IFS= read -r term; do
+    [ -n "$term" ] && grep -qiwF -- "$term" "$file" && echo "$term"
+  done < <(generated_terms)
+  return 0
+}
+
+found=$(leaks "$skill")
+if [ -z "$found" ]; then
+  ok "aucune valeur de la fixture ni des cas dans la skill (fichier entier)"
+else
+  ko "aucune valeur de la fixture ni des cas dans la skill ($(tr '\n' ' ' <<<"$found"))"
+fi
+
+# Contrôle par mutation du contrôle lui-même : un terme de chaque liste, injecté
+# dans une copie de la skill (frontmatter compris), doit être détecté.
+first_generated=$(generated_terms | head -n 1)
+for term in "${fixed_substrings[0]}" "${fixed_words[0]}" "$first_generated"; do
+  [ -n "$term" ] || continue
+  mutant="$work/mutant-SKILL.md"
+  sed "2s/\$/ $term/" "$skill" >"$mutant"
+  if grep -qxF -- "$term" <<<"$(leaks "$mutant")"; then
+    ok "mutation : « $term » injecté dans le frontmatter est détecté"
+  else
+    ko "mutation : « $term » injecté dans le frontmatter n'est pas détecté"
   fi
 done
-[ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
 
 exit $fail
