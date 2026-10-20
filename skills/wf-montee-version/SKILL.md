@@ -112,7 +112,7 @@ N'interroge que les produits présents dans le projet. La dernière LTS de Node.
 ## Étape 6 : cibles retenues
 
 - **Sans argument** : toutes les dépendances en retard. Les dépendances en écart mineur ou correctif forment un **lot unique** (une seule cible, application par application en monorepo) ; puis une cible par dépendance en écart majeur ; puis une cible pour Node.js ou Flutter s'il n'est pas à la dernière version LTS ou stable (dernière version non déterminée : pas de cible, le dire et le reprendre dans « Points non déterminés »). Aucune cible pour une dépendance à jour, d'écart non déterminé, ou d'une stack non couverte.
-- **Avec argument** : « Cibles retenues » ne contient que cette cible, et les sections suivantes ne portent que sur elle et sur les dépendances qu'elle entraîne (exigences ci-dessous). Pour un paquet, vérifie sa présence dans les manifestes, puis ses versions publiées :
+- **Avec argument** : « Cibles retenues » ne contient que cette cible, et les sections suivantes ne portent que sur elle et sur les dépendances qu'elle entraîne (exigences ci-dessous). Une dépendance n'est entraînée que si les métadonnées du registre de la version visée l'exigent : aucune cible, étape ni commande « recommandée », « d'alignement » ou « conseillée » (paquets de types, outillage, plugins) qui ne serait pas exigée ainsi. Tu peux la mentionner dans « Points non déterminés », sans version visée ni commande. Pour un paquet, vérifie sa présence dans les manifestes, puis ses versions publiées :
 
 ```bash
 for pv in '<paquet>@<version>'; do
