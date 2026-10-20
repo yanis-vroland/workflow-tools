@@ -19,8 +19,8 @@ Tu prépares, en français, la soumission d'une application mobile Flutter sur l
   Aucune autre commande Bash, même en lecture (`ls`, `cat`, `find`, `curl`…). Pour lire, utilise Read, Glob et Grep.
 - **Secrets** :
   - Ne lis jamais, ni avec Read, ni avec Grep, ni avec Bash, un fichier d'environnement (`.env`, `.env.local`, `.env.production`…, sauf `.env.example`).
-  - Fichiers de signature et de configuration sensibles : `key.properties`, `*.jks`, `*.keystore`, `*.p12`, `*.p8`, `*.mobileprovision`, `GoogleService-Info.plist`, `google-services.json`. Tu repères leur présence avec Glob, tu ne les ouvres jamais (ni Read, ni Grep), et le livrable indique seulement leur présence et leur chemin, sans aucune valeur.
-  - Avec Grep, passe toujours le paramètre `glob` limité à `*.{dart,gradle,kts,xml,pbxproj,xcconfig}` : jamais de Grep sans `glob`, ni sur des fichiers `.json`, `.plist`, `.properties` ou `.txt`.
+  - Fichiers de signature et de configuration sensibles : `key.properties`, `*.jks`, `*.keystore`, `*.p12`, `*.p8`, `*.mobileprovision`, `GoogleService-Info.plist`, `google-services.json`, `firebase_options.dart` (configuration FlutterFire, sous `lib/`). Tu repères leur présence avec Glob, tu ne les ouvres jamais (ni Read, ni Grep), et le livrable indique seulement leur présence et leur chemin, sans aucune valeur.
+  - Avec Grep, passe toujours le paramètre `glob` limité à `*.{dart,gradle,kts,xml,pbxproj,xcconfig}` et le mode `output_mode: "files_with_matches"`, qui ne liste que des noms de fichiers : jamais de Grep sans `glob` ni en mode contenu, ni sur des fichiers `.json`, `.plist`, `.properties` ou `.txt`. Lis ensuite avec Read les fichiers trouvés qui ne sont pas sensibles (jamais `firebase_options.dart`).
   - Un mot de passe, une clé ou un jeton écrit en clair dans un fichier lu (ex. `storePassword` dans `build.gradle`) n'est jamais recopié : cite le fichier et la ligne, pas la valeur.
 - **Données personnelles** : aucune adresse e-mail (de contributeur, de support ou autre) dans le livrable.
 - **Honnêteté** : chaque affirmation s'appuie sur un fichier lu, dont le chemin (relatif à la racine du projet, dossier de l'application compris) est cité. Ce qui n'a pas pu être établi est écrit « non déterminé », jamais deviné. Une exigence des stores n'est jamais affirmée de mémoire : seulement la valeur relevée dans le projet et le lien officiel (voir « Exigences qui évoluent »).
@@ -59,8 +59,8 @@ Nomme chaque application Flutter par le champ `name` de son `pubspec.yaml`, touj
 
 ## Étape 4 : fichiers sensibles
 
-- Avec Glob, repère dans chaque application les fichiers sensibles : `**/key.properties`, `**/*.jks`, `**/*.keystore`, `**/*.p12`, `**/*.p8`, `**/*.mobileprovision`, `**/GoogleService-Info.plist`, `**/google-services.json`. Ne les ouvre pas.
-- Si le projet est un dépôt git, lance `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'`. Chaque fichier de clés listé est suivi par git : la Synthèse le signale comme alerte, avec son chemin, et renvoie à `/wf-revue-securite`. Les fichiers `*.mobileprovision`, `GoogleService-Info.plist` et `google-services.json` ne déclenchent pas cette alerte.
+- Avec Glob, repère dans chaque application les fichiers sensibles : `**/key.properties`, `**/*.jks`, `**/*.keystore`, `**/*.p12`, `**/*.p8`, `**/*.mobileprovision`, `**/GoogleService-Info.plist`, `**/google-services.json`, `**/firebase_options.dart`. Ne les ouvre pas.
+- Si le projet est un dépôt git, lance `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'`. Chaque fichier de clés listé est suivi par git : la Synthèse le signale comme alerte, avec son chemin, et renvoie à `/wf-revue-securite`. Les fichiers `*.mobileprovision`, `GoogleService-Info.plist`, `google-services.json` et `firebase_options.dart` ne déclenchent pas cette alerte.
 
 ## Étape 5 : lire l'application
 
@@ -69,7 +69,7 @@ Pour chaque application Flutter, lis avec Read (chemins relatifs au dossier de l
 - `pubspec.yaml` : `version: X.Y.Z+N` (numéro de version `X.Y.Z`, numéro de build `N`) et dépendances (plugins qui touchent aux permissions : appareil photo, photothèque, localisation, micro, contacts, notifications…).
 - iOS, si `ios/` existe : `ios/Runner/Info.plist` ; `ios/Runner.xcodeproj/project.pbxproj` (`PRODUCT_BUNDLE_IDENTIFIER`, `IPHONEOS_DEPLOYMENT_TARGET`, `DEVELOPMENT_TEAM`) et `ios/Podfile` (`platform :ios`) s'ils existent ; présence de `ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json` (et de l'image 1024×1024 qu'il référence) et de `ios/Runner/PrivacyInfo.xcprivacy`, avec Glob.
 - Android, si `android/` existe : `android/app/build.gradle` ou `android/app/build.gradle.kts` (`applicationId`, `minSdk`/`minSdkVersion`, `targetSdk`/`targetSdkVersion`, `signingConfigs`, `buildTypes`), `android/app/src/main/AndroidManifest.xml` (`android:label`, `android:icon`, `uses-permission`), `android/app/src/main/res/values/strings.xml` si le libellé y renvoie, `android/gradle.properties` s'il existe ; présence des icônes de lanceur `android/app/src/main/res/mipmap-*/` avec Glob.
-- Le code Dart (`lib/`) avec Grep (`glob` `*.{dart,gradle,kts,xml,pbxproj,xcconfig}`) pour repérer l'usage des fonctionnalités protégées et un écran ou service de connexion.
+- Le code Dart (`lib/`) avec Grep (`glob` `*.{dart,gradle,kts,xml,pbxproj,xcconfig}`, mode `files_with_matches`), puis Read des fichiers trouvés hors fichiers sensibles, pour repérer l'usage des fonctionnalités protégées et un écran ou service de connexion.
 - Les métadonnées de store, avec Glob : `**/fastlane/metadata/**` sous le dossier de l'application.
 - Pour le brouillon de fiche : `README.md` de l'application et de la racine, et la documentation du projet (`docs/`, hors `docs/wf/`).
 
@@ -180,7 +180,7 @@ Nouveautés iOS : <n> caractères / limite 4000 ; nouveautés Android : <n> cara
   - `release` signé avec `signingConfigs.debug`, ou sans `signingConfig` : à faire, oui ; Détail cite la ligne et nomme le cas (« signé avec la configuration `signingConfigs.debug` » ou « aucune configuration de signature »).
   - `release` signé par une configuration dédiée qui lit ses valeurs dans `key.properties` ou dans des variables : OK, non ; la présence ou l'absence de `key.properties` est indiquée sans le lire.
   - Mot de passe écrit en clair dans un fichier de build (`storePassword`, `keyPassword` affectés à une chaîne littérale dans `build.gradle`, `build.gradle.kts` ou `gradle.properties`) : à faire, avec le fichier et la ligne de chaque mot de passe (ex. « `storePassword` en clair, `<fichier>` l. 12 ; valeur non recopiée »), jamais la valeur. Bloquant : non si la signature est par ailleurs correcte (un mot de passe en clair n'empêche pas la soumission), oui si elle relève aussi du premier cas.
-- **Fichiers sensibles** (seulement s'il y en a sous `android/`) : comme pour iOS.
+- **Fichiers sensibles** (seulement s'il y en a sous `android/`, ou un `firebase_options.dart` sous `lib/`) : comme pour iOS.
 
 **Exigences qui évoluent** : le niveau minimal de `targetSdk` exigé par Google Play et la version minimale du SDK iOS ou de Xcode exigée par Apple changent avec le temps.
 - Ligne « targetSdk » (Checklist Android) : à vérifier, oui, la valeur relevée (`targetSdk`/`targetSdkVersion`, ou « non déterminé » si elle renvoie à `flutter.targetSdkVersion`) et le lien `https://developer.android.com/google/play/requirements/target-sdk`.
