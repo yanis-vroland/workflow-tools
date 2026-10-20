@@ -128,17 +128,61 @@ fi
 
 contract "injection : raison du refus" 'nom de fichier refusé (caractère spécial), jamais lu'
 contract "injection : argument sur plusieurs lignes écarté" 'plusieurs lignes'
+# Un délimiteur de heredoc recopié dans le corps fermerait le heredoc : la suite
+# s'exécuterait. Le refus vaut pour les sources de l'en-tête autant que pour les
+# arguments (relance).
+contract "injection : délimiteur ou plusieurs lignes refusés, en-tête compris" \
+  'un chemin de source (argument ou en-tête) sur plusieurs lignes, ou qui contient le délimiteur'
 contract "injection : chemin jamais recopié dans une commande" "n'est jamais recopié dans le texte d'une commande"
 
+# Anti-recopie : dans un bloc ```bash, un chemin (<chemin>, <fichier>) ne figure
+# que dans le corps d'un heredoc, jamais dans le texte d'une commande, même sans
+# guillemets
+if [ -f "$skill" ]; then
+  # shellcheck disable=SC2016 # motifs awk littéraux
+  outside=$(awk '
+    /^[[:space:]]*```bash$/ { on = 1; d = ""; next }
+    on && /^[[:space:]]*```$/ { on = 0; next }
+    !on { next }
+    d != "" { line = $0; sub(/^[[:space:]]+/, "", line); if (line == d) d = ""; next }
+    /<(chemin|fichier)[^>]*>/ { print NR ": " $0 }
+    match($0, /<<-?[[:space:]]*[\047"]?[A-Za-z_][A-Za-z0-9_]*/) {
+      d = substr($0, RSTART, RLENGTH); sub(/^<<-?[[:space:]]*[\047"]?/, "", d)
+    }
+  ' "$skill")
+  if [ -n "$outside" ]; then
+    ko "injection : un chemin est recopié hors du corps d'un heredoc dans un bloc bash ($(tr '\n' ' ' <<<"$outside"))"
+  else
+    ok "injection : chemins des blocs bash seulement dans le corps d'un heredoc"
+  fi
+fi
+
 # bash_block <délimiteur> : bloc ```bash de SKILL.md qui contient le heredoc
-# <<'<délimiteur>', sans son indentation
+# <<'<délimiteur>', tel qu'écrit (indentation comprise : recopié tel quel avec
+# son indentation, le bloc garderait la ligne de fin du heredoc indentée, qui ne
+# le fermerait pas, et des espaces devant chaque chemin)
 bash_block() {
   awk -v d="<<'$1'" '
     /^[[:space:]]*```bash$/ { on = 1; buf = ""; has = 0; next }
     on && /^[[:space:]]*```$/ { if (has) { printf "%s", buf; exit } on = 0; next }
-    on { line = $0; sub(/^[[:space:]]+/, "", line); buf = buf line "\n"; if (index(line, d)) has = 1 }
+    on { buf = buf $0 "\n"; if (index($0, d)) has = 1 }
   ' "$skill"
 }
+
+# Bloc à heredoc sans indentation : ```bash en début de ligne
+for delim in WF_SOURCES_7c3e WF_PDF_7c3e; do
+  [ -f "$skill" ] || break
+  fence=$(awk -v d="<<'$delim'" '
+    /^[[:space:]]*```bash$/ { on = 1; f = $0; next }
+    on && /^[[:space:]]*```$/ { on = 0; next }
+    on && index($0, d) { print f; exit }
+  ' "$skill")
+  if [ "$fence" = '```bash' ]; then
+    ok "injection : bloc <<'$delim' sans indentation"
+  else
+    ko "injection : bloc <<'$delim' indenté ou absent (recopié tel quel, sa ligne de fin ne fermerait pas le heredoc)"
+  fi
+done
 
 # run_block <shell> <bloc> <chemins, un par ligne> : lance le bloc dans $inj/run
 # avec les chemins dans le corps du heredoc, à la place de la ligne <chemin>
@@ -230,5 +274,13 @@ for sh in "${shells[@]}"; do
     ko "injection ($sh) : bloc PDF, arguments inattendus ($(tr '\n' ' ' <"$inj/log") ; $out)"
   fi
 done
+
+# --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------
+
+if ! command -v node >/dev/null 2>&1; then
+  ko "node introuvable : correcteurs des evals non vérifiés (tests/correcteurs/wf-cadrage-besoin.mjs)"
+elif ! node "$root/tests/correcteurs/wf-cadrage-besoin.mjs"; then
+  fail=1
+fi
 
 exit $fail
