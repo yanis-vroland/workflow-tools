@@ -6,7 +6,7 @@ argument-hint: "[référence git]"
 
 # wf-recette
 
-Tu prépares, en français, le cahier de recette du projet ouvert dans le répertoire courant (le projet cible) : la liste des vérifications manuelles que le client, le chef de projet ou un testeur conduira pour accepter une livraison. Tu prépares les cas ; les résultats (statut, commentaire) sont saisis à la main dans le livrable par ces personnes. Tu n'écris pas de tests automatisés (c'est `wf-tests-manquants`), ne rédiges ni ne corriges les specs ou les tickets (c'est `wf-specs-tickets`), et n'exécutes ni l'application ni les cas.
+Tu prépares, en français, le cahier de recette du projet situé dans le répertoire courant (le projet cible) : la liste des vérifications manuelles que le client, le chef de projet ou un testeur conduira pour accepter une livraison. Tu prépares les cas ; les résultats (statut, commentaire) sont saisis à la main dans le livrable par ces personnes. Tu n'écris pas de tests automatisés (c'est `wf-tests-manquants`), ne rédiges ni ne corriges les specs ou les tickets (c'est `wf-specs-tickets`), et n'exécutes ni l'application ni les cas.
 
 Arguments de la commande (vide si aucun) : $ARGUMENTS
 
@@ -29,7 +29,7 @@ Sans argument, tout le projet est couvert : passe à l'étape 2.
 
 Avec un argument, c'est une référence git (tag, branche ou commit) : la campagne ne porte que sur ce qui a changé depuis elle. Avant toute autre lecture :
 
-1. Si l'argument contient autre chose que des lettres, chiffres, `.`, `_`, `/` et `-`, ou commence par `-`, ne lance aucune commande avec lui : il est introuvable (point 3).
+1. Référence admise si elle vérifie l'expression `^[A-Za-z0-9][A-Za-z0-9._/~^-]*$` : un premier caractère alphanumérique, puis des lettres, chiffres, `.`, `_`, `/`, `-`, `~` et `^` (ex. `v1.2.0`, `HEAD~3`, `v1.2.0^`). Écrite sans guillemets, elle ne peut alors ni passer pour une option, ni déclencher d'expansion (`~` et `^` hors de la première position ne sont pas interprétés). Sinon, ne lance aucune commande avec elle : elle est introuvable (point 3).
 2. Lance `git log -1 --format=%h <ref> --`. Si la commande réussit, sa sortie est le commit de la référence (hash court) : retiens la référence et ce commit.
 3. Si la commande échoue (référence inconnue, ou répertoire hors dépôt git), n'écris ni ne modifie aucun livrable, même si `docs/wf/recette.md` existe déjà, et termine par ce message : « Référence <ref> introuvable dans le dépôt : aucun cahier de recette n'a été écrit ni modifié. »
 
@@ -39,18 +39,18 @@ Avec Glob et Read :
 
 - **Specs** : les fichiers `docs/specs/*.md`. Une spec est une source de cas si elle contient des critères d'acceptation numérotés (`CA1`, `CA2`…). Relève sa ligne de statut (ex. `Statut : brouillon`) : une spec dont le statut contient « brouillon » est une **spec brouillon**. Une spec sans critère numéroté est citée dans « Périmètre et sources » et dans « Points non déterminés » (« aucun critère numéroté »), sans produire de cas.
 - **Livrable de `wf-specs-tickets`** : `docs/wf/specs-tickets.md`, s'il existe (spec 006, contrat avec cet outil). Chaque ticket y est une sous-section titrée `Tnn : <titre>` (`T01`, `T02`…), dont la rubrique « Critères d'acceptation » contient des critères numérotés `CA1`, `CA2`… propres au ticket, cités ailleurs sous la forme `Tnn-CAn`. Lis-le sans jamais le modifier.
-- **Code** : fichiers de code (`.ts`, `.tsx`, `.js`, `.jsx`, `.vue`, `.dart`, `.py`, `.rb`, `.php`, `.go`, `.rs`, `.java`, `.kt`, `.swift`, `.cs`…) et manifestes (`package.json`, `pubspec.yaml`, `pyproject.toml`, `requirements.txt`, `go.mod`, `Cargo.toml`, `composer.json`, `Gemfile`, `pom.xml`, `build.gradle`), hors `node_modules/`, dossiers de build et fichiers générés. Stack : JavaScript/TypeScript (`package.json`) et Flutter (`pubspec.yaml`) sont couvertes en v1 ; toute autre stack (Python, PHP, Go…) est nommée d'après son manifeste ou ses fichiers.
+- **Code** : fichiers de code (`.ts`, `.tsx`, `.js`, `.jsx`, `.vue`, `.dart`, `.py`, `.rb`, `.php`, `.go`, `.rs`, `.java`, `.kt`, `.swift`, `.cs`…) et manifestes (`package.json`, `pubspec.yaml`, `pyproject.toml`, `requirements.txt`, `go.mod`, `Cargo.toml`, `composer.json`, `Gemfile`, `pom.xml`, `build.gradle`), hors `node_modules/`, dossiers de build et fichiers générés. Stack : JavaScript/TypeScript (`package.json`) et Flutter (`pubspec.yaml`) sont couvertes en v1 ; toute autre stack est nommée d'après son manifeste ou ses fichiers.
 
 Puis choisis le mode :
 
 - **Mode specs** : au moins une spec à critères numérotés, ou un livrable `wf-specs-tickets` avec au moins un ticket. Les cas viennent des critères ; le code sert seulement aux prérequis et à la couverture.
 - **Mode code** : ni l'un ni l'autre, et du code d'une stack couverte. Les cas sont déduits du code.
 - **Stack non couverte** : ni spec ni livrable `wf-specs-tickets`, et un code qui ne relève ni de JavaScript/TypeScript ni de Flutter. N'écris aucun livrable, ne déduis aucun cas du code, et termine par ce message : « Stack <nom> non couverte en v1 : aucun cas n'est déduit du code et aucun cahier de recette n'a été écrit. »
-- **Rien à recetter** : ni code source, ni spec, ni livrable `wf-specs-tickets` (répertoire vide, ou seulement des documents comme un brief ou des notes, qui ne sont pas des sources de cas). N'écris rien et termine par ce message : « Aucun code source ni aucune spec trouvé dans ce répertoire : aucun cahier de recette n'a été écrit. »
+- **Rien à recetter** : ni code source, ni spec, ni livrable `wf-specs-tickets` (répertoire vide, ou seulement des documents sans code ni spec, qui ne sont pas des sources de cas). N'écris rien et termine par ce message : « Aucun code source ni aucune spec trouvé dans ce répertoire : aucun cahier de recette n'a été écrit. »
 
 ## Étape 3 : périmètre de la campagne (avec une référence seulement)
 
-1. `git diff --name-only <ref> HEAD` : liste des fichiers modifiés depuis la référence.
+1. `git diff --name-only <ref> HEAD` : liste des fichiers modifiés depuis la référence, entre commits. Les modifications non commitées n'y figurent pas : si l'en-tête porte « modifications non commitées », « Périmètre et sources » le précise sur la ligne de la référence.
 2. Specs : seules les specs de cette liste produisent des cas (tous leurs critères).
 3. Tickets : si `docs/wf/specs-tickets.md` est dans la liste, lance `git show <ref>:docs/wf/specs-tickets.md`. Un ticket est **modifié** si le contenu de sa sous-section `Tnn` (de son titre jusqu'au titre suivant de même niveau ou de niveau supérieur) diffère entre cette sortie et le fichier actuel, ou s'il n'existait pas à la référence ; si la commande échoue (fichier absent à la référence), tous les tickets sont modifiés. Seuls les tickets modifiés produisent des cas. Si le fichier n'est pas dans la liste, aucun ticket n'en produit.
 4. Code : en mode code, seuls les fichiers de code de la liste produisent des cas ; en mode specs, « Fonctionnalités sans spec » ne porte que sur les fichiers de code de la liste.
@@ -112,7 +112,7 @@ Dernier identifiant attribué : REC-<nnn>
 
 ## Périmètre et sources
 
-[Campagne limitée aux changements depuis la référence `<ref>` (commit `<sha court>`).]
+[Campagne limitée aux changements depuis la référence `<ref>` (commit `<sha court>`)[ ; les modifications non commitées ne sont pas couvertes par la référence].]
 [Avertissement du mode code, voir plus bas.]
 
 - Specs : `docs/specs/<fichier>.md`[ (spec brouillon)], …
