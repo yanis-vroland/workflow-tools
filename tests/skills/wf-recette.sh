@@ -208,6 +208,16 @@ else
   [ "$ref_ok" -eq 1 ] && ok "CA16, CA17 expression des références admises ($ref_re)"
 fi
 cite "CA16, CA17 référence jamais entre guillemets" "sans guillemets"
+# Injection d'option git : une référence qui commence par « - » (nom de branche
+# valide pour git) ferait lire une option, même entre apostrophes.
+cite "CA17 référence commençant par « - » jamais insérée" \
+  "Une valeur qui commence par \`-\` n'est jamais insérée dans une commande"
+eoo_missing=$(grep -oE '`git [^`]*<ref>[^`]*`' <<<"$body" | grep -vF -- '--end-of-options <ref>' || true)
+if [ -z "$eoo_missing" ] && grep -qF -- '--end-of-options <ref>' <<<"$body"; then
+  ok "CA16, CA17 chaque commande git qui reçoit la référence porte --end-of-options juste avant elle"
+else
+  ko "CA16, CA17 --end-of-options absent avant la référence (${eoo_missing:-aucun gabarit avec <ref>})"
+fi
 # Aucune commande prescrite (entre accents graves) ne place un texte variable
 # <…> entre guillemets doubles, où $(…) ou des accents graves seraient évalués.
 if grep -qE '`[^`]*"[^"`]*<[^>`]+>[^"`]*"[^`]*`' <<<"$body"; then
@@ -217,8 +227,8 @@ else
 fi
 # Seules les commandes de la liste blanche citent <ref>
 unexpected=$(grep -oE '`git [^`]*<ref>[^`]*`' <<<"$body" | sort -u |
-  grep -vxF -e '`git log -1 --format=%h <ref> --`' -e '`git diff --name-only <ref> HEAD`' \
-    -e '`git show <ref>:docs/wf/specs-tickets.md`' || true)
+  grep -vxF -e '`git log -1 --format=%h --end-of-options <ref> --`' -e '`git diff --name-only --end-of-options <ref> HEAD`' \
+    -e '`git show --end-of-options <ref>:docs/wf/specs-tickets.md`' || true)
 if [ -z "$unexpected" ]; then
   ok "CA16 seules les trois commandes prescrites reçoivent la référence"
 else

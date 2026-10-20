@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Bash
-input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git log -1 --format=%h v1\.3\.0 --|git diff --name-only v1\.3\.0 HEAD|git show v1\.3\.0:docs/wf/specs-tickets\.md)")'
+input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git log -1 --format=%h --end-of-options v1\.3\.0 --|git diff --name-only --end-of-options v1\.3\.0 HEAD|git show --end-of-options v1\.3\.0:docs/wf/specs-tickets\.md)")'
 min: 0
 max: 0
 ---

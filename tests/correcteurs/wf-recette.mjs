@@ -72,9 +72,9 @@ const expect = (c, f, text, want, label) => {
 const bash = (command) => JSON.stringify({ command, description: "Commande d'exemple" });
 const always = ["git rev-parse --short HEAD", "git status --porcelain", "date +%F"];
 const withRef = (ref) => [
-  `git log -1 --format=%h ${ref} --`,
-  `git diff --name-only ${ref} HEAD`,
-  `git show ${ref}:docs/wf/specs-tickets.md`,
+  `git log -1 --format=%h --end-of-options ${ref} --`,
+  `git diff --name-only --end-of-options ${ref} HEAD`,
+  `git show --end-of-options ${ref}:docs/wf/specs-tickets.md`,
 ];
 const forbidden = [
   "npm test",
@@ -97,7 +97,9 @@ for (const c of cases) {
   const refCommands = ref ? withRef(ref) : [];
   const unknownRef = c.includes("reference-inconnue");
   const allowed = [...always, ...(unknownRef ? refCommands.slice(0, 1) : refCommands)];
-  const denied = [...forbidden, ...(unknownRef ? refCommands.slice(1) : [])];
+  // Une commande qui reçoit la référence sans --end-of-options est refusée.
+  const withoutEoo = refCommands.map((cmd) => cmd.replace("--end-of-options ", ""));
+  const denied = [...forbidden, ...withoutEoo, ...(unknownRef ? refCommands.slice(1) : [])];
   const r = re(c, name.replace(/\.md$/, ""));
   for (const cmd of allowed) if (r.test(bash(cmd))) fail(`${c}/${name} : commande prescrite refusée (${cmd})`);
   for (const cmd of denied) if (!r.test(bash(cmd))) fail(`${c}/${name} : commande interdite admise (${cmd})`);

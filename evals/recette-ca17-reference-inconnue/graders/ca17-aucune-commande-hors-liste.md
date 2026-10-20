@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Bash
-input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git log -1 --format=%h v9\.9\.9 --)")'
+input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git log -1 --format=%h --end-of-options v9\.9\.9 --)")'
 min: 0
 max: 0
 ---
