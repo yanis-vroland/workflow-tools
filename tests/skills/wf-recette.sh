@@ -126,6 +126,20 @@ done
 cite "CA9 identifiants jamais réutilisés : dernier identifiant attribué" "Dernier identifiant attribué"
 in_model "CA10 sous-section « Cas retirés »" "Cas retirés"
 
+# CA9 : les saisies humaines des cas hors campagne survivent à la relance
+# suivante. L'étape de lecture du cahier existant relève aussi ces entrées, et
+# les règles de rapprochement les réintègrent ou les reconduisent.
+step5=$(awk '/^## Étape 5/ { in_step = 1; next } in_step && /^## / { exit } in_step' <<<"$body")
+if grep -qF -- "chaque entrée de « Cas hors campagne » : ID, Fonctionnalité, Source, Statut, Commentaire" <<<"$step5"; then
+  ok "CA9 la relance relève les entrées de « Cas hors campagne » (statut et commentaire)"
+else
+  ko "CA9 la relance relève les entrées de « Cas hors campagne » (absent de l'étape 5)"
+fi
+cite "CA9 un cas hors campagne qui rentre dans le périmètre revient au tableau" \
+  "revient au tableau avec son ID, son Statut et son Commentaire"
+cite "CA9 un cas hors campagne toujours hors périmètre est reconduit tel quel" \
+  "reconduit tel quel sous « Cas hors campagne »"
+
 # --- CA11, CA12 : couverture ------------------------------------------------------
 
 in_model "CA11 sous-section « Critères non recettables manuellement »" \
