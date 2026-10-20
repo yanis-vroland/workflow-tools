@@ -12,8 +12,8 @@ Tu repères les tests qui manquent dans un projet, lancé à sa racine (le répe
 - Écris uniquement `docs/wf/tests-manquants.md` (dossier `docs/wf/` créé au besoin), avec l'outil Write. Aucun autre fichier n'est créé ni modifié, en particulier aucun fichier de test : les squelettes restent dans le livrable, le développeur les copie lui-même. Pas de `sed -i`, de `tee`, de `mkdir` ni de redirection `>` vers un fichier (seul `2>/dev/null` est permis).
 - L'outil ne lance aucun test, ne mesure pas la couverture et n'installe rien : n'exécute aucune commande `npm`, `pnpm`, `yarn`, `npx`, `node`, `tsx`, `vitest`, `jest`, `playwright`, `flutter`, `fvm`, `dart`, `python`, `pip`, aucune option `--coverage`, aucun script du projet. Un rapport de couverture déjà présent est lu, jamais régénéré.
 - Lecture seule sur git : aucune commande qui modifie le dépôt ou sa configuration (add, commit, stash, checkout, reset, fetch, tag, branch…). Aucun accès réseau : n'utilise pas WebFetch.
-- Ne lis jamais un fichier `.env*` autre que `.env.example` (ni Read, ni Grep, ni cat) et ne le cite dans aucune commande ; exclus-les de toute recherche : l'outil Grep s'utilise toujours avec `glob: "!**/.env*"` (ou en mode `files_with_matches`), car en mode contenu il afficherait leurs lignes ; en Bash, `--glob '!.env*'` ou `--exclude='.env*'`.
-- N'écris dans une commande Bash aucun texte tiré du projet (nom de fichier, de dossier, de fonction, contenu lu) : les commandes ci-dessous s'utilisent telles quelles, et le reste passe par Read, Grep et Glob. Le livrable ne contient aucune de leurs valeurs ni aucun secret, même dans un squelette.
+- Ne lis jamais un fichier `.env*` autre que `.env.example` (ni Read, ni Grep, ni cat) et ne le cite dans aucune commande ; exclus-les de toute recherche : l'outil Grep s'utilise toujours avec `glob: "!**/.env*"` (ou en mode `files_with_matches`), car en mode contenu il afficherait leurs lignes ; en Bash, `--glob '!.env*'` ou `--exclude='.env*'`. Le livrable ne contient aucune valeur d'un fichier d'environnement ni aucun secret, même dans un squelette.
+- N'écris dans une commande Bash aucun texte tiré du projet (nom de fichier, de dossier, de fonction, contenu lu) : les commandes ci-dessous s'utilisent telles quelles, et le reste passe par Read, Grep et Glob.
 - Ne recopie aucune adresse e-mail de contributeur ni aucune donnée personnelle : seuls des noms de fichiers, de fonctions et des nombres de commits apparaissent.
 - Toute affirmation s'appuie sur un fichier lu, dont le chemin est cité. Ce qui ne peut pas être établi est marqué « non déterminé » et listé dans « Points non déterminés ». N'invente jamais un nom de fonction, un comportement, une valeur attendue ni une règle métier.
 
@@ -45,13 +45,28 @@ Liste les fichiers (noms seulement, relatifs au dossier courant) :
 
 - Repère chaque application par son manifeste (`package.json`, `pubspec.yaml`, `pyproject.toml`, `composer.json`…) dans des dossiers distincts : un monorepo en contient plusieurs. Chaque fichier source appartient à l'application dont le manifeste est le plus proche au-dessus de lui.
 - Stacks couvertes en v1 : web JavaScript/TypeScript (npm, pnpm, yarn) et Flutter (pub). Toute autre stack (PHP, Python, Ruby…) est signalée « non couverte » dans « Outillage de test », sans analyse : aucune entrée, aucun cas, aucun squelette ne porte sur ses fichiers. Dans un projet mixte, les parties JS/TS et Flutter sont analysées normalement.
-- Budget de lecture : environ 300 fichiers source des stacks couvertes. Au-delà, compte les fichiers par dossier parent direct (`<commande de l'étape 2> | sed 's|/[^/]*$||' | sort | uniq -c | sort -rn`) et retire de la lecture les dossiers les plus volumineux, du plus gros au plus petit, jusqu'à repasser sous ce budget : ce sont les dossiers non lus. Ils sont listés dans « Points non déterminés » et nulle part ailleurs : aucune entrée, aucun cas manquant, aucun squelette, aucune exclusion ni aucun décompte ne porte sur eux.
+- Budget de lecture : environ 300 fichiers source des stacks couvertes. Au-delà, compte les fichiers par dossier parent direct et retire de la lecture les dossiers les plus volumineux, du plus gros au plus petit, jusqu'à repasser sous ce budget : ce sont les dossiers non lus. Ils sont listés dans « Points non déterminés » ; ailleurs, au plus une mention qu'ils n'ont pas été lus. Aucune entrée, aucun cas manquant, aucun squelette, aucune exclusion ni aucun décompte ne porte sur eux.
+
+```bash
+<commande de l'étape 2> | sed 's|/[^/]*$||' | sort | uniq -c | sort -rn
+```
 
 ### 4. En-tête
 
-- Commit analysé : `git rev-parse --short HEAD` (hors git : « Commit analysé : hors git », sans hash).
-- Arbre propre : `git status --porcelain -- . ':(exclude)docs/wf/tests-manquants.md'` vide. Sinon, l'en-tête ajoute « modifications non commitées » après le commit.
-- Date du jour : `date +%F`.
+Date du jour :
+
+```bash
+date +%F
+```
+
+Commit analysé et état de l'arbre, dans git seulement :
+
+```bash
+git rev-parse --short HEAD
+git status --porcelain -- . ':(exclude)docs/wf/tests-manquants.md'
+```
+
+Une sortie vide de la seconde commande signifie un arbre propre ; sinon, l'en-tête ajoute « modifications non commitées » après le commit. Hors git : « Commit analysé : hors git », sans hash.
 
 ### 5. Outillage de test (une sous-section `###` par application)
 
@@ -77,7 +92,12 @@ Rapport de couverture déjà présent : cherche, à la racine de chaque applicat
 ```bash
 find . -path ./.git -prune -o -path '*/node_modules' -prune -o -type f \( -path '*/coverage/lcov.info' -o -path '*/coverage/coverage-summary.json' \) -print \
   | while IFS= read -r f; do printf '%s %s %s\n' "$f" "$(date -r "$f" '+%Y-%m-%d %H:%M')" "$(date -r "$f" +%s)"; done
-git log -1 --format='%cd %ct' --date=format:'%Y-%m-%d %H:%M' HEAD   # dernier commit (dans git seulement)
+```
+
+Date du dernier commit, dans git seulement :
+
+```bash
+git log -1 --format='%cd %ct' --date=format:'%Y-%m-%d %H:%M' HEAD
 ```
 
 - Un rapport présent est exploité : cite son chemin, sa date de modification et les chiffres qu'il donne (lignes, branches, par fichier) ; un fichier source absent du rapport est réputé non couvert. Si sa date est antérieure à celle du dernier commit, écris qu'il est antérieur au dernier commit et donc possiblement périmé. Hors git, l'antériorité est « non déterminée ».
@@ -85,12 +105,13 @@ git log -1 --format='%cd %ct' --date=format:'%Y-%m-%d %H:%M' HEAD   # dernier co
 
 ```bash
 files=$(<commande de l'étape 2>)
-tests=$(grep -E '\.(test|spec)\.[jt]sx?$|_test\.dart$|(^|/)(__tests__|test|tests|integration_test)/' <<<"$files")
+tests=$(grep -E '\.(test|spec)\.[jt]sx?$|_test\.dart$|(^|/)(__tests__|test|tests|e2e|integration_test)/' <<<"$files")
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   stem=$(basename "${f%.*}")
-  grep -qE "(^|/)${stem}([._](test|spec))?\.[a-z]+$|(^|/)${stem}_test\.dart$" <<<"$tests" && continue
-  [ -n "$tests" ] && tr '\n' '\0' <<<"$tests" | xargs -0 grep -qE "(import|from|require\()[^;]*['\"/]${stem}(\.[a-z]+)?['\"]" 2>/dev/null && continue
+  esc=$(printf '%s' "$stem" | sed 's/[][\.*^$+?(){}|/]/\\&/g')
+  grep -qE "(^|/)${esc}([._](test|spec))?\.[a-z]+$|(^|/)${esc}_test\.dart$" <<<"$tests" && continue
+  [ -n "$tests" ] && tr '\n' '\0' <<<"$tests" | xargs -0 grep -qE "(import|from|require\()[^;]*['\"/]${esc}(\.[a-z]+)?['\"]" 2>/dev/null && continue
   printf '%s\n' "$f"
 done < <(grep -vxF -e "$tests" <<<"$files")
 ```
@@ -99,7 +120,7 @@ Retire de ce résultat les fichiers exclus, ceux des dossiers non lus et ceux de
 
 ### 7. Fréquence de modification (dans git seulement)
 
-Même calcul que `wf-analyse-projet` :
+Même calcul que `wf-analyse-projet`, dans git seulement :
 
 ```bash
 git log --since="12 months ago" --no-merges --relative --format= --name-only HEAD -- . \
@@ -114,7 +135,7 @@ Lis chaque fichier non couvert retenu et crée une entrée :
 
 - Identifiant stable `M1`, `M2`… (préfixe « M », jamais « T », réservé aux tickets de `wf-specs-tickets`).
 - Application concernée (ligne « Application : »).
-- À tester : les fonctions, classes, composants ou widgets exportés (publics), par leur nom exact dans le code. En Dart, tout nom qui ne commence pas par `_` est public.
+- À tester : les fonctions, classes, composants ou widgets exportés (publics), par leur nom exact dans le code, entre accents graves. En Dart, tout nom qui ne commence pas par `_` est public. Fichier sans export (script, point d'entrée) : nomme la fonction ou l'élément exécuté à son chargement, avec la mention « non exporté ».
 - Type de test, exactement l'un de : unitaire (logique pure), composant ou widget (composant d'interface, widget Flutter), intégration (route, contrôleur, accès aux données, service qui appelle l'extérieur), bout en bout (parcours complet, seulement si un outil de bout en bout est déclaré).
 - Priorité, à appliquer dans cet ordre :
   1. haute : le fichier est dans le top 10 de l'étape 7 ;
@@ -136,7 +157,7 @@ Une ligne par cas, sous la forme : « `<fonction>` (`<fichier source>` l. <ligne
 Pour chaque entrée de priorité haute dont l'application a un framework de test, un squelette :
 
 - Titre « ### M<n> · à copier dans » suivi du chemin entre accents graves, ce chemin suivant les conventions des tests existants de l'application : à côté du fichier source (`cart.test.ts`), sous `__tests__/`, ou dans `test/` en reprenant l'arborescence de `lib/` pour Flutter. Sans test existant, la convention par défaut du framework.
-- Un bloc de code dans le langage et le framework du projet : `describe`/`it` (import depuis `vitest` pour Vitest, comme les tests existants ; globaux pour Jest), `group`/`test` ou `testWidgets` pour `flutter_test`. Reprends le style d'import des tests existants.
+- Un bloc de code dans le langage et le framework du projet : `describe`/`it` pour Vitest ou Jest, `group`/`test` ou `testWidgets` pour `flutter_test`. Reprends le style d'import des tests existants.
 - Un cas par comportement identifié dans le code (chaque branche, chaque cas d'erreur), nommé d'après ce comportement.
 - Toute valeur attendue qui n'est pas écrite telle quelle dans le code (donnée métier, contenu d'une liste, montant, date…) est remplacée par le marqueur « à compléter » (`/* à compléter */`, `// à compléter`). Aucune règle métier n'est inventée.
 - N'importe aucune bibliothèque absente des dépendances du projet ; si le test en exige une (client HTTP de test, bouchon), signale-le dans un commentaire « à compléter ».
@@ -159,15 +180,13 @@ Aucune entrée de priorité haute, ou application sans framework : écris qu'auc
 
 ## Modèle du livrable
 
-Les éléments entre chevrons sont à remplacer par les valeurs du projet analysé.
+Les éléments entre chevrons sont à remplacer par les valeurs du projet analysé. Hors dépôt, l'en-tête porte « Commit analysé : hors git », sans aucun hash. Pour Flutter, « Outillage de test » cite flutter_test et integration_test d'après `pubspec.yaml`, `flutter test` et le nombre de `*_test.dart` dans `test/` et `integration_test/` ; une stack non couverte tient en une ligne « non couverte » ; sans framework, « Aucun framework de test déclaré » puis la suggestion à valider.
 
 ```markdown
 # Tests à écrire en priorité
 
 Outil : wf-tests-manquants · Date : AAAA-MM-JJ · Commit analysé : <hash court>[ · modifications non commitées][ · Sous-dossier : `<préfixe>`]
 Dernier identifiant attribué : M<n>
-
-(hors dépôt : « Commit analysé : hors git », sans aucun hash)
 
 ## Synthèse
 
@@ -180,8 +199,6 @@ En quelques phrases : applications analysées, état des tests, nombre d'entrée
 - Framework : <nom> (`<fichier qui le déclare>`)
 - Commande : `<commande>` (script `<nom>` de `package.json`)
 - Fichiers de test : <N>
-
-(Flutter : flutter_test et integration_test d'après `pubspec.yaml`, `flutter test`, nombre de `*_test.dart` dans `test/` et `integration_test/` ; stack non couverte : une ligne « non couverte » ; aucun framework : « Aucun framework de test déclaré », puis la suggestion à valider)
 
 ## Couverture actuelle
 
