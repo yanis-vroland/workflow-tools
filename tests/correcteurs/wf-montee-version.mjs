@@ -227,8 +227,10 @@ check(
 check(
   "CA9 registre interrogé pour react",
   "montee-version-ca09-version-inexistante/ca09-registre-interroge.md",
-  ["curl -sf https://registry.npmjs.org/react/99.0.0", "for p in 'react'; do curl -sf \"https://registry.npmjs.org/$p\"; done"].map(bash),
-  ["curl -sf https://registry.npmjs.org/react-dom/latest", "grep react package-lock.json", "curl -sf https://pub.dev/api/packages/react"].map(bash),
+  ["curl -sf https://registry.npmjs.org/react/99.0.0", "for p in 'react'; do curl -sf \"https://registry.npmjs.org/$p\"; done",
+    "while read -r p v; do curl -s \"https://registry.npmjs.org/$p\"; done <<'WF_NOMS_7c1e'\nreact 99.0.0\nWF_NOMS_7c1e"].map(bash),
+  ["curl -sf https://registry.npmjs.org/react-dom/latest", "grep react package-lock.json", "curl -sf https://pub.dev/api/packages/react",
+    "while read -r p v; do curl -s \"https://registry.npmjs.org/$p\"; done <<'WF_NOMS_7c1e'\nreact-dom 19\n@types/react\nWF_NOMS_7c1e"].map(bash),
 );
 check(
   "CA14 métadonnées de react-dom",

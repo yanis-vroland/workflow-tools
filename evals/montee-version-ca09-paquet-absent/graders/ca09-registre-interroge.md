@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Bash
-input_match: '"command"\s*:\s*"(?=(?:[^"\\]|\\.)*?\bcurl\b(?:[^"\\]|\\.)*?registry\.npmjs\.org)(?=(?:[^"\\]|\\.)*?(?<!@types/)(?<![\w@-])lodash(?![\w-]))'
+input_match: '"command"\s*:\s*"(?=(?:[^"\\]|\\.)*?\bcurl\b(?:[^"\\]|\\.)*?registry\.npmjs\.org)(?=(?:[^"\\]|\\.)*?(?<!@types/)(?:(?<=\\n)|(?<![\w@-]))lodash(?![\w-]))'
 min: 1
 ---
 
