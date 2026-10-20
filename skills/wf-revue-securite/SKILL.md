@@ -11,7 +11,7 @@ Tu rédiges, en français, une revue de sécurité du projet ouvert dans le rép
 
 - **Écriture** : un seul fichier, `docs/wf/revue-securite.md`, écrit avec l'outil Write (qui crée `docs/wf/` au besoin ; pas de `mkdir`). Aucun autre fichier du projet n'est créé, modifié, déplacé ou supprimé, y compris les livrables des autres outils dans `docs/wf/`. Tu recommandes des corrections, tu n'en appliques aucune.
 - **Analyse statique seulement** : ni test d'intrusion, ni requête vers une instance du projet, ni exécution du projet, de ses tests, de son installation ou de ses outils (npm, npx, yarn, pnpm, node, flutter, dart, docker…), ni analyseur externe (Semgrep, gitleaks, osv-scanner, audit de gestionnaire de paquets…), ni recherche dans l'historique git (`git log`, `git show`, `git grep`, `git blame`…) : seul l'état courant des fichiers compte.
-- **Bash** ne sert qu'aux commandes données dans cette skill, recopiées telles quelles : `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F`, les deux `git ls-files` de l'étape 2, et les interrogations par `curl` de l'étape 4. Aucune autre commande, même en lecture (`ls`, `cat`, `find`, `grep`…) : pour lire, utilise Read, Glob et Grep.
+- **Bash** ne sert qu'aux commandes données dans cette skill, recopiées telles quelles : `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F`, les deux `git ls-files` de l'étape 2 (chacune seule, sans rien y ajouter), et les interrogations par `curl` de l'étape 4. Aucune autre commande, même en lecture (`ls`, `cat`, `find`, `grep`…) : pour lire, utilise Read, Glob et Grep.
 - **Réseau** : seulement `api.osv.dev` (base d'avis de sécurité) et `pub.dev` (dépendances déclarées d'un paquet pub), en lecture. Tu n'envoies que des noms et des versions de paquets, jamais de code ni de contenu du projet.
 - **Secrets** : ne lis jamais, ni avec Read, ni avec Grep, ni avec Bash, un fichier d'environnement (`.env`, `.env.local`, `.env.production`…, tout `.env*` sauf `.env.example`) ni un fichier de secrets ou d'identifiants (`.envrc`, `.npmrc`, `.pypirc`, `android/key.properties`, keystores, clés et certificats). Leur seul nom, obtenu par `git ls-files`, peut être cité. Avec Grep, passe toujours le paramètre `glob` limité à des extensions de code (ex. `*.{ts,tsx,js,jsx,mjs,cjs,vue,dart}`) : un dossier seul peut contenir un fichier d'environnement.
 - **Aucune valeur secrète dans le livrable** : toute valeur littérale de secret est remplacée par `[masqué]`. Aucun caractère de la valeur n'y figure : ni début, ni fin, ni longueur, ni ligne de code recopiée qui la contient.
@@ -62,8 +62,6 @@ Identifiants `Sn` (un seul espace de numérotation pour les dépendances et les 
 
 Premier passage : numérote à partir de `S1`, dans l'ordre du livrable. Tant qu'aucun identifiant n'a été attribué, la ligne de l'en-tête porte « Dernier identifiant attribué : aucun ».
 
-Si OSV.dev est injoignable à la relance, une entrée de « Dépendances vulnérables » du livrable précédent dont la même version figure toujours dans le lockfile est conservée avec son identifiant, sous la mention de l'étape 4 ; les autres sont retirées.
-
 ## Étape 4 : dépendances vulnérables
 
 ### Versions et liens
@@ -76,53 +74,65 @@ Si OSV.dev est injoignable à la relance, une entrée de « Dépendances vulnér
 
 ### Interroger OSV.dev
 
-Avant d'écrire un nom ou une version dans une commande, vérifie qu'il ne contient que des caractères `A-Za-z0-9@/._+-` (donc ni apostrophe, ni guillemet, ni `$`, ni accent grave) ; sinon ne l'écris jamais dans une commande et signale-le comme non vérifié. Chaque nom et chaque version est écrit entre apostrophes simples. Écosystèmes OSV : `"npm"` pour npm, pnpm et yarn, `"Pub"` pour pub. Au plus 500 paquets par commande ; au-delà, plusieurs commandes.
+Un nom, une version ou un identifiant d'avis lu dans le projet ou dans une réponse n'est **jamais écrit dans le texte d'une commande**, même entre apostrophes : bash l'analyserait avant toute validation, et un nom piégé (apostrophe suivie d'une substitution de commande) s'exécuterait. Il est écrit, un paquet ou un avis par ligne (les lignes de paquets commencent par le mot `paquet`, recopié tel quel), dans le corps d'un heredoc dont le délimiteur est entre apostrophes (`<<'OSV_PKGS_9f2c'`) : bash n'interprète rien de ce corps. Avant de l'y écrire, écarte toute ligne qui contient le délimiteur, une espace dans un nom ou une version, ou un retour à la ligne, et signale le paquet comme non vérifié. Chaque valeur est ensuite validée en bash avant tout usage : seuls les caractères `A-Za-z0-9@/._~+-` sont admis (donc ni apostrophe, ni guillemet, ni `$`, ni accent grave) ; une ligne refusée est signalée comme non vérifiée dans « Points non déterminés ». Écosystèmes OSV : `npm` pour npm, pnpm et yarn, `Pub` pour pub. Au plus 500 paquets par commande ; au-delà, plusieurs commandes.
 
 ```bash
 q=""; labels=()
 q_add() {
-  [[ $2 =~ ^(@[a-z0-9._-]+/)?[a-z0-9._-]+$ && $3 =~ ^[0-9A-Za-z.+-]+$ ]] || { echo "$1 $2 $3 : nom ou version invalide, non vérifié"; return; }
+  [[ ($1 == npm || $1 == Pub) && $2 =~ ^(@[A-Za-z0-9._~-]+/)?[A-Za-z0-9._~-]+$ && $3 =~ ^[0-9A-Za-z.+-]+$ ]] || { echo "paquet ignoré, nom ou version invalide (non vérifié) : $1 $2 $3"; return; }
   q+="${q:+,}{\"package\":{\"ecosystem\":\"$1\",\"name\":\"$2\"},\"version\":\"$3\"}"
   labels+=("$1 $2 $3")
 }
-q_add "npm" '<nom>' '<version>'
-q_add "Pub" '<nom>' '<version>'
+while read -r _ eco name version; do q_add "$eco" "$name" "$version"; done <<'OSV_PKGS_9f2c'
+paquet npm <nom> <version>
+paquet Pub <nom> <version>
+OSV_PKGS_9f2c
 out=$(curl -sS --max-time 60 -w '\n%{http_code}' -H 'Content-Type: application/json' -d "{\"queries\":[$q]}" https://api.osv.dev/v1/querybatch); rc=$?; code=${out##*$'\n'}
 if [ "$rc:$code" = "0:200" ]; then
   i=0
   while IFS= read -r item; do
     ids=$(grep -oE '"id":"[^"]+"' <<<"$item" | cut -d'"' -f4 | tr '\n' ' ')
     [ -n "$ids" ] && echo "${labels[$i]} : $ids"
+    case $item in *next_page_token*) echo "${labels[$i]} : réponse paginée, avis incomplets (non déterminé)" ;; esac
     i=$((i + 1))
-  done < <(printf '%s' "${out%$'\n'*}" | tr -d ' \n\r\t' | grep -oE '\{"vulns":\[[^]]*\]\}|\{\}')
+  done < <(printf '%s' "${out%$'\n'*}" | tr -d ' \n\r\t' | grep -oE '\{"vulns":\[[^]]*\][^{}]*\}|\{\}')
   echo "osv.dev : ${#labels[@]} paquets interrogés, $i réponses"
 else
   echo "osv.dev injoignable (curl $rc, HTTP $code)"
 fi
 ```
 
-Si le nombre de réponses diffère du nombre de paquets interrogés, les paquets sans réponse sont « non déterminé » et vont dans « Points non déterminés ». Puis, pour chaque identifiant d'avis renvoyé, lis l'avis :
+Si le nombre de réponses diffère du nombre de paquets interrogés, ou si une réponse est paginée, les paquets concernés sont « non déterminé » et vont dans « Points non déterminés ». Puis, pour chaque identifiant d'avis renvoyé (un par ligne du heredoc), lis l'avis :
 
 ```bash
-for id in '<identifiant>' '<identifiant>'; do
-  [[ $id =~ ^[A-Za-z0-9._:-]+$ ]] || { echo "$id : identifiant invalide, ignoré"; continue; }
+while read -r id; do
+  [[ $id =~ ^[A-Za-z0-9._:-]+$ ]] || { echo "identifiant d'avis invalide, ignoré : $id"; continue; }
   out=$(curl -sS --max-time 20 -w '\n%{http_code}' "https://api.osv.dev/v1/vulns/$id"); rc=$?; code=${out##*$'\n'}
   if [ "$rc:$code" = "0:200" ]; then
-    printf '%s' "${out%$'\n'*}" | tr -d '\n' | sed -E 's/"details": ?"([^"\\]|\\.)*",?//; s/"references": ?\[[^]]*\],?//'; echo
+    printf '%s' "${out%$'\n'*}" | tr -d '\n' | sed -E 's/"details": ?"([^"\\]|\\.)*",?//; s/"references": ?\[[^]]*\],?//; s/,? ?"versions": ?\[[^]]*\]//g'; echo
   else
     echo "osv.dev injoignable pour $id (curl $rc, HTTP $code)"
   fi
-done
+done <<'OSV_IDS_9f2c'
+<identifiant>
+OSV_IDS_9f2c
 ```
 
-Dépendances déclarées d'un paquet pub (lien d'une transitive pub seulement) :
+Dépendances déclarées d'un paquet pub (lien d'une transitive pub seulement ; une ligne `paquet <nom> <version>` par dépendance directe) :
 
 ```bash
-for p in '<nom>@<version>'; do
-  [[ $p =~ ^[a-z0-9_]+@[0-9A-Za-z.+-]+$ ]] || { echo "$p : invalide, ignoré"; continue; }
-  out=$(curl -sS --max-time 20 -w '\n%{http_code}' "https://pub.dev/api/packages/${p%@*}/versions/${p#*@}"); rc=$?; code=${out##*$'\n'}
-  if [ "$rc:$code" = "0:200" ]; then grep -oE '"dependencies":\{[^}]*\}' <<<"${out%$'\n'*}" | head -1; else echo "pub.dev injoignable pour $p (curl $rc, HTTP $code)"; fi
-done
+while read -r _ name version; do
+  [[ $name =~ ^[a-z0-9_]+$ && $version =~ ^[0-9A-Za-z.+-]+$ ]] || { echo "paquet pub invalide, ignoré : $name $version"; continue; }
+  out=$(curl -sS --max-time 20 -w '\n%{http_code}' "https://pub.dev/api/packages/$name/versions/$version"); rc=$?; code=${out##*$'\n'}
+  if [ "$rc:$code" = "0:200" ]; then
+    deps=$(printf '%s' "${out%$'\n'*}" | tr -d '\n' | awk '{ i = index($0, "\"dependencies\":{"); if (!i) exit; d = 0; for (j = i + 15; j <= length($0); j++) { c = substr($0, j, 1); if (c == "{") d++; else if (c == "}" && --d == 0) { print substr($0, i, j - i + 1); exit } } }')
+    echo "$name $version : ${deps:-aucune dépendance déclarée}"
+  else
+    echo "pub.dev injoignable pour $name $version (curl $rc, HTTP $code)"
+  fi
+done <<'PUB_PKGS_9f2c'
+paquet <nom> <version>
+PUB_PKGS_9f2c
 ```
 
 ### Ce qu'on retient de chaque avis
@@ -135,7 +145,7 @@ done
 
 ### Base d'avis injoignable
 
-Si OSV.dev ne répond pas (sortie « osv.dev injoignable »), « Dépendances vulnérables » porte exactement « non déterminé (base d'avis injoignable) », sans aucun avis cité, et « Points non déterminés » le reprend ; la « Synthèse » donne les dépendances comme non déterminées. Seules les entrées conservées de l'étape 3 restent dans le tableau, sous cette mention : « entrées reprises du livrable du AAAA-MM-JJ, non revérifiées ». Le reste de la revue est produit normalement.
+Si OSV.dev ne répond pas (sortie « osv.dev injoignable »), « Dépendances vulnérables » porte exactement « non déterminé (base d'avis injoignable) », sans aucun avis cité, et « Points non déterminés » le reprend ; la « Synthèse » donne les dépendances comme non déterminées. Aucune entrée de dépendance du livrable précédent n'est reconduite : ses identifiants sont retirés (étape 3) et ne seront jamais réattribués. Le reste de la revue est produit normalement.
 
 ## Étape 5 : constats dans le code et secrets
 
