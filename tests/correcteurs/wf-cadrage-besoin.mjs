@@ -102,6 +102,7 @@ const francais = [
   "- Liste to-do du technicien.",
   "- Q01 (B01) : « The app must be fast » (brief-en.md, « Constraints ») : quel temps de réponse ?",
   "- Q01 : « The app must\n  be fast » : quel temps de réponse ?",
+  "- Q02 (B03) : « Monthly\n  dashboard for management » : quelle fréquence ?",
   "- Facturation (brief-en.md, « Out of scope »).",
   "- Données clients hébergées dans l'UE (brief-en.md, « Constraints »).",
   "- Outil : wf-cadrage-besoin",
