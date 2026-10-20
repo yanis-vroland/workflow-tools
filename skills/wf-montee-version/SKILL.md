@@ -46,7 +46,7 @@ Applications : chaque dossier qui porte un `package.json` (avec dépendances) ou
 
 ## Étape 4 : livrable existant et livrable de sécurité
 
-- Si `docs/wf/montee-version.md` existe, lis-le d'abord. Tu le réécriras en entier avec Write : un seul plan dans le fichier (jamais l'ancien suivi du nouveau), aucune copie datée ou numérotée. L'inventaire reflète les versions actuelles du lockfile ; conserve seulement ce qui reste vrai, et mets à jour la date, le commit et l'argument.
+- Si `docs/wf/montee-version.md` existe, lis-le d'abord. Tu le réécriras en entier avec Write : un seul plan dans le fichier (jamais l'ancien suivi du nouveau), aucune copie datée ou numérotée. L'inventaire reflète les versions actuelles du lockfile ; conserve seulement ce qui reste vrai, et mets à jour la date, le commit et l'argument. L'historique est porté par git : le livrable mis à jour ne cite plus aucune valeur périmée de l'ancien, ni son ancienne date, ni son ancien commit, ni une version qui n'est plus installée ou plus la dernière publiée, même pour signaler le changement (pas de note « mis à jour depuis… », pas de colonne ni de ligne « avant / après »). La date et le commit de l'en-tête viennent des commandes de l'étape 3, jamais de l'ancien livrable.
 - Si `docs/wf/revue-securite.md` existe, lis sa section « Dépendances vulnérables » : chaque entrée a un identifiant `Sn`, un nom, un écosystème, une version installée et une première version corrigée (ou « aucune correction publiée »). Ne reprends que ces entrées (pas les constats dans le code ni les secrets), et ne modifie jamais ce fichier. S'il est absent, n'en tiens pas compte.
 
 ## Étape 5 : inventaire des versions
