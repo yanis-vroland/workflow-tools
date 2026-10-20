@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Bash
-input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git symbolic-ref refs/remotes/origin/HEAD|git show-ref --verify refs/heads/(?:main|master)|git branch -a --no-merged [\w./-]+|git rev-list --count [\w./-]+\.\.[\w./-]+|git log -1 --format=%cs [\w./-]+)")'
+input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git symbolic-ref refs/remotes/origin/HEAD|git show-ref --verify refs/heads/(?:main|master)|git branch -a --no-merged (?!-)[\w./-]+|git rev-list --count (?!-)[\w./-]+\.\.(?!-)[\w./-]+|git log -1 --format=%cs (?!-)[\w./-]+)")'
 min: 0
 max: 0
 ---

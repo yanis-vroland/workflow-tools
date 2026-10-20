@@ -90,60 +90,90 @@ else
   ok "CA2 les neuf sections, dans l'ordre"
 fi
 
-# --- Aucune valeur propre à la fixture FieldOps -----------------------------------
-# Les exemples de la skill restent génériques : sinon les evals sur FieldOps
-# mesureraient la recopie d'un exemple, pas le comportement (surapprentissage).
+# --- Aucune valeur propre aux fixtures ni aux données des cas ----------------------
+# Les exemples de la skill restent génériques : sinon les evals mesureraient la
+# recopie d'un exemple, pas le comportement (surapprentissage). La liste des
+# valeurs interdites est générée à partir des correcteurs et des scaffolds des
+# cas evals/passation-*/ (fragments entre accents graves, identifiants en
+# majuscules, hash de commit) et des identifiants en majuscules de la fixture
+# FieldOps. En sont exclus les fragments que la spec 016 ou l'ADR-001 imposent,
+# et les noms génériques que la skill doit citer (tableau « allowed »). Les
+# valeurs de « forced » (mots des cas qui ne sont ni entre accents graves ni en
+# majuscules) sont toujours interdites, même si la spec les cite en exemple.
 
-fieldops_values=(
-  "FieldOps"
-  "REGISTRY_TOKEN"
-  "DEPLOY_TOKEN"
-  "MAP_API_KEY"
-  "JWT_SECRET"
-  "PAYMENT_WEBHOOK_SECRET"
-  "example.invalid"
-  "feat/export-pdf"
-  "notifications-push"
-  "mapClient.ts"
-  "mailer.ts"
-  "payment.ts"
-  "src/api/routes/interventions.ts"
-  "5b26289"
-  "STRIPE_SECRET_KEY"
-  "FLY_API_TOKEN"
-  "203.0.113"
-  "PRODUCTION_DATABASE_URL"
-  "MAP_API"
-  "_API_KEY"
-  "purge"
-  "2fc99c0"
-  "cartographie"
-  "registre d'images"
-  "webhook"
-  "flyctl"
-  "requirements.txt"
-  "stripe"
-  "Stripe"
-  "sentry"
-  "Sentry"
-  "0.0.0.0"
-  "10.0.2.2"
-  "Application web"
-  "Application mobile"
-  "direction technique du client"
-  "export-pdf"
-  "notifications-push"
-  "fix/libelles"
-  "trunk"
+case_files=()
+while IFS= read -r f; do case_files+=("$f"); done < <(
+  find "$root"/evals/passation-* \( -path '*/graders/*.md' -o -name scaffold.sh \) -type f | LC_ALL=C sort
 )
-leak_ok=1
-for value in "${fieldops_values[@]}"; do
-  if grep -qF -- "$value" <<<"$body"; then
-    ko "aucune valeur des fixtures dans la skill (« $value » présent)"
-    leak_ok=0
+imposed=$(cat "$root/docs/specs/016-wf-passation.md" "$root/docs/adr/001-conventions-communes-des-outils.md")
+allowed=(
+  "date +%F"
+  "git status --porcelain"
+  "git symbolic-ref refs/remotes/origin/HEAD"
+  "git show-ref --verify refs/heads/main"
+  "git log -1 --format=%cs <branche>"
+  "git rev-list --count <principale>..<branche>"
+  "package.json"
+  "README.md"
+  "../../README.md"
+  "docs/specs/"
+  "onboarding.md"
+  "exploitation.md"
+  "doc-projet/installation.md"
+  "doc-projet/configuration.md"
+  "Info.plist"
+  "fastlane"
+)
+forced=(
+  EXPIRES_AT cartographie "registre d'images" webhook flyctl Stripe stripe Sentry sentry
+  0.0.0.0 10.0.2.2 "Application web" "Application mobile" "direction technique du client"
+  trunk purge FieldOps
+)
+
+generated=$(
+  {
+    # shellcheck disable=SC2016 # accents graves littéraux
+    cat "${case_files[@]}" | grep -oE '`[^`]{4,}`' | tr -d '`'
+    cat "${case_files[@]}" | grep -oE '\b[A-Z][A-Z0-9_]{3,}\b'
+    cat "${case_files[@]}" | grep -oE '\b[0-9a-f]{7}\b'
+    find "$root/tests/fixtures/fieldops" -type f -exec cat {} + | grep -oE '\b[A-Z][A-Z0-9_]{3,}\b'
+  } | LC_ALL=C sort -u | while IFS= read -r value; do
+    grep -qF -- "$value" <<<"$imposed" && continue
+    for a in "${allowed[@]}"; do [ "$a" = "$value" ] && continue 2; done
+    printf '%s\n' "$value"
+  done
+)
+forbidden=$( { printf '%s\n' "$generated"; printf '%s\n' "${forced[@]}"; } | grep -v '^$' | LC_ALL=C sort -u)
+
+# leaks <texte> : affiche les valeurs interdites présentes dans le texte, comme
+# mot entier (le souligné compte comme séparateur : « <NOM>_EXPIRES_AT » contient
+# EXPIRES_AT, « PASSWORD » ne contient pas PASS)
+leaks() {
+  local text=$1 value escaped
+  while IFS= read -r value; do
+    escaped=$(sed 's/[][\.*^$/+?(){}|]/\\&/g' <<<"$value")
+    if grep -qE -- "(^|[^A-Za-z0-9])${escaped}([^A-Za-z0-9]|\$)" <<<"$text"; then
+      printf '%s\n' "$value"
+    fi
+  done <<<"$forbidden"
+}
+
+if [ "$(wc -l <<<"$forbidden")" -lt 50 ]; then
+  ko "liste des valeurs interdites trop courte ($(wc -l <<<"$forbidden" | tr -d ' ') valeurs) : génération défaillante"
+fi
+found=$(leaks "$body")
+if [ -z "$found" ]; then
+  ok "aucune valeur des fixtures ni des cas dans la skill"
+else
+  ko "aucune valeur des fixtures ni des cas dans la skill (présentes : $(tr '\n' ' ' <<<"$found"))"
+fi
+# Contrôle par mutation : une valeur des cas ou de la fixture ajoutée au corps est détectée
+for mutant in MAP_API_KEY_EXPIRES_AT "<NOM>_EXPIRES_AT" PRODUCTION_DATABASE_URL "feat/export-pdf" \
+  2fc99c0 "service de cartographie" REGISTRY_TOKEN "src/services/mapClient.ts"; do
+  if [ -z "$(leaks "$body"$'\n'"ex. $mutant.")" ]; then
+    ko "contrôle par mutation : « $mutant » ajouté à la skill n'est pas détecté"
   fi
 done
-[ "$leak_ok" -eq 1 ] && ok "aucune valeur des fixtures dans la skill"
 
 # --- CA3 : documentation de référence, livrables internes exclus -----------------
 
@@ -203,6 +233,22 @@ absent "Injection : aucune commande Bash prescrite avec des guillemets doubles" 
 absent "Injection : aucune commande Bash prescrite avec une substitution" '^ *- `(git|date)[^`]*(\$\(|\$\{)'
 cite "Injection : filtrage des noms de branche avant toute commande" "nom non pris en charge : date et avance non déterminées"
 cite "Grep en mode contenu précédé du mode files_with_matches" "files_with_matches"
+# L'exclusion qui précède le mode contenu reprend toute la liste des fichiers de secrets
+grep_rule=$(grep -F "files_with_matches" <<<"$body")
+for secret_file in .envrc .npmrc android/key.properties '*.keystore' '*.jks' '*.pem' '*.p12' \
+  'credentials*.json' 'service-account*.json'; do
+  if grep -qF -- "$secret_file" <<<"$grep_rule"; then
+    ok "Grep en mode contenu : $secret_file écarté avant lecture"
+  else
+    ko "Grep en mode contenu : $secret_file absent de l'exclusion qui précède le mode contenu"
+  fi
+done
+
+# CA11 : le nom de la branche principale issu de git symbolic-ref est filtré lui aussi
+cite "CA11 nom de la branche principale filtré avant usage" "nom de la branche principale"
+
+# CA3 : chaque document est listé par un lien, sans regroupement par dossier
+absent "CA3 aucun regroupement des documents par dossier" "plus de cinq"
 
 # --- Correcteurs des evals (motifs compilés, liste blanche Bash) -------------------
 

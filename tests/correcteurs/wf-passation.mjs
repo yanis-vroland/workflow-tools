@@ -102,6 +102,11 @@ const forbidden = [
   "npm test",
   "mkdir -p docs/wf",
   "cat README.md",
+  // Argument pris pour une option (nom de branche commençant par « - »)
+  "git log -1 --format=%cs --output=docs/x",
+  "git branch -a --no-merged --contains",
+  "git rev-list --count main..--all",
+  "git rev-list --count --all..main",
 ];
 for (const c of cases) {
   const g = graders[c]["ca01-commandes-autorisees"];

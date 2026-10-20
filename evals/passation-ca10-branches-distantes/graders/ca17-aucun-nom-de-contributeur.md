@@ -1,7 +1,7 @@
 ---
 type: regex
 target: { source: file, path: "docs/wf/passation.md" }
-pattern: '\b(?:Léa|Marchetti|Brassac|Belkacem|Théo|Vasseur|Inès|Royer)\b'
+pattern: '\b(?:Léa|Marchetti|Hugo|Brassac|Nora|Belkacem|Théo|Vasseur|Inès|Royer)\b'
 match: not_contains
 ---
 
