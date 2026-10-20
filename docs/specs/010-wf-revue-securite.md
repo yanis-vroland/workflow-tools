@@ -55,3 +55,27 @@ Couverts par CA7, CA8, CA11, CA16, CA17, CA19, et CA22 à CA25.
 ## Questions ouvertes
 
 - Aucune.
+
+## Amendement 1 (proposé)
+
+Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+
+- CA3 : l'en-tête porte aussi la ligne « Dernier identifiant attribué : Sn », ou « aucun » tant qu'aucun identifiant n'a été attribué.
+- CA4 : le seul accès réseau est la lecture d'OSV.dev (avis de sécurité) et de pub.dev (dépendances déclarées d'un paquet pub) ; seuls des noms et versions de paquets et des identifiants d'avis sont envoyés.
+- CA5 : une entrée `Sn` par couple (dépendance, avis). L'avis est identifié par son identifiant OSV, suivi de ses alias CVE. La sévérité publiée est le niveau de sévérité de l'avis, à défaut son vecteur CVSS, à défaut « non publiée ». Un avis dont les intervalles ne contiennent pas la version installée n'est pas retenu. npm, pnpm et yarn sont interrogés comme l'écosystème npm.
+- CA5 : un nom, une version ou un identifiant d'avis lu dans le projet ou dans une réponse n'est jamais exécuté ni interprété par le shell, quel que soit son contenu ; une valeur qui contient un caractère hors lettres, chiffres et `@/._~+-` n'est pas vérifiée, et « Points non déterminés » le signale.
+- CA5 : un paquet sans réponse de la base, ou dont la réponse est incomplète (paginée), est « non déterminé » et figure dans « Points non déterminés ».
+- CA6 : pour une transitive pub, la dépendance directe qui l'introduit est établie d'après les dépendances déclarées des dépendances directes publiées sur pub.dev ; à défaut, l'entrée porte « transitive (introduite par : non déterminé) » et « Points non déterminés » le reprend.
+- CA7 : sans lockfile, la version vérifiée est la plus basse admise par la contrainte déclarée ; la colonne de version indique « non déterminée » avec la contrainte et la version vérifiée. Une contrainte sans borne basse (toute version, dépôt git, chemin local) n'est pas vérifiée et figure dans « Points non déterminés ».
+- CA8 : base d'avis injoignable à une relance : les entrées de dépendances du livrable précédent ne sont pas reconduites, et leurs identifiants ne sont jamais réattribués.
+- CA9 : chaque entrée indique aussi son application ; la catégorie est un libellé en français (injection, contrôle d'accès, authentification, secret exposé, stockage non sécurisé, configuration, cryptographie, communication non sécurisée, intégrité, journalisation, gestion des erreurs) suivi de la catégorie OWASP correspondante du référentiel de l'application, selon une table fixe. Les secrets, fichiers d'environnement suivis et constats de configuration vont dans « Secrets et configuration », les autres dans « Constats dans le code ».
+- CA11 : l'absence d'en-têtes de sécurité ou de politique CSP dans le code donne un constat « à vérifier », un proxy ou un serveur hors du dépôt pouvant les poser.
+- CA13 : la route est citée complète, préfixe de montage compris ; une vérification d'appartenance manquante (un utilisateur authentifié qui agit sur la ressource d'un autre) est aussi signalée.
+- CA14 : une valeur littérale donnée comme valeur par défaut d'un calcul compte comme valeur affectée ; la recommandation demande de sortir la valeur du code et de la renouveler.
+- CA16 : si la liste des fichiers d'environnement suivis ne peut pas être obtenue de git (commande refusée par un garde-fou), l'outil se replie sur leurs seuls noms dans l'arborescence : leur suivi est alors non déterminé et le constat porte le statut « à vérifier ». Hors dépôt git, la vérification est « non applicable ».
+- CA17 : les fichiers de secrets ou d'identifiants (configuration d'un gestionnaire de paquets, propriétés de signature, clés, certificats) ne sont pas lus non plus, et les recherches dans le code sont limitées aux extensions de code.
+- CA18 : « Synthèse » donne le nombre de dépendances et le nombre d'avis, répartis par sévérité publiée, et porte toujours une ligne « Limites » qui rappelle CA4 et dit que l'analyse ne garantit pas l'absence de faille.
+- CA19 : un projet sans aucune dépendance déclarée n'interroge pas la base ; « Dépendances vulnérables » porte « aucun constat ».
+- CA20 : le prochain identifiant est supérieur au plus grand entre celui de la ligne « Dernier identifiant attribué » et le plus grand présent dans le livrable ; une entrée garde son identifiant si sa clé est inchangée (dépendance : écosystème, nom, avis ; constat : catégorie, fichier et code visé, la ligne pouvant changer).
+- CA25 : le budget de lecture est d'environ 300 fichiers source, fichiers générés exclus ; au-delà, les dossiers les plus volumineux ne sont pas lus, et les recherches dans le code les excluent aussi.
+- Cas limite : les commandes git de l'outil ne reçoivent aucune valeur venue du projet ou de l'utilisateur (pas de référence, de branche ni de chemin fournis).
