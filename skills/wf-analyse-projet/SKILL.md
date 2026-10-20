@@ -35,7 +35,7 @@ Liste les fichiers source (noms seulement, relatifs au dossier courant) :
 ```bash
 { if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ] && git rev-parse -q --verify HEAD >/dev/null && [ -n "$(git ls-files -- . | head -1)" ]; then git ls-files --cached --others --exclude-standard -- .; else find . -type f -not -path './.git/*' | sed 's|^\./||'; fi; } \
   | grep -iE '\.(ts|tsx|js|jsx|mjs|cjs|vue|svelte|astro|html?|css|scss|sass|less|dart|php|py|rb|go|java|kt|kts|scala|groovy|swift|m|mm|c|h|cc|cpp|hpp|cs|fs|rs|ex|exs|erl|clj|lua|pl|r|sh|bash|sql)$' \
-  | grep -vE '(^|/)(node_modules|vendor|build|dist|\.dart_tool|docs/wf)/|\.d\.ts$|\.g\.dart$|\.min\.(js|css)$' | sort -u
+  | grep -vE '(^|/)(node_modules|vendor|build|dist|\.dart_tool|docs/wf)/|(^|/)\.env|\.d\.ts$|\.g\.dart$|\.min\.(js|css)$' | sort -u
 ```
 
 - Répertoire vide (`ls -A` ne liste rien d'autre que `.git` et `.claude`) : réponds « Le répertoire est vide : aucun livrable n'a été écrit. » et arrête-toi.
@@ -108,12 +108,15 @@ files=$(<commande de l'étape 2> | grep -viE '\.(html?|css|scss|sass|less|sql|sh
 tests=$(grep -E '\.(test|spec)\.[jt]sx?$|_test\.dart$|(^|/)(__tests__|test|tests)/' <<<"$files")
 while IFS= read -r f; do
   [ -n "$f" ] || continue
-  stem=$(basename "${f%.*}")
-  grep -qE "(^|/)${stem}([._](test|spec))?\.[a-z]+$|(^|/)${stem}_test\.dart$" <<<"$tests" && continue
-  [ -n "$tests" ] && tr '\n' '\0' <<<"$tests" | xargs -0 grep -qE "(import|from|require\()[^;]*['\"/]${stem}(\.[a-z]+)?['\"]" 2>/dev/null && continue
+  stem=$(basename -- "${f%.*}")
+  re=$(printf '%s' "$stem" | sed 's/[][\.^$*+?(){}|/]/\\&/g')
+  grep -qE -e "(^|/)${re}([._](test|spec))?\.[a-z]+$|(^|/)${re}_test\.dart$" <<<"$tests" && continue
+  [ -n "$tests" ] && tr '\n' '\0' <<<"$tests" | xargs -0 grep -qE -e "(import|from|require\()[^;]*['\"/]${re}(\.[a-z]+)?['\"]" -- 2>/dev/null && continue
   printf '%s\n' "$f"
 done < <(grep -vxF -e "$tests" <<<"$files")
 ```
+
+Le nom de chaque fichier est échappé avant la recherche (parenthèses, points, tiret initial pris littéralement) ; les fichiers d'environnement sont exclus dès l'inventaire de l'étape 2 et ne sont jamais lus ici.
 
 Limite : la recherche se fait ligne à ligne. Un import réparti sur plusieurs lignes (`import {` … `} from '…'`) est vu par sa ligne `from` ; un chemin construit dynamiquement ou un alias qui ne finit pas par le nom du fichier ne l'est pas. Précise à chaque fois que cette heuristique est approximative (ni exécution des tests, ni mesure de couverture). Relève aussi la présence de lint, de CI, de TODO/FIXME.
 
