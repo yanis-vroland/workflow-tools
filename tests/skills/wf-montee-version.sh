@@ -169,6 +169,7 @@ cite "CA19 lockfile absent" "aucun lockfile"
 cite "CA22 stack non couverte" "non couverte"
 cite "CA22 exemple composer.json" "composer.json"
 cite "CA22 exemple pyproject.toml" "pyproject.toml"
+cite "CA23 aucune valeur périmée de l'ancien livrable" "ne cite plus aucune valeur périmée de l'ancien"
 
 # --- CA24 : argument dans l'en-tête -------------------------------------------------
 
