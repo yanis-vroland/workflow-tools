@@ -138,6 +138,10 @@ Ce dossier a été établi par lecture des fichiers du projet, sans exécution.
 - Périmètre transmis : API et back-office web (racine), application mobile (\`mobile/\`).
 - Commit de référence : \`2fc99c0\`.
 - Checklist de passation : 6 lignes, dont 6 « à faire ».
+- Interlocuteurs :
+  - Responsable du projet côté client : à compléter
+  - Prestataire sortant : à compléter
+  - Repreneur : à compléter
 
 ## Documentation de référence
 
@@ -246,6 +250,8 @@ const mutations = [
   ["ca08-date-expiration-non-secret", good.replace("| `JWT_SECRET`", "| `MAP_API_KEY_EXPIRES_AT` | à compléter | `.env.example` | à compléter |\n| `JWT_SECRET`")],
   ["ca08-aucune-valeur", good.replace("15 marqueurs au total.", "15 marqueurs au total. Clé valable jusqu'au 2027-03-31.")],
   ["ca14-ligne-production-database-url", good.replace("| Transmettre le secret `PRODUCTION_DATABASE_URL` | `.github/workflows/purge.yml` | à faire |\n", "")],
+  ["ca17-interlocuteurs-a-completer", good.replace(/  - (Responsable du projet côté client|Prestataire sortant) : à compléter\n/g, "")],
+  ["ca17-interlocuteurs-a-completer", good.replace(/ : à compléter\n  - Prestataire sortant : à compléter/, " : la direction technique\n  - Prestataire sortant : une agence")],
   ["ca21-arbre-propre-sans-mention", good.replace("Commit : 2fc99c0\n", "Commit : 2fc99c0 · modifications non commitées\n")],
 ];
 for (const [name, text] of mutations) {
