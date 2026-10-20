@@ -17,8 +17,9 @@ Le chemin `docs/wf/release-notes.md`, le titre des sections `## Version <numéro
 - **Écriture** : le seul fichier écrit est `docs/wf/release-notes.md`, créé avec l'outil Write (qui crée `docs/wf/` au besoin ; pas de `mkdir`) ou modifié avec l'outil Edit. Aucun autre fichier du projet n'est créé, modifié ou supprimé : ni `CHANGELOG.md`, ni le numéro de version d'un manifeste, ni les livrables des autres outils. Aucun tag, aucune branche, aucun commit, aucune publication de release.
 - **Entrée** : l'historique git, et rien d'autre. Ne lis aucun fichier du projet avec Read, Glob ou Grep, à la seule exception de `docs/wf/release-notes.md` s'il existe. Le contenu du manifeste se lit par `git show` (étape 4).
 - **Bash** : seulement les commandes données dans cette skill, recopiées telles quelles en remplaçant les `<…>`, sans redirection vers un fichier ni autre commande. Aucune commande git qui modifie le dépôt (add, commit, tag, checkout, switch, stash, reset, fetch, pull…), aucune installation ni exécution du projet.
+- **Valeurs insérées dans une commande** : une référence passée en argument n'entre dans le shell que par le heredoc de l'étape 2, qui la valide avant usage. Partout ailleurs, les emplacements `<bas>`, `<haut>`, `<premier commit>` et `<hash>` ne reçoivent que des hash hexadécimaux produits par git (étapes 2, 3 et 5), entre apostrophes et après `--end-of-options`. Une valeur qui commence par `-` n'est jamais insérée dans une commande : elle est refusée (étape 2), pour qu'aucune référence ne devienne une option de git. Le numéro de `--version` et le texte des arguments ne sont jamais insérés dans une commande.
 - **Modifications non commitées** : elles ne sont jamais prises en compte dans les notes. N'utilise jamais `git diff` sur l'arbre de travail ni `git diff HEAD` : seuls les commits de la plage comptent. Elles ne servent qu'à la mention de l'en-tête (étape 7).
-- **Secrets** : ne lis jamais le contenu ni le diff d'un fichier d'environnement (`.env`, `.env.local`, `.env.staging`…, `.env.example` compris, inutile ici) ni d'un fichier d'identifiants (`.envrc`, `.npmrc`, `key.properties`, clés et certificats), même versionné dans le dépôt : toute commande `git show` porte les exclusions de l'étape 6. Aucune valeur de ces fichiers dans le livrable.
+- **Secrets** : ne lis jamais le contenu ni le diff d'un fichier d'environnement (`.env`, `.env.local`, `.env.staging`…, `.env.example` compris, inutile ici) ni d'un fichier d'identifiants (`.envrc`, `.npmrc`, `key.properties`, clés et certificats), même versionné dans le dépôt : toute commande `git show` qui affiche un diff ou une liste de fichiers porte les exclusions de l'étape 6. Seules les lectures du manifeste de l'étape 4, qui visent un fichier nommé (`package.json` ou `pubspec.yaml`), en sont dispensées. Aucune valeur de ces fichiers dans le livrable.
 - **Données personnelles** : aucune adresse e-mail et aucun nom de contributeur dans le livrable, y compris ceux des lignes `Co-Authored-By:` ou `Signed-off-by:` des messages. N'utilise aucun format git qui affiche l'auteur ou le committer, ni aucune commande qui liste les contributeurs.
 - **Honnêteté** : chaque entrée s'appuie sur un ou plusieurs commits de la plage, cités dans « Références ». Rien n'est inventé (ni fonctionnalité, ni bénéfice, ni action requise) ; ce qui n'a pas pu être établi est « non déterminé » et figure dans « Points non déterminés ».
 - **Aucune question** pendant l'exécution.
@@ -26,10 +27,12 @@ Le chemin `docs/wf/release-notes.md`, le titre des sections `## Version <numéro
 ## Étape 1 : dépôt git
 
 ```bash
-if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ] && git rev-parse -q --verify HEAD >/dev/null && [ -n "$(git ls-files -- . | head -1)" ]; then echo "dans git"; else echo "hors git"; fi
+git rev-parse --is-inside-work-tree
+git rev-parse -q --verify HEAD
+git ls-files -- . | head -n 1
 ```
 
-« hors git » (pas de dépôt, dépôt sans commit, ou dépôt parent qui ne suit pas ce dossier) : n'écris rien, ne lis rien d'autre, et termine par ce message : « Ce projet n'est pas un dépôt git avec un historique : impossible d'établir les changements de la version. Aucun livrable n'a été écrit. »
+Le projet est « dans git » si la première commande affiche `true`, la deuxième un hash et la troisième un fichier. Sinon il est « hors git » (pas de dépôt, dépôt sans commit, ou dépôt parent qui ne suit pas ce dossier) : n'écris rien, ne lis rien d'autre, et termine par ce message : « Ce projet n'est pas un dépôt git avec un historique : impossible d'établir les changements de la version. Aucun livrable n'a été écrit. »
 
 Puis : `git rev-parse --is-shallow-repository` (`true` : clone superficiel, voir étape 3).
 
@@ -37,17 +40,24 @@ Puis : `git rev-parse --is-shallow-repository` (`true` : clone superficiel, voir
 
 Découpe les arguments :
 
-- `--version <numéro>` (ou `--version=<numéro>`) : numéro de version imposé.
-- Les autres arguments sont des références git (tag, branche, hash) : zéro, une ou deux. Une seule référence est la borne basse, la borne haute est alors `HEAD`. Plus de deux références : indique la syntaxe `/wf-release-notes [<référence basse> <référence haute>] [--version <numéro>]` et arrête-toi sans rien écrire.
-- Une référence qui contient autre chose que lettres, chiffres, `.`, `_`, `/` et `-`, ou qui commence par `-`, n'existe pas : ne la passe à aucune commande.
+- `--version <numéro>` (ou `--version=<numéro>`) : numéro de version imposé. Il doit correspondre à `^[0-9A-Za-z.+-]+$` sans commencer par `-` ; sinon, sans aucune commande, termine par : « `--version` : numéro de version refusé (lettres, chiffres, `.`, `+` et `-` seulement, sans `-` initial) : aucun livrable n'a été écrit ni modifié. »
+- Les autres arguments sont des références git (tag, branche, hash, ou expression comme `HEAD~3`, `<tag>^`, `<branche>@{1}`) : zéro, une ou deux. Une seule référence est la borne basse, la borne haute est alors `HEAD`. Plus de deux références : indique la syntaxe `/wf-release-notes [<référence basse> <référence haute>] [--version <numéro>]` et arrête-toi sans rien écrire.
+- Avant toute commande, examine chaque référence : vide, commençant par `-`, sur plusieurs lignes, ou contenant un autre caractère que lettres, chiffres, `.`, `_`, `/`, `~`, `^`, `@`, `{`, `}`, `+` et `-` (apostrophe, guillemet, espace, `$`, accent grave…) : ne lance aucune commande, n'écris rien, et termine par : « Référence `<référence>` : référence refusée : caractères non pris en charge. Aucun livrable n'a été écrit ni modifié. »
 
-Vérifie chaque référence donnée, une commande par référence :
+Résous ensuite chaque référence admise en hash de commit, une commande par référence, la référence recopiée seule sur la ligne du heredoc (délimiteur entre apostrophes : rien n'y est interprété) puis validée à nouveau par bash :
 
 ```bash
-git rev-parse -q --verify '<référence>^{commit}'
+IFS= read -r ref <<'WF_FIN_REF'
+<référence>
+WF_FIN_REF
+case $ref in '' | -* | *[!A-Za-z0-9._/~^@{}+-]*) echo "référence refusée : caractères non pris en charge" ;; *) git rev-parse -q --verify --end-of-options "$ref^{commit}" || echo "référence inexistante" ;; esac
 ```
 
-Sortie vide : la référence n'existe pas. N'écris rien, ne modifie rien, et termine par : « La référence `<référence>` n'existe pas dans ce dépôt : aucun livrable n'a été écrit ni modifié. » (en clone superficiel, ajoute qu'elle est peut-être absente de l'historique tronqué).
+- Sortie : le hash complet du commit. C'est lui, et non le nom, qui remplace `<bas>` ou `<haut>` dans toutes les commandes suivantes.
+- « référence refusée : caractères non pris en charge » : termine par le message de refus ci-dessus.
+- « référence inexistante » : n'écris rien, ne modifie rien, et termine par : « La référence `<référence>` n'existe pas dans ce dépôt : aucun livrable n'a été écrit ni modifié. » (en clone superficiel, ajoute qu'elle est peut-être absente de l'historique tronqué).
+
+Sans référence haute, résous `HEAD` de la même façon.
 
 ## Étape 3 : plage
 
@@ -60,20 +70,22 @@ La plage va de la borne basse (exclue) à la borne haute (incluse). Garde les no
   git log --format=%D --decorate-refs=refs/tags/ HEAD | tr ',' '\n' | sed -n 's/^ *tag: //p' | grep -m1 -E '^v?[0-9]+\.[0-9]+\.[0-9]+$'
   ```
 
+  Le tag trouvé est résolu en hash par la commande de l'étape 2, comme une référence passée en argument.
+
 - Pas de borne basse (aucun tag de version) : la plage part du premier commit du dépôt, inclus. Relève-le, avec sa date :
 
   ```bash
   git rev-list --max-parents=0 --abbrev-commit HEAD
-  git log -1 --format='%h %cs' <premier commit>
+  git log -1 --format='%h %cs' --end-of-options '<premier commit>'
   ```
 
   « Points non déterminés » le signale : « aucun tag de version accessible depuis `HEAD` : la plage part du premier commit du dépôt (`<hash>`) ».
 - Clone superficiel (étape 1) sans borne basse trouvée : le premier commit relevé ci-dessus est seulement le premier commit disponible, la borne basse réelle manque à l'historique. « Points non déterminés » le signale à la place de la mention précédente : « clone superficiel : l'historique ne contient pas la borne basse de la plage ; premier commit réellement disponible : `<hash>` (<date>) ; les commits antérieurs ne sont pas couverts ».
 
-Compte les commits, hors commits de fusion (sans borne basse, retire `<bas>..`) :
+Compte les commits, hors commits de fusion (sans borne basse, l'emplacement devient `'<haut>'`) :
 
 ```bash
-git rev-list --count --no-merges <bas>..<haut>
+git rev-list --count --no-merges --end-of-options '<bas>..<haut>'
 ```
 
 Zéro : n'écris rien, ne modifie rien, et termine par : « La plage de `<bas>` (exclu) à `<haut>` (inclus) ne contient aucun commit : aucun livrable n'a été écrit ni modifié. »
@@ -84,8 +96,8 @@ Zéro : n'écris rien, ne modifie rien, et termine par : « La plage de `<bas>` 
 2. Sinon, le manifeste à la racine du projet, tel qu'il est dans le commit de la borne haute (une modification non commitée du manifeste n'est pas prise en compte) : d'abord `package.json`, puis `pubspec.yaml` ; une commande échoue si le fichier n'existe pas.
 
    ```bash
-   git show '<haut>:./package.json' | grep -m1 '"version"'
-   git show '<haut>:./pubspec.yaml' | grep -m1 -E '^version:'
+   git show --end-of-options '<haut>:./package.json' | grep -m1 '"version"'
+   git show --end-of-options '<haut>:./pubspec.yaml' | grep -m1 -E '^version:'
    ```
 
    Source : « lu dans `package.json` » ou « lu dans `pubspec.yaml` ».
@@ -96,14 +108,16 @@ Le titre n'affiche pas le numéro de build : tout ce qui suit `+` est retiré (`
 Date du titre : date du commit de la borne haute.
 
 ```bash
-git log -1 --format=%cs <haut>
+git log -1 --format=%cs --end-of-options '<haut>'
 ```
 
 ## Étape 5 : commits de la plage
 
 ```bash
-git log --no-merges --reverse --format='@@@ %h%n%B' <bas>..<haut>
+git log --no-merges --reverse --format='@@@ %h%n%B' --end-of-options '<bas>..<haut>'
 ```
+
+(sans borne basse : `'<haut>'`)
 
 Chaque bloc commence par `@@@ <hash court>`, suivi du message complet (sujet, corps, pieds). Les commits de fusion sont exclus : ils n'apparaissent nulle part dans le livrable, mais les commits des branches fusionnées sont dans la plage et comptent normalement.
 
@@ -130,8 +144,8 @@ Sujet au format Conventional Commits : `<type>(<portée>)!: <description>`, port
 **Hors convention** : lis la liste des fichiers modifiés, puis si besoin le diff, toujours avec ces exclusions :
 
 ```bash
-git show --stat --format= <hash> -- . ':(exclude,glob)**/.env*' ':(exclude,glob)**/.envrc' ':(exclude,glob)**/.npmrc' ':(exclude,glob)**/key.properties' ':(exclude,glob)**/*.pem' ':(exclude,glob)**/*.key' ':(exclude,glob)**/*.p12' ':(exclude,glob)**/*.jks'
-git show --format= <hash> -- . ':(exclude,glob)**/.env*' ':(exclude,glob)**/.envrc' ':(exclude,glob)**/.npmrc' ':(exclude,glob)**/key.properties' ':(exclude,glob)**/*.pem' ':(exclude,glob)**/*.key' ':(exclude,glob)**/*.p12' ':(exclude,glob)**/*.jks'
+git show --stat --format= --end-of-options '<hash>' -- . ':(exclude,glob)**/.env*' ':(exclude,glob)**/.envrc' ':(exclude,glob)**/.npmrc' ':(exclude,glob)**/key.properties' ':(exclude,glob)**/*.pem' ':(exclude,glob)**/*.key' ':(exclude,glob)**/*.p12' ':(exclude,glob)**/*.jks'
+git show --format= --end-of-options '<hash>' -- . ':(exclude,glob)**/.env*' ':(exclude,glob)**/.envrc' ':(exclude,glob)**/.npmrc' ':(exclude,glob)**/key.properties' ':(exclude,glob)**/*.pem' ':(exclude,glob)**/*.key' ':(exclude,glob)**/*.p12' ':(exclude,glob)**/*.jks'
 ```
 
 - Le message et le diff montrent clairement une nouvelle fonctionnalité, une amélioration ou une correction visible : classe-le comme tel.
@@ -143,7 +157,7 @@ Les mêmes commandes servent, au besoin, pour un regroupement ou une correction 
 ## Étape 7 : en-tête
 
 - Date : `date +%F`.
-- Commit analysé : le hash court de la borne haute de la plage (pas forcément `HEAD`) : `git rev-parse --short '<haut>^{commit}'`.
+- Commit analysé : le hash court de la borne haute de la plage (pas forcément `HEAD`) : `git rev-parse --short --end-of-options '<haut>'`.
 - `git status --porcelain` : si la sortie contient au moins une ligne qui ne concerne pas `docs/wf/release-notes.md`, ajoute « modifications non commitées » à l'en-tête (elles restent hors des notes).
 
 ## Modèle du livrable

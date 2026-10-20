@@ -212,6 +212,7 @@ Spec 009, lancée par `/wf-release-notes`, tous les cas `hors-reseau` (tag `wf-r
 | `release-notes-ca23-clone-superficiel` | clone de profondeur 3, `package.json` sans `version` | CA23, CA6 (version non déterminée) |
 | `release-notes-ca20-plage-vide` | FieldOps, tag `v1.3.0` sur `HEAD` | CA20 |
 | `release-notes-ca21-reference-inexistante` | FieldOps, `v0.9.0 v1.2.0` | CA21 |
+| `release-notes-ca21-reference-piegee` | FieldOps, référence avec apostrophe et substitution de commande (`v1.0.0'$(touch pwned)'`) | CA21, injection shell : refus sans aucune commande, aucun fichier `pwned` |
 | `release-notes-ca22-hors-git` | copie de FieldOps sans historique | CA22 |
 
 Hash rejouables vérifiés : en-têtes `28e190e`, `db46741`, `17691e6`, `4a5b78b`, `fe0d161`, `5366555`, `9986263` (borne haute de chaque cas), et les commits de chaque plage dans « Références ». Une modification de la fixture ou d'un scaffold les change : mettre à jour les graders `ca03-…`, `ca04-…`, `ca05-…`, `ca12-…`.
