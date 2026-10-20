@@ -142,9 +142,10 @@ bash_block() {
 
 # run_block <shell> <bloc> <chemins, un par ligne> : lance le bloc dans $inj/run
 # avec les chemins dans le corps du heredoc, à la place de la ligne <chemin>
+# (par l'environnement : awk -v refuse les sauts de ligne et interprète les \)
 run_block() {
   local script
-  script=$(awk -v paths="$3" '$0 == "<chemin>" { print paths; next } { print }' <<<"$2")
+  script=$(PATHS_BODY="$3" awk '$0 == "<chemin>" { print ENVIRON["PATHS_BODY"]; next } { print }' <<<"$2")
   (cd "$inj/run" && PATH="$inj/bin:$PATH" FAKE_LOG="$inj/log" "$1" -c "$script" 2>&1)
 }
 
