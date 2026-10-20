@@ -138,6 +138,7 @@ PUB_PKGS_9f2c
 ### Ce qu'on retient de chaque avis
 
 - Identifiant : celui d'OSV (GHSA, CVE ou identifiant OSV), suivi entre parenthèses de ses alias CVE s'il en a.
+- Attribution : vérifie que le champ `affected` de l'avis vise bien le paquet (écosystème et nom) auquel la requête par lot l'a rattaché ; en cas d'écart, c'est `affected` qui fait foi, et l'écart est signalé dans « Points non déterminés ».
 - Sévérité publiée, reprise telle quelle : le champ `database_specific.severity` (ex. `HIGH`, `MODERATE`) ; à défaut, le vecteur CVSS du champ `severity` ; à défaut, « non publiée ». Jamais la grille élevé, moyen, faible des constats du code.
 - Première version corrigée : dans `affected` (même écosystème, même nom), l'événement `fixed` de l'intervalle qui contient la version installée ; sans `fixed` (seulement `last_affected`, ou aucun), écris « aucune correction publiée ».
 - Un avis qui ne vise pas la version installée (hors de tous les intervalles) n'est pas retenu.
@@ -180,7 +181,7 @@ La description justifie le niveau par la grille (ex. « route protégée par le 
 ### Statut
 
 - **confirmé** : le code lu suffit à établir le constat.
-- **à vérifier** : sa réalité dépend d'un élément que tu n'as pas pu lire (configuration serveur ou d'un proxy, middleware global introuvable, valeur d'une variable d'environnement, fichier d'un dossier non lu). La description nomme cet élément (ex. « dépend de la variable d'environnement `SESSION_SECRET`, non lue »).
+- **à vérifier** : sa réalité dépend d'un élément que tu n'as pas pu lire (configuration serveur ou d'un proxy, middleware global introuvable, valeur d'une variable d'environnement, fichier d'un dossier non lu). La description nomme cet élément (ex. « dépend de la variable d'environnement `SESSION_SECRET`, non lue »). En particulier, une valeur littérale de secret utilisée seulement comme valeur par défaut d'une variable d'environnement (elle ne sert que si la variable est absente) garde le niveau élevé, mais son statut est « à vérifier », et la description nomme la variable.
 
 ### Ce qu'il faut rechercher, au minimum
 
