@@ -111,8 +111,9 @@ allowed=(
   "git status --porcelain"
   "git symbolic-ref refs/remotes/origin/HEAD"
   "git show-ref --verify refs/heads/main"
-  "git log -1 --format=%cs <branche>"
-  "git rev-list --count <principale>..<branche>"
+  "git log -1 --format=%cs --end-of-options <branche>"
+  "git rev-list --count --end-of-options <principale>..<branche>"
+  "git branch -a --no-merged=<principale>"
   "package.json"
   "README.md"
   "../../README.md"
@@ -243,6 +244,37 @@ for secret_file in .envrc .npmrc android/key.properties '*.keystore' '*.jks' '*.
     ko "Grep en mode contenu : $secret_file absent de l'exclusion qui précède le mode contenu"
   fi
 done
+
+# --- Injection d'option git : aucune révision fournie sans --end-of-options -------
+# Chaque gabarit de commande git (entre accents graves) qui reçoit une révision
+# fournie (<principale>, <branche>) la protège : « --end-of-options » avant la
+# révision, ou valeur collée à son option (« --no-merged=<principale> »), que git
+# ne peut pas lire comme une option.
+
+# unprotected_git <texte> : gabarits git à révision fournie non protégés
+unprotected_git() {
+  # shellcheck disable=SC2016 # accents graves littéraux
+  grep -oE '`git [^`]*<(principale|branche)>[^`]*`' <<<"$1" |
+    grep -vE -- '--end-of-options <|--no-merged=<principale>' || true
+}
+found_git=$(unprotected_git "$body")
+if [ -z "$found_git" ]; then
+  ok "Injection d'option git : chaque révision fournie est protégée"
+else
+  ko "Injection d'option git : gabarits non protégés : $(tr '\n' ' ' <<<"$found_git")"
+fi
+# shellcheck disable=SC2016 # accents graves littéraux
+if grep -qE -- '`git [^`]*<(principale|branche)>' <<<"$body"; then
+  ok "Injection d'option git : gabarits à révision fournie présents"
+else
+  ko "Injection d'option git : aucun gabarit à révision fournie trouvé (contrôle sans objet)"
+fi
+cite "Injection d'option git : règle « commence par - »" "Une valeur qui commence par \`-\` n'est jamais insérée dans une commande"
+# Contrôle par mutation : retirer un --end-of-options fait échouer le contrôle
+mutant_body=${body/--end-of-options /}
+if [ "$mutant_body" = "$body" ] || [ -z "$(unprotected_git "$mutant_body")" ]; then
+  ko "contrôle par mutation : un --end-of-options retiré n'est pas détecté"
+fi
 
 # CA11 : le nom de la branche principale issu de git symbolic-ref est filtré lui aussi
 cite "CA11 nom de la branche principale filtré avant usage" "nom de la branche principale"

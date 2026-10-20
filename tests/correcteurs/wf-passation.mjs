@@ -82,10 +82,10 @@ const allowed = [
   "git symbolic-ref refs/remotes/origin/HEAD",
   "git show-ref --verify refs/heads/main",
   "git show-ref --verify refs/heads/master",
-  "git branch -a --no-merged origin/main",
-  "git branch -a --no-merged main",
-  "git rev-list --count origin/main..remotes/origin/feat/x-y_1.2",
-  "git log -1 --format=%cs remotes/origin/feat/x",
+  "git branch -a --no-merged=origin/main",
+  "git branch -a --no-merged=main",
+  "git rev-list --count --end-of-options origin/main..remotes/origin/feat/x-y_1.2",
+  "git log -1 --format=%cs --end-of-options remotes/origin/feat/x",
 ];
 const forbidden = [
   "git fetch",
@@ -104,6 +104,12 @@ const forbidden = [
   "cat README.md",
   // Argument pris pour une option (nom de branche commençant par « - »)
   "git log -1 --format=%cs --output=docs/x",
+  "git log -1 --format=%cs --end-of-options --output=pwned.txt",
+  "git branch -a --no-merged=--output=x",
+  // Formes sans --end-of-options (ou sans « = ») : refusées
+  "git log -1 --format=%cs feat/x",
+  "git rev-list --count main..feat/x",
+  "git branch -a --no-merged main",
   "git branch -a --no-merged --contains",
   "git rev-list --count main..--all",
   "git rev-list --count --all..main",
