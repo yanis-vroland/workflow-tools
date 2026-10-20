@@ -309,6 +309,17 @@ if grep -qE "\"<[^>]+>\"|'<[^>]+>'" "$skill_md"; then
   echo "ÉCHEC  injection : un nom est recopié entre guillemets ou apostrophes dans une commande ($(grep -oE "\"<[^>]+>\"|'<[^>]+>'" "$skill_md" | sort -u | tr '\n' ' '))"
   injection_ok=0
 fi
+# Une boucle `for` recopie les noms dans le texte de la commande (revue, S4)
+if grep -qE '^[[:space:]]*for p in ' "$skill_md"; then
+  echo "ÉCHEC  injection : boucle « for p in » sur des noms écrits dans la commande"
+  injection_ok=0
+fi
+# Délimiteur public : un nom égal à une ligne de délimiteur fermerait le heredoc avant
+# la vérification du shell ; la skill le fait refuser avant l'écriture du heredoc (S1)
+if ! grep -qE "égal à une ligne de délimiteur \(\`WF_NPM_5e1a\`, \`WF_PUB_5e1a\`\).*refuse" "$skill_md"; then
+  echo "ÉCHEC  injection : refus préalable d'un nom égal à un délimiteur (WF_NPM_5e1a, WF_PUB_5e1a) absent de la skill"
+  injection_ok=0
+fi
 if ! grep -qF 'nom de paquet invalide, non vérifié' "$skill_md"; then
   echo "ÉCHEC  injection : mention « nom de paquet invalide, non vérifié » absente de la skill"
   injection_ok=0
@@ -334,7 +345,7 @@ SH
 chmod +x "$inj/bin/curl"
 
 # shellcheck disable=SC2016 # noms piégés : substitutions littérales
-npm_names=('vite' '@scope/outil' "x'\$(touch pwned1)'" '$(touch pwned2)' '`touch pwned3`' 'y";touch pwned4;"')
+npm_names=('vite' '@scope/outil' "x'\$(touch pwned1)'" '$(touch pwned2)' '`touch pwned3`' 'y";touch pwned4;"' '.cache' '_priv' '@.x/outil' '@scope/_outil')
 # shellcheck disable=SC2016
 pub_names=('path_utils' "z'\$(touch pwned5)'")
 shells=(bash)
@@ -357,8 +368,9 @@ for sh in "${shells[@]}"; do
     echo "ÉCHEC  injection ($sh) : registres interrogés inattendus ($(tr '\n' ' ' <"$inj/log"))"
     injection_ok=0
   fi
-  if [ "$(grep -c 'nom de paquet invalide, non vérifié' <<<"$out")" -ne 5 ]; then
-    echo "ÉCHEC  injection ($sh) : 5 noms invalides signalés attendus ($out)"
+  # 9 : 4 noms piégés npm, 4 noms npm commençant par `.` ou `_` (nom ou portée), 1 nom piégé pub
+  if [ "$(grep -c 'nom de paquet invalide, non vérifié' <<<"$out")" -ne 9 ]; then
+    echo "ÉCHEC  injection ($sh) : 9 noms invalides signalés attendus ($out)"
     injection_ok=0
   fi
 done

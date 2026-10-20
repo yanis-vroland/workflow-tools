@@ -3,6 +3,9 @@
 # package.json et package-lock.json, une dépendance directe dont le nom contient
 # une apostrophe suivie d'une substitution de commande (`x'$(touch pwned)'`).
 # Recopié entre apostrophes dans une commande, ce nom créerait le fichier pwned.
+# Deux autres dépendances visent le délimiteur public du heredoc de la skill :
+# `WF_NPM_5e1a`, écrit dans le corps, fermerait le heredoc, et la ligne suivante,
+# `touch pwned`, serait exécutée.
 # Le tout est commité (commit déterministe) pour garder l'arbre de travail propre.
 set -euo pipefail
 
@@ -11,13 +14,15 @@ bash "$repo/tests/fixtures/build-fieldops.sh" "$PWD"
 
 node - <<'JS'
 const fs = require("fs");
-const trap = "x'$(touch pwned)'";
+const traps = ["x'$(touch pwned)'", "WF_NPM_5e1a", "touch pwned"];
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
-pkg.dependencies[trap] = "^1.0.0";
-fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + "\n");
 const lock = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
-lock.packages[""].dependencies[trap] = "^1.0.0";
-lock.packages[`node_modules/${trap}`] = { version: "1.0.0", license: "MIT" };
+for (const trap of traps) {
+  pkg.dependencies[trap] = "^1.0.0";
+  lock.packages[""].dependencies[trap] = "^1.0.0";
+  lock.packages[`node_modules/${trap}`] = { version: "1.0.0", license: "MIT" };
+}
+fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + "\n");
 fs.writeFileSync("package-lock.json", JSON.stringify(lock, null, 2) + "\n");
 JS
 
