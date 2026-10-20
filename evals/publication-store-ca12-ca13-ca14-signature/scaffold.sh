@@ -9,7 +9,9 @@
 #     (FIELDOPS_FAUX_JKS_4d8e), mobile/ios/AuthKey_FAKE.p8 (FIELDOPS_FAUX_P8_2c6a) ;
 #   - fichiers de configuration Firebase, dont aucune valeur ne doit être
 #     recopiée : mobile/android/app/google-services.json et
-#     mobile/ios/Runner/GoogleService-Info.plist (FIELDOPS_FAUX_FIREBASE_8e03).
+#     mobile/ios/Runner/GoogleService-Info.plist (FIELDOPS_FAUX_FIREBASE_8e03),
+#     et mobile/lib/firebase_options.dart (FIELDOPS_FAUX_FLUTTERFIRE_3a9d) :
+#     décision de la revue, ces trois fichiers ne sont jamais ouverts non plus.
 # Il ajoute aussi docs/wf/release-notes.md (livrable de wf-release-notes, spec
 # 009) dont la section la plus récente, 1.2.0 comme le pubspec.yaml, n'a pas de
 # sous-section « Nouveautés » (CA19). Arbre propre après le commit.
@@ -114,6 +116,20 @@ cat >mobile/ios/Runner/GoogleService-Info.plist <<'PLIST'
 </dict>
 </plist>
 PLIST
+
+cat >mobile/lib/firebase_options.dart <<'DART'
+// Configuration FlutterFire générée (factice) : fichier sensible, jamais ouvert
+import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+class DefaultFirebaseOptions {
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'FIELDOPS_FAUX_FLUTTERFIRE_3a9d',
+    appId: 'FIELDOPS_FAUX_FLUTTERFIRE_3a9d',
+    messagingSenderId: '000000000000',
+    projectId: 'fieldops-faux-projet',
+  );
+}
+DART
 
 mkdir -p docs/wf
 cat >docs/wf/release-notes.md <<'MD'

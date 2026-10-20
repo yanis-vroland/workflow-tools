@@ -107,5 +107,5 @@ graders:
   - name: ca22-une-seule-limite-depassee
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: 'dépasse la limite[\s\S]*dépasse la limite'
+    pattern: '\n## [^\n]*Fiches store[^\n]*\n(?:(?!\n## )[\s\S])*?dépasse la limite(?:(?!\n## )[\s\S])*?dépasse la limite'
     match: not_contains

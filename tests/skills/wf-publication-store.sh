@@ -139,6 +139,9 @@ for sensitive in "key.properties" "*.jks" "*.keystore" "*.p12" "*.p8" \
   cite "CA12 fichier sensible $sensitive" "$sensitive"
 done
 
+cite "CA12 configuration FlutterFire jamais ouverte" "firebase_options.dart"
+cite "CA12 et ADR-001 : Grep en mode files_with_matches" 'output_mode: "files_with_matches"'
+
 # --- CA13 : fichier de clés suivi par git ------------------------------------------
 
 cite "CA13 commande git ls-files des fichiers de clés" \
@@ -260,5 +263,44 @@ for value in "${fieldops_values[@]}"; do
   fi
 done
 [ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
+
+# Extraction automatique : jetons nommés (avec « _ », « . », « - » ou en
+# camelCase, 6 caractères ou plus) des scaffolds des cas et de l'application
+# mobile de la fixture. Un jeton présent dans la skill (mot entier, casse
+# ignorée) doit être un nom imposé par la spec ou un nom standard d'outillage
+# Flutter, iOS, Android ou fastlane, listé ci-dessous.
+allowed_tokens=" androidmanifest.xml appicon.appiconset applicationid assets.xcassets
+  build.gradle build.gradle.kts buildtypes com.android.application contents.json
+  description.txt developer.android.com developer.apple.com firebase_options.dart
+  full_description.txt google-services.json googleservice-info.plist info.plist
+  iphoneos_deployment_target key.properties keypassword keywords.txt minsdk
+  minsdkversion name.txt package.json product_bundle_identifier project.pbxproj
+  publication-store.md pubspec.yaml react-native readme.md release-notes.md
+  short_description.txt signingconfig signingconfigs signingconfigs.debug
+  sous-section storepassword subtitle.txt targetsdk targetsdkversion title.txt
+  uses-permission wf-publication-store wf-release-notes "
+body_lower=$(tr '[:upper:]' '[:lower:]' <<<"$body")
+auto_ok=1
+while IFS= read -r token; do
+  lower=$(tr '[:upper:]' '[:lower:]' <<<"$token")
+  case $allowed_tokens in *[[:space:]]"$lower"[[:space:]]*) continue ;; esac
+  if grep -qwF -- "$lower" <<<"$body_lower"; then
+    ko "aucun nom des cas ni de la fixture mobile dans la skill (« $token » présent)"
+    auto_ok=0
+  fi
+done < <({
+  cat "$root"/evals/publication-store-*/scaffold.sh
+  find "$root/tests/fixtures/fieldops/mobile" -type f -exec cat {} +
+} | grep -oE '\b[A-Za-z][A-Za-z0-9]*([_.-][A-Za-z0-9]+)+|\b[a-z]+[A-Z][A-Za-z0-9]*' |
+  awk 'length($0) >= 6' | sort -u)
+[ "$auto_ok" -eq 1 ] && ok "aucun nom des cas ni de la fixture mobile dans la skill (extraction automatique)"
+
+# --- Motifs des correcteurs des evals (compilation, exemples) -----------------------
+
+if out=$(node "$root/tests/correcteurs/wf-publication-store.mjs" 2>&1); then
+  ok "motifs des correcteurs des evals (tests/correcteurs/wf-publication-store.mjs)"
+else
+  ko "motifs des correcteurs des evals ($out)"
+fi
 
 exit $fail

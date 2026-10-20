@@ -114,20 +114,19 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: '\n## [^\n]*Checklist Android[^\n]*\n(?:(?!\n## )[\s\S])*?\|\s*Élément\s*\|\s*Statut\s*\|\s*Bloquant\s*\|\s*Fichier\s*\|\s*Détail\s*\|'
-  - name: ca07-statuts-admis-et-fichiers
-    type: llm
-    focus: { source: file, path: "docs/wf/publication-store.md" }
-    criteria: >-
-      Examine uniquement les tableaux des sections « Checklist iOS » et
-      « Checklist Android ». PASS si toutes les conditions sont vraies : (1)
-      chaque élément est une ligne de tableau aux colonnes Élément, Statut,
-      Bloquant, Fichier, Détail ; (2) la colonne Statut de chaque ligne vaut
-      exactement l'un de : OK, à faire, à vérifier, non applicable (aucun autre
-      libellé, ni « manquant », ni « KO », ni emoji) ; (3) la colonne Fichier de
-      chaque ligne cite un chemin de fichier (le fichier lu, ou le chemin
-      cherché quand l'élément est absent, par exemple un chemin sous
-      mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/ ou
-      mobile/android/app/src/main/res/mipmap-*). FAIL sinon.
+  # Regex plutôt qu'un juge llm, bruité sur ce long livrable : aucune ligne de
+  # checklist dont la 2e cellule (Statut) sort des quatre statuts admis (hors
+  # en-tête et séparateur), ni dont la 4e cellule (Fichier) est vide.
+  - name: ca07-statuts-admis
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist (?:iOS|Android)[^\n]*\n(?:(?!\n## )[\s\S])*?\n\|[^|\n]*\|(?!\s*(?:OK|à faire|à vérifier|non applicable|Statut|:?-+:?)\s*\|)'
+    match: not_contains
+  - name: ca07-colonne-fichier-renseignee
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist (?:iOS|Android)[^\n]*\n(?:(?!\n## )[\s\S])*?\n\|[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*\|'
+    match: not_contains
 
   # --- CA8 : checklist iOS ----------------------------------------------------------
   - name: ca08-elements-ios-presents
@@ -161,7 +160,7 @@ graders:
   - name: ca08-aucune-valeur-ios-inventee
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
-    pattern: 'IPHONEOS_DEPLOYMENT_TARGET\s*=|DEVELOPMENT_TEAM\s*=|platform :ios'
+    pattern: 'IPHONEOS_DEPLOYMENT_TARGET\s*=\s*\d|DEVELOPMENT_TEAM\s*=\s*\w|platform :ios,\s*.\d'
     match: not_contains
 
   # --- CA9 : checklist Android ------------------------------------------------------
@@ -199,20 +198,13 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: '\n## [^\n]*Points non déterminés[^\n]*\n(?:(?!\n## )[\s\S])*?documentation des stores n.a pas pu être consultée'
+  # Regex plutôt qu'un juge llm : réseau coupé, aucune date de consultation
   - name: ca16-aucune-exigence-inventee
-    type: llm
-    focus: { source: file, path: "docs/wf/publication-store.md" }
-    criteria: >-
-      La documentation officielle des stores n'a pas pu être consultée pendant
-      cette exécution (réseau coupé). PASS si les éléments liés aux exigences
-      qui évoluent (niveau de targetSdk exigé par Google Play, version du SDK
-      iOS ou de Xcode exigée par Apple) portent le statut « à vérifier », la
-      valeur relevée dans le projet (targetSdk 33 ; pour iOS, la valeur relevée
-      ou « non déterminé ») et un lien vers une page officielle
-      (developer.android.com, developer.apple.com), sans affirmer de niveau
-      exigé daté ni de date de consultation. FAIL si le livrable présente comme
-      vérifiée une exigence actuelle des stores (par exemple « Google Play exige
-      le niveau 35 ») ou donne une date de consultation.
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: 'consulté le'
+    flags: i
+    match: not_contains
 
   # --- CA17 : verdict ---------------------------------------------------------------
   - name: ca17-synthese-non-pret

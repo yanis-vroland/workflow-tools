@@ -73,6 +73,17 @@ graders:
       avec la configuration debug, icônes absentes). FAIL s'il n'y a qu'un
       verdict global ou si une application n'a pas de verdict.
 
+  # CA17 : apps/superviseur n'a aucun élément bloquant « à faire » (icônes
+  # présentes, permission INTERNET seule, signature release par key.properties)
+  - name: ca17-superviseur-pret-a-soumettre
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Synthèse[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)[^\n]*(?=[^\n]*prêt à soumettre)(?=[^\n]*superviseur)'
+  - name: ca17-technicien-non-pret
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Synthèse[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)[^\n]*(?=[^\n]*non prêt)(?=[^\n]*technicien)'
+
   # --- CA24 : application Android seule ----------------------------------------------
   - name: ca24-ios-non-applicable-pour-superviseur
     type: regex

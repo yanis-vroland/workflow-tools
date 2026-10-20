@@ -1,0 +1,61 @@
+schema_version: "1.1"
+name: publication-store-ca15-documentation-lue
+description: >-
+  Spec 015 (wf-publication-store), CA15 avec la documentation des stores
+  joignable : FieldOps complet, passe reseau qui accorde en plus
+  WebFetch(domain:developer.android.com) et WebFetch(domain:developer.apple.com).
+  Les exigences qui évoluent gardent le statut « à vérifier », la valeur
+  relevée et le lien officiel, et citent l'exigence lue avec sa date de
+  consultation.
+tags: [wf-publication-store, spec-015, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: temoin-livrable-cree
+    type: file_exists
+    path: "docs/wf/publication-store.md"
+  # Témoins : les pages officielles ont bien été demandées
+  - name: ca15-temoin-page-android-demandee
+    type: tool_used
+    tool: WebFetch
+    input_match: '"url"\s*:\s*"https://developer\.android\.com/'
+    min: 1
+  - name: ca15-temoin-page-apple-demandee
+    type: tool_used
+    tool: WebFetch
+    input_match: '"url"\s*:\s*"https://developer\.apple\.com/'
+    min: 1
+  - name: ca15-target-sdk-lu-et-date
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist Android[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)\|(?=[^\n]*targetSdk)(?=[^\n]*\b33\b)(?=[^\n]*\|\s*à vérifier\s*\|)(?=[^\n]*https://developer\.android\.com/)(?=[^\n]*consulté le \d{4}-\d{2}-\d{2})'
+  - name: ca15-sdk-ios-lu-et-date
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)\|(?=[^\n]*(?:SDK|Xcode))(?=[^\n]*\|\s*à vérifier\s*\|)(?=[^\n]*https://developer\.apple\.com/)(?=[^\n]*consulté le \d{4}-\d{2}-\d{2})'
+  - name: ca15-pas-de-repli-hors-reseau
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: 'documentation des stores n.a pas pu être consultée'
+    match: not_contains
+  - name: ca15-aucun-contenu-du-projet-envoye
+    type: tool_used
+    tool: WebFetch
+    input_match: 'fieldops|FIELDOPS|com\.example|1\.2\.0'
+    min: 0
+    max: 0
+  - name: ca15-bash-liste-blanche
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git ls-files -- ''\*key\.properties'' ''\*\.jks'' ''\*\.keystore'' ''\*\.p12'' ''\*\.p8'')")'
+    min: 0
+    max: 0
