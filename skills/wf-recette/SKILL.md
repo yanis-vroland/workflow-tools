@@ -67,7 +67,7 @@ Puis choisis le mode :
 Si `docs/wf/recette.md` existe, lis-le d'abord : c'est une relance (nouvelle campagne). Tu le réécriras en entier avec Write, un seul cahier dans le fichier, sans copie datée ni numérotée (les campagnes précédentes restent dans l'historique git). Relève :
 
 - chaque cas du tableau : ID, Fonctionnalité, Source, Statut, Commentaire ;
-- chaque entrée de « Cas hors campagne » : ID, Fonctionnalité, Source, Statut, Commentaire (« dernier statut » et « dernier commentaire » de l'entrée, « aucun » valant commentaire vide). Ce sont des cas existants au même titre que ceux du tableau : leurs saisies ne doivent jamais se perdre ;
+- chaque entrée de « Cas hors campagne » : ID, Fonctionnalité, Source, Statut, Commentaire (« dernier statut » et « dernier commentaire » de l'entrée, « aucun » valant commentaire vide ; le point qui termine l'entrée ne fait pas partie du commentaire : un commentaire réintégré au tableau est identique, caractère pour caractère, à celui qu'avait le tableau, sans point ajouté). Ce sont des cas existants au même titre que ceux du tableau : leurs saisies ne doivent jamais se perdre ;
 - le **dernier identifiant attribué** : le plus grand entre la ligne « Dernier identifiant attribué » de l'en-tête et tous les `REC-nnn` présents dans le fichier (tableau, « Cas hors campagne », « Cas retirés »).
 
 ## Étape 6 : établir les cas
@@ -143,7 +143,7 @@ Dernier identifiant attribué : REC-<nnn>
 
 ### Cas hors campagne
 
-- REC-<nnn> : <fonctionnalité> (`<source>`), dernier statut : <statut>, dernier commentaire : <commentaire ou « aucun »>.
+- REC-<nnn> : <fonctionnalité> (`<source>`), dernier statut : <statut>, dernier commentaire : <commentaire tel quel, ou « aucun »>.
 
 ### Cas retirés
 
