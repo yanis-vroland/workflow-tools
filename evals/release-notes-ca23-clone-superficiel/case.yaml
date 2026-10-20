@@ -133,10 +133,12 @@ graders:
       disponibles (921f57c, 2fc99c0, 9986263), aucun tag n'est accessible, et
       package.json n'a pas de champ version (pas de pubspec.yaml à la racine).
 
+      Le titre, le premier commit disponible et les références sont vérifiés
+      ailleurs.
+
       Réussite si toutes les affirmations suivantes sont vraies :
-      1. « Points non déterminés » signale que l'historique est tronqué (clone
-         superficiel) et que la borne basse de la plage n'y figure pas.
-      2. Il indique le premier commit réellement disponible, 921f57c.
-      3. Le titre de section indique « Version non déterminée » et « Points non
-         déterminés » le signale.
-      4. Aucun numéro de version n'est inventé (ni 1.2.0, ni 1.2.0+14, ni autre).
+      1. « Points non déterminés » explique que l'historique est tronqué et que la
+         borne basse de la plage n'y figure pas, donc que des commits antérieurs
+         peuvent manquer.
+      2. Aucun numéro de version n'est donné nulle part dans le livrable, même
+         présenté comme probable ou déduit d'un tag ou d'un autre fichier.

@@ -141,11 +141,12 @@ absent "CA25 pas de git shortlog" 'git shortlog'
 
 cite "CA26 exclusion des fichiers d'environnement des diffs" ":(exclude,glob)**/.env*"
 
-# --- Injection shell : aucun texte variable entre guillemets doubles -------------------
-# Un <emplacement> (référence, hash, borne) remplacé entre guillemets doubles
-# laisserait passer $(…) ou des accents graves. Les emplacements des commandes
-# (blocs bash et commandes en ligne) sont entre apostrophes ou nus, après
-# validation des caractères de la référence.
+# --- Injection shell et injection d'option git ---------------------------------------
+# Une référence passée en argument n'entre dans le shell que par un heredoc à
+# délimiteur entre apostrophes, validée par bash avant usage. Toute autre
+# valeur insérée dans une commande est un hash produit par git, entre
+# apostrophes, après --end-of-options : une valeur qui commence par « - » ne
+# peut pas devenir une option de git.
 
 # Accents graves et $ littéraux, sans expansion voulue
 # shellcheck disable=SC2016
@@ -153,10 +154,27 @@ commands=$(
   awk '/^ *```bash$/ { in_block = 1; next } in_block && /^ *```$/ { in_block = 0 } in_block' <<<"$body"
   grep -oE '`(git|date) [^`]*`' <<<"$body"
 )
-if grep -qE '"[^"]*<[^>"]+>[^"]*"' <<<"$commands"; then
-  ko "aucun emplacement <…> entre guillemets doubles dans une commande ($(grep -oE '"[^"]*<[^>"]+>[^"]*"' <<<"$commands" | head -n 1))"
+# Corps du heredoc : la seule ligne où un emplacement est nu
+slots=$(grep -vxE ' *<référence>' <<<"$commands")
+
+if grep -qE '"[^"]*<[^>"]+>[^"]*"' <<<"$slots"; then
+  ko "aucun emplacement <…> entre guillemets doubles dans une commande ($(grep -oE '"[^"]*<[^>"]+>[^"]*"' <<<"$slots" | head -n 1))"
 else
   ok "aucun emplacement <…> entre guillemets doubles dans une commande"
+fi
+# Hors heredoc, chaque emplacement est dans un mot entre apostrophes
+bare=$(sed -E "s/'[^']*'//g" <<<"$slots" | grep -E '<[^>]+>' || true)
+if [ -n "$bare" ]; then
+  ko "tout emplacement <…> d'une commande est entre apostrophes (nu : $(head -n 1 <<<"$bare"))"
+else
+  ok "tout emplacement <…> d'une commande est entre apostrophes"
+fi
+# Chaque commande git qui reçoit une révision (emplacement ou variable) porte --end-of-options
+missing=$(grep -E '\bgit [^|;&]*(<[^>]+>|"\$[a-z_]+)' <<<"$slots" | grep -v -- '--end-of-options' || true)
+if [ -n "$missing" ]; then
+  ko "--end-of-options devant chaque révision fournie (absent : $(head -n 1 <<<"$missing"))"
+else
+  ok "--end-of-options devant chaque révision fournie"
 fi
 # shellcheck disable=SC2016
 if grep -qF '$ARGUMENTS' <<<"$commands"; then
@@ -164,8 +182,21 @@ if grep -qF '$ARGUMENTS' <<<"$commands"; then
 else
   ok "\$ARGUMENTS jamais inséré dans une commande"
 fi
-cite "validation des caractères d'une référence avant toute commande" \
-  "contient autre chose que lettres, chiffres, \`.\`, \`_\`, \`/\` et \`-\`, ou qui commence par \`-\`, n'existe pas"
+# Aucune substitution de commande : le correcteur du cas de référence piégée
+# signale tout « $( » dans une commande Bash
+# shellcheck disable=SC2016
+if grep -qF '$(' <<<"$commands"; then
+  ko "aucune substitution \$( dans les commandes prescrites"
+else
+  ok "aucune substitution \$( dans les commandes prescrites"
+fi
+cite "référence passée par un heredoc à délimiteur entre apostrophes" "<<'WF_FIN_REF'"
+cite "validation bash des caractères de la référence" "*[!A-Za-z0-9._/~^@{}+-]*"
+cite "règle : valeur commençant par « - » jamais insérée" \
+  "Une valeur qui commence par \`-\` n'est jamais insérée dans une commande"
+cite "message de référence refusée" "référence refusée : caractères non pris en charge"
+cite "validation de --version" '^[0-9A-Za-z.+-]+$'
+cite "message de numéro de version refusé" "numéro de version refusé"
 
 # --- Hors périmètre : aucun tag, aucun CHANGELOG ---------------------------------------
 
@@ -203,5 +234,27 @@ for value in "${fieldops_values[@]}"; do
   fi
 done
 [ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
+
+# Valeurs extraites automatiquement des cas d'eval (graders, prompts, données
+# déposées) : hash courts, numéros de version, identifiants de ticket
+case_values=$(
+  cat "$root"/evals/release-notes-*/case.yaml "$root"/evals/release-notes-*/prompt.md \
+    "$root"/evals/release-notes-*/donnees/* 2>/dev/null |
+    grep -oE '\b[0-9a-f]{7}\b|v?[0-9]+\.[0-9]+\.[0-9]+(\+[0-9]+)?|\bT[0-9]{2}\b' |
+    grep -E '[0-9]' | sort -u
+)
+auto_ok=1
+while IFS= read -r value; do
+  [ -n "$value" ] || continue
+  if grep -qF -- "$value" <<<"$body"; then
+    ko "aucune valeur des cas d'eval dans la skill (« $value » présent)"
+    auto_ok=0
+  fi
+done <<<"$case_values"
+if [ -z "$case_values" ]; then
+  ko "valeurs des cas d'eval extraites (aucune trouvée sous evals/release-notes-*)"
+elif [ "$auto_ok" -eq 1 ]; then
+  ok "aucune valeur des cas d'eval dans la skill ($(wc -l <<<"$case_values" | tr -d ' ') valeurs)"
+fi
 
 exit $fail

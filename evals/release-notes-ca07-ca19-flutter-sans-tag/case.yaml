@@ -141,10 +141,8 @@ graders:
     criteria: |
       CA19. Le dépôt n'a aucun tag de version et aucune référence n'est passée.
 
-      Réussite si toutes les affirmations suivantes sont vraies :
-      1. La plage couverte part du premier commit du dépôt (06c195d,
-         « chore: initialisation du projet ») : il figure dans « Références ».
-      2. « Points non déterminés » signale l'absence de tag de version et le fait
-         que la plage part du premier commit.
-      3. Le titre de la section est « Version 3.6.0 », sans le numéro de build, et
-         le numéro est attribué à pubspec.yaml.
+      Le titre, la source du numéro et les références sont vérifiés ailleurs.
+
+      Réussite si « Points non déterminés » explique à la fois qu'aucun tag de
+      version n'a été trouvé et que la plage part, pour cette raison, du premier
+      commit du dépôt.
