@@ -182,24 +182,24 @@ graders:
   - name: ca09-interventions-ts-haute
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/routes/interventions\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bhaute\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/routes/interventions\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : haute\b'
     flags: i
   - name: ca09-intervention-list-screen-haute
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*mobile/lib/screens/intervention_list_screen\.dart[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bhaute\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*mobile/lib/screens/intervention_list_screen\.dart[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : haute\b'
     flags: i
 
   # --- CA10 : branches conditionnelles en priorité moyenne, le reste faible --------
   - name: ca10-scheduling-moyenne
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/domain/scheduling\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bmoyenne\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/domain/scheduling\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : moyenne\b'
     flags: i
   - name: ca10-db-faible
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/db\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bfaible\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/db\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : faible\b'
     flags: i
   # Le juge llm (FAIL FAIL PASS sur un livrable conforme) est remplacé par des
   # motifs : au plus deux entrées hautes, justification chiffrée, fichiers sans
@@ -207,7 +207,7 @@ graders:
   - name: ca09-pas-plus-de-deux-entrees-hautes
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?:(?!\n## )[\s\S])*?Priorit[ée] : haute\b){3}'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?:(?!\n## )[\s\S])*?\n- Priorit[ée] : haute\b){3}'
     match: not_contains
   - name: ca09-justification-avec-nombre-de-commits
     type: regex
@@ -217,26 +217,39 @@ graders:
   - name: ca10-mailer-faible
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/services/mailer\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bfaible\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/services/mailer\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : faible\b'
     flags: i
   # main.tsx : aucune branche conditionnelle
   - name: ca10-main-tsx-faible
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/web/main\.tsx[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bfaible\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/web/main\.tsx[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : faible\b'
+    flags: i
+
+  # seed.ts : la seule branche est dans une fonction non exportée (CA10 : fonction ou méthode publique)
+  - name: ca10-seed-faible
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/db/seed\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : faible\b'
+    flags: i
+  # intervention_detail_screen.dart : branches dans les méthodes d'une classe d'état privée (_…)
+  - name: ca10-intervention-detail-faible
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*mobile/lib/screens/intervention_detail_screen\.dart[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : faible\b'
     flags: i
 
   # --- CA11 : tri par priorité puis par nombre de commits ----------------------------
   - name: ca11-aucune-haute-apres-moyenne-ou-faible
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?Priorit[ée][^\n]*\b(?:moyenne|faible)\b(?:(?!\n## )[\s\S])*?Priorit[ée][^\n]*\bhaute\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n- Priorit[ée] : (?:moyenne|faible)\b(?:(?!\n## )[\s\S])*?\n- Priorit[ée] : haute\b'
     flags: i
     match: not_contains
   - name: ca11-aucune-moyenne-apres-faible
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?Priorit[ée][^\n]*\bfaible\b(?:(?!\n## )[\s\S])*?Priorit[ée][^\n]*\bmoyenne\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n- Priorit[ée] : faible\b(?:(?!\n## )[\s\S])*?\n- Priorit[ée] : moyenne\b'
     flags: i
     match: not_contains
   # interventions.ts (4 commits récents du scaffold, plus ceux de la fixture
@@ -317,25 +330,30 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
     pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?\x60\x60\x60dart\n(?=(?:(?!\x60\x60\x60)[\s\S])*?flutter_test)(?=(?:(?!\x60\x60\x60)[\s\S])*?\btestWidgets\()'
-  - name: ca14-squelettes-selon-le-correcteur
-    type: llm
-    focus: { source: file, path: "docs/wf/tests-manquants.md" }
-    criteria: >-
-      Section « Squelettes de tests ». PASS si toutes les affirmations suivantes
-      sont vraies. (1) Il y a un squelette pour chaque entrée de priorité haute
-      de « Tests manquants », chacun précédé du chemin où le copier. (2) Celui
-      de src/api/routes/interventions.ts est en TypeScript avec Vitest
-      (describe/it, import depuis vitest), à copier à côté du fichier source
-      (src/api/routes/interventions.test.ts), comme le test existant
-      src/domain/invoice.test.ts. (3) Celui de
-      mobile/lib/screens/intervention_list_screen.dart est en Dart avec
-      flutter_test (testWidgets), à copier sous mobile/test/. (4) Chaque
-      squelette contient un cas par comportement identifié dans le code (pour
-      les routes : liste filtrée, détail introuvable, champs manquants,
-      transition interdite, suppression… ; pour l'écran : chargement, hors
-      connexion, liste affichée). (5) Aucun squelette n'importe une
-      bibliothèque absente des dépendances du projet sans le signaler. FAIL
-      sinon.
+  # Le juge llm (FAIL x3 sur un livrable conforme de 22 000 caractères) est
+  # remplacé par des motifs : un titre de squelette par entrée haute, un cas
+  # par comportement du code, aucune bibliothèque de test non déclarée.
+  - name: ca14-titre-squelette-routes
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M\d+ · à copier dans \x60src/api/routes/interventions\.test\.ts\x60'
+  - name: ca14-titre-squelette-ecran
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M\d+ · à copier dans \x60mobile/test/(?:[\w/]+/)?intervention_list_screen_test\.dart\x60'
+  - name: ca14-cas-par-comportement-routes
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?\x60\x60\x60(?:ts|typescript)\n(?=(?:(?!\x60\x60\x60)[\s\S])*?\b404\b)(?=(?:(?!\x60\x60\x60)[\s\S])*?\b400\b)(?=(?:(?!\x60\x60\x60)[\s\S])*?\b409\b)(?=(?:(?!\x60\x60\x60)[\s\S])*?\b204\b)(?:(?:(?!\x60\x60\x60)[\s\S])*?\bit\(){6}'
+  - name: ca14-cas-par-comportement-ecran
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?\x60\x60\x60dart\n(?=(?:(?!\x60\x60\x60)[\s\S])*?Hors connexion)(?:(?:(?!\x60\x60\x60)[\s\S])*?\btestWidgets\(){3}'
+  - name: ca14-aucune-bibliotheque-non-declaree
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?(?:from [\"''](?:supertest|@testing-library/[\w-]+|nock|msw)[\"'']|import ''package:(?:mockito|mocktail|http_mock_adapter)/)'
+    match: not_contains
 
   # --- CA15 : aucune règle métier inventée ---------------------------------------------
   - name: ca15-marqueur-a-completer

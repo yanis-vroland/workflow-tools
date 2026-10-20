@@ -58,13 +58,13 @@ graders:
   - name: ca18-aucune-priorite-haute
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?Priorit[ée][^\n]*\bhaute\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n- Priorit[ée] : haute\b'
     flags: i
     match: not_contains
   - name: ca18-temoin-entree-moyenne
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/quote\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bmoyenne\b'
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/quote\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?\n- Priorit[ée] : moyenne\b'
     flags: i
   - name: ca18-points-non-determines-git
     type: regex

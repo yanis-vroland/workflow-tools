@@ -193,6 +193,8 @@ cite "CA8 priorité faible" "faible"
 cite "CA8 champ Justification" "Justification"
 cite "CA9 même calcul que wf-analyse-projet (12 derniers mois)" '--since="12 months ago"'
 cite "CA9 top 10" "10"
+cite "CA10 branche hors fonction ou méthode publique sans effet sur la priorité" \
+  "méthode d'une classe privée ne compte pas"
 
 # --- CA12 : fichiers sans logique exécutable --------------------------------------
 
