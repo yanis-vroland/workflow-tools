@@ -65,6 +65,7 @@ Précisions issues de l'implémentation, à valider. Chacune complète le CA ind
 - CA8 : les noms à tester sont cités entre accents graves ; en Dart, est public tout nom qui ne commence pas par `_` ; un fichier sans export (script, point d'entrée) nomme l'élément exécuté à son chargement, avec la mention « non exporté ».
 - CA8 : le type « bout en bout » n'est proposé que si un outil de test de bout en bout est déclaré dans le projet.
 - CA9 : un fichier modifié par un seul commit sur 12 mois n'est pas un point chaud (même règle que `wf-analyse-projet`) ; le top 10 peut donc compter moins de 10 fichiers.
+- CA10 : est publique une fonction exportée, une méthode publique d'une classe exportée ou un gestionnaire enregistré sur un objet exporté ; une branche située dans une fonction non exportée, une méthode privée ou une méthode d'une classe privée (en Dart, nom commençant par `_`, y compris la classe d'état d'un widget) ne rend pas le fichier prioritaire.
 - CA11 : à priorité et nombre de commits égaux, les entrées sont triées par chemin.
 - CA12 : sont aussi réputés générés les fichiers `*.gr.dart` et `*.mocks.dart`, et ceux dont l'en-tête porte `GENERATED CODE`, `@generated`, `DO NOT EDIT` ou `Code generated` ; « Couverture actuelle » donne les chemins des fichiers exclus en plus de leur nombre.
 - CA13 : chaque cas manquant tient sur une ligne : fonction, fichier source et ligne de la branche, branche non déclenchée, fichier de test existant, statut « à vérifier ».
