@@ -239,6 +239,12 @@ check(
   ["curl -sf https://registry.npmjs.org/react/latest", "grep react-dom package-lock.json"].map(bash),
 );
 check(
+  "CA3 registre pub.dev",
+  `${nominal}/ca03-registre-pub-dev-interroge.md`,
+  ['url="https://pub.dev/api/packages/$p"; curl -s "$url"', "curl -s https://pub.dev/api/packages/http"].map(bash),
+  ["grep -n pub.dev mobile/pubspec.lock", "cat mobile/pubspec.lock", "curl -s https://pub.dev/packages/http/changelog"].map(bash),
+);
+check(
   "CA7 témoin d'échec réseau",
   "montee-version-ca07-registre-injoignable/ca07-temoin-echec-reseau.md",
   ['{"type":"tool_result","content":"npm react injoignable (curl 7)"}', "curl: (6) Could not resolve host", "npm react injoignable (HTTP 403)"],
@@ -394,6 +400,16 @@ sampleCase(nominal, nominalDoc, [
   ["adr001-aucune-adresse-email.md", livrable(nominalHeader, swap(nominalParts, "Points non déterminés", "- Dernière", "- Contributrice lea.marchetti@example.invalid.\n- Dernière"))],
   ["ca25-secret-absent-du-livrable.md", livrable(nominalHeader, swap(nominalParts, "Points non déterminés", "- Dernière", "- Valeur FIELDOPS_FAUX_SECRET_7f3a.\n- Dernière"))],
 ]);
+
+check(
+  "CA11 S1 hors des sections du plan",
+  `${nominal}/ca11-s1-non-cite.md`,
+  [livrable(nominalHeader, swap(nominalParts, "Points non déterminés", "- Dernière", "- Le constat S1 (code) est hors périmètre.\n- Dernière"))],
+  [
+    livrable(nominalHeader, swap(nominalParts, "Synthèse", "- Plan", "- S1 non traité.\n- Plan")),
+    livrable(nominalHeader, swap(nominalParts, "Plan de montée", "(S3)", "(S1, S3)")),
+  ],
+);
 
 // Registre injoignable : versions publiées « non déterminé »
 const nd = "non déterminé";
@@ -601,6 +617,23 @@ if (!existsSync(skillPath)) {
   const skill = readFileSync(skillPath, "utf8");
   const commands = [...skill.matchAll(/^```bash\n([\s\S]*?)^```$/gm)].map((m) => m[1].trimEnd());
   if (commands.length === 0) ko("aucun bloc ```bash dans la skill");
+  // Les commandes réellement lancées ont leur heredoc rempli de noms de paquets :
+  // un nom comme vite, tsx ou make, seul sur sa ligne, ne doit pas passer pour une
+  // exécution. On vérifie donc aussi les blocs remplis de noms d'outils.
+  const body = ["vite", "vitest 1.0.1", "tsx 4.6.0", "make", "eslint", "typescript", "jest", "node", "npm", "yarn", "pnpm", "react-dom 19"].join("\n");
+  const filled = commands.map((b) => b.replace(/(<<'WF_NOMS_7c1e'\n)[\s\S]*?(\nWF_NOMS_7c1e$)/m, `$1${body}$2`));
+  if (!filled.some((b, i) => b !== commands[i])) ko("aucun heredoc WF_NOMS_7c1e à remplir dans les blocs de la skill");
+  commands.push(...filled.filter((b, i) => b !== commands[i]));
+  check(
+    "CA20 heredoc : corps ignoré, commandes suivantes détectées",
+    `${nominal}/ca20-ni-installation-ni-execution.md`,
+    [bash(`while read -r p; do echo "$p"; done <<'WF_NOMS_7c1e'\nvite\ntsx\nmake\nWF_NOMS_7c1e`)],
+    [
+      bash(`while read -r p; do echo "$p"; done <<'WF_NOMS_7c1e'\nvite\nWF_NOMS_7c1e\nnpm install`),
+      bash(`while read -r p; do echo "$p"; done <<'AUTRE'\nvite\nAUTRE`),
+      bash("cat <<WF_NOMS_7c1e\nx\nWF_NOMS_7c1e\nvite"),
+    ],
+  );
   for (const c of cases) {
     for (const file of [
       "ca20-ni-installation-ni-execution.md",
@@ -614,13 +647,16 @@ if (!existsSync(skillPath)) {
       if (graders[`${c}/${file}`]) check("commandes de la skill permises", `${c}/${file}`, commands.map(bash), []);
     }
   }
-  const all = bash(commands.join("\n"));
-  for (const key of [
-    `${nominal}/ca03-registre-npm-interroge.md`,
-    `${nominal}/ca03-registre-pub-dev-interroge.md`,
-    `${nominal}/ca06-calendrier-consulte.md`,
+  // Chaque correcteur « registre interrogé » doit être satisfait par le bloc de la
+  // skill qui interroge ce registre, pris seul (pas par la concaténation des blocs).
+  for (const [key, domain] of [
+    [`${nominal}/ca03-registre-npm-interroge.md`, "registry.npmjs.org"],
+    [`${nominal}/ca03-registre-pub-dev-interroge.md`, "pub.dev/api/"],
+    [`${nominal}/ca06-calendrier-consulte.md`, "endoflife.date"],
   ]) {
-    check("commandes de la skill exigées", key, [all], []);
+    const blocks = commands.filter((b) => b.includes(domain));
+    if (blocks.length === 0) ko(`aucun bloc de la skill n'interroge ${domain}`);
+    else check(`commandes de la skill exigées (${domain}, chaque bloc seul)`, key, blocks.map(bash), []);
   }
   // Les commandes de registre, une fois le paquet substitué, visent bien l'adresse du paquet
   const npmBlock = commands.find((b) => b.includes("registry.npmjs.org"));

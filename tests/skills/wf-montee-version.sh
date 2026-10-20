@@ -127,6 +127,11 @@ cite "CA8 exemple d'argument paquet" "/wf-montee-version vue 3"
 cite "CA8 exemple d'argument SDK" "/wf-montee-version flutter 3.27"
 cite "CA9 et CA26 aucun livrable écrit" "aucun livrable n'a été écrit"
 cite "CA10 lot unique mineur et correctif" "lot unique"
+cite "CA10 une cible par dépendance en écart majeur, jamais regroupée" "jamais regroupée avec une autre dépendance"
+cite "CA10 ordre des cibles retenues" "Ordre de « Cibles retenues »"
+cite "CA3 nom invalide cité tel quel" "cité tel qu'il figure dans le manifeste"
+cite "CA19 écart sans lockfile fondé sur la contrainte" "Sans lockfile, l'écart se calcule"
+cite "CA13 rupture = changement précis" "Une rupture est un changement précis"
 
 # --- CA11 : livrable de wf-revue-securite -----------------------------------------
 
