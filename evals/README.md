@@ -107,12 +107,13 @@ CA20 : le répertoire de la session est imposé par `claude plugin eval` et le s
 
 ### wf-tests-manquants
 
-Spec 012, lancée par `/wf-tests-manquants`, tous les cas `hors-reseau` (tag `wf-tests-manquants` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca13-…`). Tous les cas qui produisent un livrable portent `ca07-aucun-lanceur-…` : aucune commande Bash ne lance `npm`, `npx`, `node`, `vitest`, `jest`, `flutter`, `dart`, `python`, `pip`… ni l'option `--coverage`.
+Spec 012, lancée par `/wf-tests-manquants`, tous les cas `hors-reseau` (tag `wf-tests-manquants` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca13-…`). Tous les cas qui produisent un livrable portent `ca07-aucun-lanceur-…` et `ca01-aucune-ecriture-hors-livrable` : aucune commande Bash ne lance `npm`, `npx`, `node`, `vitest`, `jest`, `flutter`, `dart`, `python`, `pip`… ni l'option `--coverage`.
 
 | Cas | Projet de départ | CA |
 |---|---|---|
 | `tests-manquants-ca23-fieldops-monorepo` | FieldOps complet (web et Flutter), propre, sans rapport de couverture | CA1 à CA4, CA6 à CA15, CA21, CA23 |
 | `tests-manquants-ca05-rapports-couverture` | FieldOps complet, `integration_test` déclaré, `coverage/coverage-summary.json` et `mobile/coverage/lcov.info` datés du 2026-09-15, antérieurs au dernier commit | CA5, CA4, CA7 |
+| `tests-manquants-ca05-rapport-recent` | FieldOps complet, `coverage/coverage-summary.json` produit au lancement, postérieur au dernier commit | CA5 |
 | `tests-manquants-ca16-ca18-sans-framework-ni-depot` | projet TypeScript (Vite) sans framework ni fichier de test, hors git | CA16, CA18 (cas limites), CA12 |
 | `tests-manquants-ca17-tout-couvert` | module TypeScript dont chaque branche est testée (Vitest) | CA17 (cas limite) |
 | `tests-manquants-ca19-stack-mixte` | FieldOps complet et un service Python (`relay/`) | CA19 (cas limite) |
@@ -124,6 +125,8 @@ Spec 012, lancée par `/wf-tests-manquants`, tous les cas `hors-reseau` (tag `wf
 Points chauds indépendants de la date (CA9, CA11) : le scaffold de `tests-manquants-ca23-fieldops-monorepo` ajoute des commits datés relativement au jour d'exécution (4 sur `src/api/routes/interventions.ts`, 2 sur `mobile/lib/screens/intervention_list_screen.dart`, il y a 1 à 6 jours), qui les gardent dans le top 10 sur 12 mois glissants, dans cet ordre. Le HEAD de ce cas n'est donc pas figé : son en-tête est vérifié sur la forme du hash, et le hash rejouable est vérifié dans `tests-manquants-ca05-rapports-couverture` (`558fca6`).
 
 `tests/correcteurs/wf-tests-manquants.mjs`, lancé par `tests/skills.sh`, compile les motifs de ces cas et confronte chaque commande Bash prescrite par la skill aux correcteurs Bash « max: 0 » : la liste d'extensions de l'inventaire (`(ts|tsx|…|dart|…)`) avait été prise pour un lancement de `tsx` par `ca07-aucun-lanceur-…`.
+
+Pas de juge `llm` sur le livrable du cas principal ni sur celui de CA24 (22 000 à 25 000 caractères) : les juges y rendaient des verdicts contradictoires ou trop stricts sur des livrables conformes (CA8, CA9-CA10, CA15, CA24). Ils sont remplacés par des motifs, éprouvés sur le livrable réel de l'eval et sur ses mutations : une ligne obligatoire par entrée (« À tester » avec un nom, type, priorité, justification), identifiants uniques, noms exportés réels, au plus deux entrées hautes, aucun code HTTP attendu absent du code, aucun montant ni date attendus, aucun décompte de « Couverture actuelle » incluant les dossiers non lus.
 
 Le livrable de la relance (CA20) fixe une convention que la spec laisse ouverte : la ligne d'en-tête « Dernier identifiant attribué : M<n> », qui garde la trace des identifiants retirés (même principe que `wf-cadrage-besoin`).
 
