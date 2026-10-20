@@ -105,13 +105,56 @@ fieldops_values=(
   "suggestTechnician"
   "loyalCustomer"
 )
-leak_ok=1
-for value in "${fieldops_values[@]}"; do
-  if grep -qiF -- "$value" <<<"$body"; then
-    ko "aucune valeur de FieldOps dans la skill (« $value » présent)"
-    leak_ok=0
+# Complétés automatiquement par les noms propres aux données des cas : noms
+# déclarés ou importés dans les scaffold.sh, dossiers qu'ils créent, identifiants
+# composés (camelCase, snake_case) et noms de fichiers cités par les case.yaml.
+# Seuls les termes imposés par la spec ou propres au format des cas sont admis.
+allowed_terms=" flutter_test integration_test testWidgets toBeCloseTo toStrictEqual toEqual typescript
+  allowed_tools file_exists file_path input_match last_message max_turns not_contains
+  scaffold_script schema_version timeout_seconds tool_used config format types serve
+  python vitest _test coverage describe "
+allowed_terms=" $(tr '[:upper:]\n' '[:lower:] ' <<<"$allowed_terms" | tr -s ' ') "
+case_terms() {
+  {
+    cat "$root"/evals/tests-manquants-*/scaffold.sh |
+      grep -oE '\b(export (async )?(function|const|class|interface|type)|def|class) [A-Za-z_][A-Za-z0-9_]*' |
+      awk '{ print $NF }'
+    grep -ohE 'import \{[^}]*\}' "$root"/evals/tests-manquants-*/scaffold.sh | sed 's/^import //' | tr -c 'A-Za-z0-9_\n' '\n'
+    grep -ohE 'mkdir -p [A-Za-z0-9_/ -]+' "$root"/evals/tests-manquants-*/scaffold.sh | sed 's/^mkdir -p //' | tr -s ' /' '\n'
+    sed -E 's/\\[bBdDsSwWn]//g; s/\\\././g' "$root"/evals/tests-manquants-*/case.yaml |
+      grep -oE '\b[a-z]+[A-Z][A-Za-z0-9]*\b|\b[A-Z][a-z]+[A-Z][A-Za-z0-9]*\b|\b[a-z]+_[a-z_]+\b|[A-Za-z0-9_-]+\.(ts|tsx|dart|py)\b' |
+      sed -E 's/\.(ts|tsx|dart|py)$//'
+    printf '%s\n' not_found missing_fields invalid_transition
+  } | awk 'length($0) >= 5' | sort -u | while IFS= read -r term; do
+    case "$allowed_terms" in
+      *" $(tr '[:upper:]' '[:lower:]' <<<"$term") "*) ;;
+      *) printf '%s\n' "$term" ;;
+    esac
+  done
+}
+while IFS= read -r term; do fieldops_values+=("$term"); done < <(case_terms)
+
+# leaks <texte> : affiche les valeurs des cas présentes dans le texte
+leaks() {
+  local value
+  for value in "${fieldops_values[@]}"; do
+    grep -qiF -- "$value" <<<"$1" && printf '%s\n' "$value"
+  done
+}
+
+# Contrôle par mutation : la détection doit voir un nom des données des cas
+for probe in estimateQuote pick_channel relay overlaps interventionsRouter missing_fields; do
+  if [ -z "$(leaks "$body $probe")" ]; then
+    ko "contrôle anti-fuite : « $probe » ajouté à la skill n'est pas détecté"
   fi
 done
+
+leak_ok=1
+while IFS= read -r value; do
+  [ -n "$value" ] || continue
+  ko "aucune valeur des données des cas dans la skill (« $value » présent)"
+  leak_ok=0
+done < <(leaks "$body")
 [ "$leak_ok" -eq 1 ] && ok "aucune valeur de FieldOps dans la skill"
 
 # --- CA3 et CA4 : outillage de test ----------------------------------------------
@@ -175,6 +218,34 @@ cite "CA22 message répertoire vide" "Le répertoire est vide : aucun livrable n
 cite "CA22 message sans code source" "Le répertoire ne contient aucun code source : aucun livrable n'a été écrit."
 cite "CA23 application de chaque entrée" "Application :"
 cite "CA24 dossiers non lus" "dossiers non lus"
+
+# --- CA6 : heuristique de couverture, nom de fichier pris littéralement ----------
+# Le bloc de la skill est exécuté sur une liste de fichiers fictive. Un nom
+# contenant des caractères de regex (`[id].tsx`, route dynamique) ne doit pas
+# être réputé couvert par un test d'un autre fichier (`d.test.tsx`).
+
+heuristic=$(awk '/^```bash$/ { b = 1; buf = ""; next } b && /^```$/ { b = 0; if (buf ~ /stem=/) { print buf; exit } next } b { buf = buf $0 "\n" }' <<<"$body")
+if [ -z "$heuristic" ]; then
+  ko "CA6 bloc bash de l'heuristique de couverture introuvable"
+else
+  sandbox="$work/heuristique"
+  mkdir -p "$sandbox/src/pages"
+  : >"$sandbox/src/pages/[id].tsx"
+  printf 'import { Page } from "./d";\n' >"$sandbox/src/pages/d.test.tsx"
+  : >"$sandbox/src/pages/d.tsx"
+  : >"$sandbox/src/cart.ts"
+  printf 'import { total } from "./cart";\n' >"$sandbox/src/cart.test.ts"
+  : >"$sandbox/src/orphan.ts"
+  listing="printf '%s\\n' 'src/pages/[id].tsx' src/pages/d.test.tsx src/pages/d.tsx src/cart.ts src/cart.test.ts src/orphan.ts"
+  script="${heuristic//<commande de l\'étape 2>/$listing}"
+  uncovered=$(cd "$sandbox" && bash -c "$script" 2>&1)
+  if grep -qxF 'src/pages/[id].tsx' <<<"$uncovered" && grep -qxF 'src/orphan.ts' <<<"$uncovered" &&
+    ! grep -qxF 'src/cart.ts' <<<"$uncovered" && ! grep -qxF 'src/pages/d.tsx' <<<"$uncovered"; then
+    ok "CA6 heuristique : nom de fichier échappé dans la regex ([id].tsx non couvert)"
+  else
+    ko "CA6 heuristique : résultat inattendu ($(tr '\n' ' ' <<<"$uncovered"))"
+  fi
+fi
 
 # --- ADR-001 : fichiers d'environnement jamais affichés par Grep -------------------
 # En mode contenu, Grep afficherait les lignes d'un fichier d'environnement

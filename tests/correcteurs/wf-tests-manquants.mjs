@@ -61,24 +61,41 @@ ok(`${cases.length} cas, motifs compilés`);
 
 // --- Commandes prescrites par la skill -----------------------------------------
 const skill = readFileSync(join(root, "skills", "wf-tests-manquants", "SKILL.md"), "utf8");
-const blocks = [...skill.matchAll(/^```bash\n([\s\S]*?)^```$/gm)].map((m) => m[1].trimEnd());
+// Chaque bloc avec la dernière ligne non vide qui le précède : un bloc annoncé
+// « dans git seulement » n'est jamais exécuté hors git.
+const blocks = [...skill.matchAll(/^```bash\n([\s\S]*?)^```$/gm)].map((m) => {
+  const before = skill.slice(0, m.index).trimEnd().split("\n").pop();
+  return { text: m[1].trimEnd(), gitOnly: /dans git seulement/i.test(before) };
+});
 if (blocks.length < 4) ko(`blocs bash de la skill trouvés : ${blocks.length}, attendu au moins 4`);
-const inventory = blocks.find((b) => b.includes("git ls-files --cached"));
+const inventory = blocks.find((b) => b.text.includes("git ls-files --cached"))?.text;
 if (!inventory) ko("bloc d'inventaire (étape 2) introuvable");
 const bash = (command) => JSON.stringify({ command, description: "Commande de la skill" });
 
-for (const [i, block] of blocks.entries()) {
-  // Élément à substituer : « <mots en minuscules> » (pas « <<< », ni « 2> »)
-  const placeholders = (block.match(/<[a-zà-ÿ@][a-zà-ÿ0-9 '’_@-]*>/g) || []).filter((p) => p !== "<commande de l'étape 2>");
+// Élément à substituer : « <mots en minuscules> » (pas « <<< », ni « 2> »)
+const placeholdersOf = (text) =>
+  (text.match(/<[a-zà-ÿ@][a-zà-ÿ0-9 '’_@-]*>/g) || []).filter((p) => p !== "<commande de l'étape 2>");
+
+for (const [i, { text, gitOnly }] of blocks.entries()) {
+  const placeholders = placeholdersOf(text);
   if (placeholders.length) ko(`bloc bash ${i + 1} : élément à substituer ${placeholders.join(", ")} (texte du projet dans une commande)`);
-  const command = block.replaceAll("<commande de l'étape 2>", inventory ?? "");
+  const command = text.replaceAll("<commande de l'étape 2>", inventory ?? "");
   for (const { c, g, re } of bashZero) {
-    // Ce correcteur ne vaut que hors git, où la skill n'appelle pas git log
-    if (g.name === "ca18-aucun-historique-interroge") continue;
+    // Ce correcteur ne vaut que hors git : seuls les blocs « dans git seulement » y échappent
+    if (gitOnly && g.name === "ca18-aucun-historique-interroge") continue;
     if (re.test(bash(command))) ko(`bloc bash ${i + 1} attrapé par ${c} ${g.name}`);
   }
 }
 ok(`${blocks.length} blocs bash de la skill confrontés aux correcteurs Bash « max: 0 »`);
+
+// Commandes en code en ligne (`git …`, `date …`, `find …`, `ls …`) : même règle
+// d'injection que les blocs, aucun élément du projet à substituer.
+const inline = [...skill.matchAll(/`((?:git|date|find|ls)\b[^`\n]*)`/g)].map((m) => m[1]);
+for (const span of inline) {
+  const placeholders = placeholdersOf(span);
+  if (placeholders.length) ko(`commande en ligne « ${span} » : élément à substituer ${placeholders.join(", ")}`);
+}
+ok(`${inline.length} commandes en ligne vérifiées (aucun texte du projet à substituer)`);
 
 // --- Correcteur des lanceurs (CA7) -----------------------------------------------
 const lanceurs = bashZero.find(({ g }) => g.name.startsWith("ca07-aucun-lanceur"));

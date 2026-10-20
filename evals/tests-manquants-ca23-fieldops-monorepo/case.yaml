@@ -140,19 +140,43 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
     pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M1\b'
-  - name: ca08-entrees-completes-selon-le-correcteur
-    type: llm
-    focus: { source: file, path: "docs/wf/tests-manquants.md" }
-    criteria: >-
-      Section « Tests manquants ». PASS si chaque entrée comporte : un
-      identifiant de la forme M1, M2… (préfixe M, jamais T), unique ; le chemin
-      du fichier source ; les fonctions, classes, composants ou widgets exportés
-      à tester, nommés tels qu'ils figurent dans le code (ex.
-      interventionsRouter, suggestTechnician, InterventionListScreen) ; un type
-      de test parmi unitaire, composant ou widget, intégration, bout en bout ;
-      une priorité parmi haute, moyenne, faible ; et une justification de cette
-      priorité. FAIL si une entrée omet l'un de ces éléments, ou si un nom cité
-      n'existe pas dans le fichier.
+  # Le juge llm (FAIL x3 sur un livrable de 22 000 caractères conforme) est
+  # remplacé par des motifs : chaque entrée « ### M… » doit porter chaque ligne.
+  # Ligne « À tester : » avec au moins un nom entre accents graves
+  - name: ca08-chaque-entree-nomme-ce-qu-il-faut-tester
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M\d+[^\n]*\n(?:(?!\n#{2,3} )(?!- À tester : [^\n]*\x60)[\s\S])*\n#{2,3} '
+    match: not_contains
+  # Type de test parmi les quatre de la spec
+  - name: ca08-chaque-entree-a-un-type-valide
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M\d+[^\n]*\n(?:(?!\n#{2,3} )(?!- Type de test : (?:unitaire|composant ou widget|intégration|bout en bout)\b)[\s\S])*\n#{2,3} '
+    match: not_contains
+  # Priorité parmi haute, moyenne, faible
+  - name: ca08-chaque-entree-a-une-priorite-valide
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M\d+[^\n]*\n(?:(?!\n#{2,3} )(?!- Priorité : (?:haute|moyenne|faible)\b)[\s\S])*\n#{2,3} '
+    match: not_contains
+  # Justification non vide
+  - name: ca08-chaque-entree-est-justifiee
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### M\d+[^\n]*\n(?:(?!\n#{2,3} )(?!- Justification : \S)[\s\S])*\n#{2,3} '
+    match: not_contains
+  # Identifiants uniques dans « Tests manquants »
+  - name: ca08-identifiants-uniques
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### (M\d+)\b(?:(?!\n## )[\s\S])*?\n### \1\b'
+    match: not_contains
+  # Noms exportés réels, rattachés à leur entrée
+  - name: ca08-noms-exportes-des-entrees
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*interventions\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?- À tester : [^\n]*\binterventionsRouter\b)(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*scheduling\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?- À tester : [^\n]*\bsuggestTechnician\b)(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*intervention_list_screen\.dart[^\n]*\n(?:(?!\n###? )[\s\S])*?- À tester : [^\n]*\bInterventionListScreen\b)'
 
   # --- CA9 : points chauds non couverts en priorité haute --------------------------
   - name: ca09-interventions-ts-haute
@@ -177,22 +201,30 @@ graders:
     target: { source: file, path: "docs/wf/tests-manquants.md" }
     pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/db\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bfaible\b'
     flags: i
-  - name: ca09-ca10-priorites-selon-le-correcteur
-    type: llm
-    focus: { source: file, path: "docs/wf/tests-manquants.md" }
-    criteria: >-
-      Règles de priorité de « Tests manquants » : haute pour un fichier non
-      couvert parmi les 10 fichiers les plus modifiés sur 12 mois (dans ce
-      projet : src/api/routes/interventions.ts et
-      mobile/lib/screens/intervention_list_screen.dart) ; sinon moyenne si le
-      fichier contient une fonction ou méthode publique avec une branche
-      conditionnelle (if, switch, ternaire, levée d'exception) ; sinon faible.
-      PASS si seules ces deux entrées sont en priorité haute, si les fichiers
-      sans aucune branche conditionnelle (ex. src/api/db.ts,
-      src/services/mailer.ts, src/web/main.tsx) sont en priorité faible, si
-      src/domain/scheduling.ts est en priorité moyenne, et si chaque
-      justification renvoie au critère appliqué (fréquence de modification
-      avec le nombre de commits, ou branche conditionnelle). FAIL sinon.
+  # Le juge llm (FAIL FAIL PASS sur un livrable conforme) est remplacé par des
+  # motifs : au plus deux entrées hautes, justification chiffrée, fichiers sans
+  # branche en priorité faible.
+  - name: ca09-pas-plus-de-deux-entrees-hautes
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?:(?!\n## )[\s\S])*?Priorit[ée] : haute\b){3}'
+    match: not_contains
+  - name: ca09-justification-avec-nombre-de-commits
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/routes/interventions\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?- Justification : [^\n]*\b\d+ commits?\b'
+  # mailer.ts : aucune branche conditionnelle
+  - name: ca10-mailer-faible
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/services/mailer\.ts[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bfaible\b'
+    flags: i
+  # main.tsx : aucune branche conditionnelle
+  - name: ca10-main-tsx-faible
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/web/main\.tsx[^\n]*\n(?:(?!\n###? )[\s\S])*?Priorit[ée][^\n]*\bfaible\b'
+    flags: i
 
   # --- CA11 : tri par priorité puis par nombre de commits ----------------------------
   - name: ca11-aucune-haute-apres-moyenne-ou-faible
@@ -224,8 +256,7 @@ graders:
   - name: ca12-nombre-de-fichiers-exclus
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
-    pattern: '\n## [^\n]*Couverture actuelle[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)(?=[^\n]*\bexclu)(?=[^\n]*\b\d+\b)'
-    flags: i
+    pattern: '\n## [^\n]*Couverture actuelle[^\n]*\n(?:(?!\n## )[\s\S])*?Fichiers exclus \(sans logique ex[ée]cutable\) : [1-9]'
   - name: ca12-exclusions-selon-le-correcteur
     type: llm
     focus: { source: file, path: "docs/wf/tests-manquants.md" }
@@ -311,18 +342,19 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/tests-manquants.md" }
     pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?à compléter'
-  - name: ca15-aucune-regle-inventee-selon-le-correcteur
-    type: llm
-    focus: { source: file, path: "docs/wf/tests-manquants.md" }
-    criteria: >-
-      Squelettes de tests. Une valeur attendue est déductible du code quand
-      elle y figure littéralement (ex. codes HTTP 400, 404, 409, 201, 204,
-      messages d'erreur not_found, missing_fields, invalid_transition, libellé
-      « Hors connexion : données du dernier chargement »). PASS si toute autre
-      valeur attendue (données métier, contenu d'une liste, nombre
-      d'éléments, horaires…) est remplacée par le marqueur « à compléter »,
-      et si aucun squelette n'affirme une règle métier absente du code. FAIL
-      si une valeur attendue est inventée.
+  # Le juge llm (FAIL x3) comptait comme inventés des codes déductibles du code
+  # (401 et 403 du middleware d'authentification). Remplacé par des motifs :
+  # aucun code HTTP attendu absent du code, aucun montant ni aucune date attendus.
+  - name: ca15-aucun-code-http-invente
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?(?:\btoBe|\bstatus\)\.toEqual)\((?!(?:200|201|204|400|401|403|404|409)\))[1-5]\d\d\)'
+    match: not_contains
+  - name: ca15-aucun-montant-ni-date-attendus
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Squelettes de tests[^\n]*\n(?:(?!\n## )[\s\S])*?(?:\.(?:toBe|toEqual|toStrictEqual|toBeCloseTo)\(\s*|\bexpect\([^\n]*?,\s*)(?:-?\d+\.\d+|[\"'']\d{4}-\d{2}-\d{2}|[\"'']\d{1,2}[:h]\d{2})'
+    match: not_contains
 
   # --- CA21 : fichier d'environnement non lu ------------------------------------------
   - name: ca21-temoin-faux-secret-genere
