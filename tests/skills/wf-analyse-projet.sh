@@ -219,6 +219,80 @@ else
   fail=1
 fi
 
+# --- Commandes des étapes 2 et 6, exécutées sur des noms de fichiers piégés ---------
+# Spec 001, CA5 et CA10 (amendement) : on extrait les blocs bash des étapes 2
+# (inventaire) et 6 (couverture) du SKILL.md et on les exécute, hors git, sur un
+# projet factice. Témoins : un fichier couvert par son nom et un fichier non
+# couvert, pour qu'un résultat vide ou plein ne passe pas pour une réussite.
+
+# step_block <numéro d'étape> : premier bloc ```bash de la section « ### <n>. »
+step_block() {
+  awk -v h="### $1. " '
+    index($0, h) == 1 { in_step = 1; next }
+    in_step && /^### / { exit }
+    in_step && /^```bash$/ { in_code = 1; next }
+    in_code && /^```$/ { exit }
+    in_code { print }
+  ' "$real/SKILL.md"
+}
+
+proj="$work/noms-pieges"
+mkdir -p "$proj/src"
+printf 'export const a = 1;\n' >"$proj/src/a(b.ts"
+printf "import { a } from './a(b';\n" >"$proj/src/parenthese.test.ts"
+printf 'export const d = 1;\n' >"$proj/src/tiret.ts"
+printf "import { d } from './src/tiret';\n" >"$proj/-e.test.ts"
+printf 'export const v = 1;\n' >"$proj/-v.ts"
+printf "import { v } from './-v';\n" >"$proj/option.test.ts"
+printf 'export const p = 1;\n' >"$proj/src/plain.ts"
+printf "import { p } from './plain';\n" >"$proj/src/plain.test.ts"
+printf 'export const o = 1;\n' >"$proj/src/orphelin.ts"
+# Fichier d'environnement nommé comme un module de test JS
+env_file=".env.test.js"
+printf 'API_KEY=valeur-secrete-factice\n' >"$proj/$env_file"
+
+step2=$(step_block 2)
+step6=$(step_block 6)
+placeholder="<commande de l'étape 2>"
+if [ -z "$step2" ] || [ -z "$step6" ] || ! grep -qF -- "$placeholder" <<<"$step6"; then
+  echo "ÉCHEC  CA5/CA10 : blocs bash des étapes 2 et 6 introuvables dans le SKILL.md"
+  fail=1
+else
+  script="inventory() {
+$step2
+}
+${step6//"$placeholder"/inventory}"
+  inv_out=$(cd "$proj" && bash -c "$step2" 2>&1)
+  cov_out=$(cd "$proj" && bash -c "$script" 2>&1)
+
+  if grep -qE '(^|/)\.env' <<<"$inv_out"; then
+    echo "ÉCHEC  CA10 : l'inventaire de l'étape 2 contient un fichier d'environnement ($env_file), lu ensuite par l'étape 6"
+    fail=1
+  else
+    echo "OK     CA10 : l'inventaire de l'étape 2 exclut un fichier d'environnement nommé comme un module JS"
+  fi
+
+  # <chemin>|<attendu dans la liste des non couverts : oui/non>|<description>
+  for entry in \
+    "src/a(b.ts|non|fichier a(b.ts importé par un test déclaré couvert" \
+    "src/tiret.ts|non|fichier importé par le test racine -e.test.ts déclaré couvert" \
+    "-v.ts|non|fichier racine -v.ts (nom pris pour une option) importé par un test déclaré couvert" \
+    "src/plain.ts|non|témoin : fichier couvert par son nom absent des non couverts" \
+    "src/orphelin.ts|oui|témoin : fichier non couvert listé"; do
+    path=${entry%%|*}
+    rest=${entry#*|}
+    expected=${rest%%|*}
+    description=${rest#*|}
+    if grep -qxF -- "$path" <<<"$cov_out"; then listed=oui; else listed=non; fi
+    if [ "$listed" = "$expected" ]; then
+      echo "OK     CA5 : $description"
+    else
+      echo "ÉCHEC  CA5 : $description (sortie de l'étape 6 : $(tr '\n' ' ' <<<"$cov_out"))"
+      fail=1
+    fi
+  done
+fi
+
 # --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------------
 
 if ! command -v node >/dev/null 2>&1; then
