@@ -148,10 +148,9 @@ function skillCommands() {
   return [...skill.matchAll(/```bash\n([\s\S]*?)```/g)].map((m) =>
     m[1]
       .trim()
-      .replace(/'<nom>'/g, "'vitest'")
-      .replace(/'<version>'/g, "'1.0.1'")
-      .replace(/'<identifiant>'/g, "'GHSA-aaaa-bbbb-cccc'")
-      .replace(/'<nom>@<version>'/g, "'flutter_lints@2.0.3'"),
+      .replace(/'?<nom>'?/g, "vitest")
+      .replace(/'?<version>'?/g, "1.0.1")
+      .replace(/'?<identifiant>'?/g, "GHSA-aaaa-bbbb-cccc"),
   );
 }
 

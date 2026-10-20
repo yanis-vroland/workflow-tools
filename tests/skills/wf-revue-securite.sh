@@ -173,7 +173,7 @@ generic_tokens=(
   "docs/wf" "docs/wf/revue-securite.md" "wf-revue-securite" "iOS" "JS/TS" "TypeScript"
   "JavaScript/TypeScript" "OSV.dev" "package.json" "package-lock.json" "lock.json"
   "lock.yaml" "yarn.lock" "pnpm-lock.yaml" "pubspec.yaml" "pubspec.lock" "requirements.txt"
-  "rawQuery" "shared_preferences" "pub.dev" "api.osv.dev"
+  "rawQuery" "shared_preferences" "pub.dev" "api.osv.dev" "node_modules"
 )
 is_generic() {
   local t
@@ -186,7 +186,7 @@ is_generic() {
 case_tokens=$(
   {
     cat "$root"/evals/revue-securite-*/scaffold.sh "$root"/evals/revue-securite-*/donnees/* 2>/dev/null |
-      grep -oE '[A-Za-z_][A-Za-z0-9_]*([./-][A-Za-z0-9_]+)+|[a-z]+[A-Z][A-Za-z0-9]*|[A-Z][a-z]+[A-Z][A-Za-z0-9]*|[A-Z][A-Z0-9]*_[A-Z0-9_]+|\b[0-9]+\.[0-9]+\.[0-9]+\b|\bS[0-9]{2,}\b'
+      grep -oE '[A-Za-z_][A-Za-z0-9_]*([./-][A-Za-z0-9_]+)+|[a-z]+[A-Z][A-Za-z0-9]*|[A-Z][a-z]+[A-Z][A-Za-z0-9]*|[A-Z][A-Z0-9]*_[A-Z0-9_]+|[a-z][a-z0-9]*_[a-z0-9_]+|\b[0-9]+\.[0-9]+\.[0-9]+\b|\bS[0-9]{2,}\b'
     cat "$root"/evals/revue-securite-*/graders/*.md |
       grep -oE '[A-Za-z0-9_]+\\?\.(ts|tsx|js|dart|py|json|yaml|lock|txt)\b' | tr -d '\134'
   } | sort -u
@@ -262,24 +262,26 @@ run_block() {
     in_block && /^```$/ { in_block = 0; if (index(buf, k)) print buf; next }
     in_block { buf = buf $0 "\n" }
   ' <<<"$body")
-  if grep -qE "<<'[A-Za-z0-9_]+'" <<<"$block"; then
-    # Heredoc : les lignes de gabarit sont remplacées par les lignes de données
-    filled=$(awk -v data="$data" '
-      /<[a-z][^>]*>/ { if (!done) { print data; done = 1 }; next }
-      { print }
-    ' <<<"$block")
-  else
-    # Forme historique : gabarits entre apostrophes dans le texte de la commande,
-    # remplis avec la première donnée (le modèle recopie le nom tel quel)
-    local first name version
-    first=$(head -n 1 <<<"$data")
-    name=$(awk '{ print (NF == 3 ? $2 : $1) }' <<<"$first")
-    version=$(awk '{ print (NF == 3 ? $3 : $2) }' <<<"$first")
-    filled=${block//<nom>@<version>/$name@$version}
-    filled=${filled//<nom>/$name}
-    filled=${filled//<version>/$version}
-    filled=${filled//<identifiant>/$name}
-  fi
+  # La première ligne de gabarit est dupliquée pour chaque donnée (champs : nom et
+  # version, ou identifiant), comme le ferait le modèle en recopiant le lockfile ;
+  # les autres lignes de gabarit sont retirées.
+  local template lines="" a b line done_=0
+  template=$(grep -m 1 -E '<[a-z][^>]*>' <<<"$block")
+  while read -r a b; do
+    line=${template//<nom>/$a}
+    line=${line//<version>/$b}
+    line=${line//<identifiant>/$a}
+    lines+="$line"$'\n'
+  done <<<"$data"
+  filled=""
+  while IFS= read -r line; do
+    if [[ $line =~ \<[a-z][^\>]*\> ]]; then
+      [ "$done_" -eq 0 ] && filled+="$lines"
+      done_=1
+    else
+      filled+="$line"$'\n'
+    fi
+  done <<<"$block"
   dir=$(mktemp -d "$work/exec.XXXXXX")
   (
     cd "$dir" || exit 1
@@ -296,9 +298,9 @@ run_block() {
 hostile='x'"'"'$(touch${IFS}pwned)'"'"
 
 printf '%s' '{"results":[{"vulns":[{"id":"GHSA-aaaa-bbbb-cccc","modified":"x"}],"next_page_token":"t1"},{"vulns":[{"id":"GHSA-dddd-eeee-ffff","modified":"y"}]}]}' >"$work/batch.json"
-out=$(run_block "api.osv.dev/v1/querybatch" "$work/batch.json" "npm $hostile 1.0.0
-npm JSONStream 1.3.5
-npm sample-pkg 4.18.2")
+out=$(run_block "api.osv.dev/v1/querybatch" "$work/batch.json" "$hostile 1.0.0
+JSONStream 1.3.5
+sample-pkg 4.18.2")
 if grep -q PWNED <<<"$out"; then
   ko "injection shell : la requête OSV par lot exécute un nom de paquet hostile (fichier pwned créé)"
 else
