@@ -131,6 +131,7 @@ Précisions issues de l'implémentation, à valider. Chacune complète le CA ind
 - CA2 : l'en-tête de `index.md` comporte, en plus de l'outil, de la date et du commit, les lignes « Niveau atteint » (A, B ou C, avec la mention « forcé par --niveau » le cas échéant), « Sources lues », « Derniers identifiants attribués » et « Exécution ».
 - CA4 : une source se cite sous la forme « phrase » (fichier, « titre de section ») pour un fichier Markdown ou texte, « phrase » (fichier, page N) pour un PDF, l'identifiant `Bnn` pour un besoin du cadrage, « réponse saisie à la question `Qnn` » ou « décision saisie en `Dnn` » pour une saisie.
 - CA4 : un élément sans source n'est ajouté comme « supposé » que s'il est indispensable à l'entité qui le porte.
+- CA4 : chaque relation porte sa propre source (phrase citée, identifiant de besoin ou saisie) ou la marque « supposé », même quand la règle dont découlent ses cardinalités est elle-même sourcée.
 - CA5 : les noms d'entités du diagramme sont en majuscules, sans accent ni espace.
 - CA7 : chaque relation indique la règle `RGnn` dont découlent ses cardinalités.
 - CA8 : chaque question se termine par « Bloquante : oui » ou « Bloquante : non » ; une question est bloquante si sa réponse change une table, une colonne, une clé, une cardinalité ou une contrainte du schéma physique.
