@@ -177,7 +177,84 @@ const pubTable = [
   "| S1 | Carnet | `http` | pub | 0.12.2 | transitive (via `google_fonts`) | GHSA-4rgh-jx4f-qfcq (CVE-2020-35669) | MODERATE | 0.13.3 |",
 ].join("\n");
 
+// Entrée de constat complète (format du modèle du livrable), pour les correcteurs de forme
+const fullEntry = (id, overrides = {}) =>
+  constat(id, {
+    Application: "API",
+    Niveau: "moyen",
+    Catégorie: "injection (A05:2025 Injection)",
+    Emplacement: "`src/a.ts:3`",
+    Description: "requête concaténée.",
+    Recommandation: "requête paramétrée.",
+    Statut: "confirmé",
+    ...overrides,
+  });
+const without = (entry, field) => entry.replace(new RegExp(`- ${field} : [^\\n]*\\n`), "");
+const jwtFallback = fullEntry("S5", {
+  Niveau: "élevé",
+  Catégorie: "secret exposé (A07:2025 Authentication Failures)",
+  Emplacement: "`src/api/middleware/auth.ts:6`",
+  Description: "valeur littérale `[masqué]` de repli de `JWT_SECRET`, variable d'environnement non lue.",
+  Statut: "à vérifier",
+});
+const r7Suites = [
+  {
+    file: "revue-securite-fieldops/graders/ca09-champs-des-constats.md",
+    input: text,
+    // not_contains : un « positif » est une entrée incomplète
+    positive: ["Statut", "Niveau", "Recommandation", "Application"].map((f) =>
+      doc({ "Constats dans le code": fullEntry("S3") + "\n" + without(fullEntry("S4"), f) }),
+    ).concat([
+      doc({ "Secrets et configuration": fullEntry("S6", { Emplacement: "`src/a.ts`" }) }),
+      doc({ "Constats dans le code": fullEntry("S3", { Catégorie: "injection" }) }),
+    ]),
+    negative: [
+      doc({ "Constats dans le code": fullEntry("S3") + "\n" + fullEntry("S4", { Catégorie: "stockage non sécurisé (M9:2024 Insecure Data Storage)" }) }),
+      doc({ "Secrets et configuration": fullEntry("S6", { Emplacement: "`.env.staging`", Statut: "à vérifier" }) }),
+    ],
+  },
+  {
+    file: "revue-securite-fieldops/graders/ca05-forme-des-entrees.md",
+    input: text,
+    positive: [
+      doc({ "Dépendances vulnérables": depsTable.replace("| LOW | 4.20.0 |", "| faible | 4.20.0 |") }),
+      doc({ "Dépendances vulnérables": depsTable.replace("| directe |", "| |") }),
+    ],
+    negative: [doc({ "Dépendances vulnérables": depsTable })],
+  },
+  {
+    file: "revue-securite-fieldops/graders/ca11-secret-de-repli-a-verifier.md",
+    input: text,
+    positive: [doc({ "Secrets et configuration": jwtFallback })],
+    negative: [
+      doc({ "Secrets et configuration": jwtFallback.replace("à vérifier", "confirmé") }),
+      doc({ "Constats dans le code": jwtFallback }),
+    ],
+  },
+  {
+    file: "revue-securite-ca07-sans-lockfile/graders/ca07-version-tiree-de-la-contrainte.md",
+    input: text,
+    positive: [doc({ "Dépendances vulnérables": depsTable })],
+    negative: [
+      doc({
+        "Dépendances vulnérables": depsTable
+          .split("\n")
+          .slice(0, 3)
+          .join("\n")
+          .replace("| 4.18.2 |", "| non déterminée (contrainte `^4.18.2`, vérifiée en 4.18.2) |"),
+      }),
+    ],
+  },
+  {
+    file: "revue-securite-ca05-ca06-transitive-pub/graders/ca06-pub-dev-interroge.md",
+    input: text,
+    positive: ['google_fonts 1.1.0 : \\"dependencies\\":{\\"flutter\\"', 'google_fonts 1.1.0 : "dependencies":{}'],
+    negative: ["paquet google_fonts 1.1.0", "pub.dev injoignable pour google_fonts 1.1.0 (curl 6, HTTP 000)"],
+  },
+];
+
 const suites = [
+  ...r7Suites,
   {
     file: "revue-securite-ca22-stack-mixte/graders/ca22-aucune-dependance-python.md",
     input: text,

@@ -138,6 +138,9 @@ for level in "élevé" "moyen" "faible"; do
 done
 cite "CA9 statut « confirmé »" "confirmé"
 cite "CA9 statut « à vérifier »" "à vérifier"
+cite "CA11 et CA14 : valeur de repli d'une variable d'environnement à vérifier" \
+  "seulement comme valeur par défaut d'une variable d'environnement"
+cite "CA5 : attribution d'un avis vérifiée par son champ affected" "c'est \`affected\` qui fait foi"
 
 # --- CA12 à CA17 : catégories et règles de détection ----------------------------------
 
