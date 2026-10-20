@@ -57,28 +57,36 @@ Lis ensuite les manifestes, lockfiles, configurations (CI, Docker, `.env.example
 ### 4. Dépendances
 
 - Version installée : celle du lockfile (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `pubspec.lock`), à défaut celle du manifeste en le précisant.
-- Dernière version publiée des dépendances directes, en une commande par écosystème. Avant de l'écrire dans la commande, vérifie chaque nom : npm `^(@[a-z0-9._-]+/)?[a-z0-9._-]+$`, pub `^[a-z0-9_]+$`. Un nom non conforme n'est jamais écrit dans une commande : signale-le comme non vérifié. Écris chaque nom entre apostrophes simples ; le `/` d'un paquet à portée (`@scope/nom`) est encodé en `%2F`.
+- Dernière version publiée des dépendances directes, en un seul appel de Bash. Un nom de paquet lu dans un manifeste ou un lockfile n'est **jamais écrit dans le texte d'une commande**, même entre apostrophes : bash l'analyserait avant toute vérification, et un nom piégé (apostrophe suivie d'une substitution de commande) s'exécuterait. Vérifie d'abord chaque nom : npm `^(@[a-z0-9._-]+/)?[a-z0-9._-]+$`, pub `^[a-z0-9_]+$`. Un nom non conforme n'est écrit nulle part dans une commande, ni interrogé : signale-le dans « Points non déterminés » avec la mention « nom de paquet invalide, non vérifié ». Les noms conformes sont écrits tels quels, un par ligne, dans le corps des heredocs ci-dessous, dont le délimiteur est entre apostrophes (bash n'interprète rien de ce corps) : `WF_NPM_5e1a` pour npm (pnpm, yarn), `WF_PUB_5e1a` pour pub. Le shell les vérifie à nouveau avant tout usage, puis ne les emploie qu'en variable ; une ligne « nom de paquet invalide, non vérifié » de la sortie se traite comme un nom non conforme. Le `/` d'un paquet à portée (`@scope/nom`) est encodé en `%2F` par le shell.
 
 ```bash
-for p in '<paquet>' '<@scope/paquet>'; do
-  [[ $p =~ ^(@[a-z0-9._-]+/)?[a-z0-9._-]+$ ]] || { echo "npm $p nom invalide, ignoré"; continue; }
+while IFS= read -r p; do
+  [ -n "$p" ] || continue
+  [[ $p =~ ^(@[a-z0-9._-]+/)?[a-z0-9._-]+$ ]] || { echo "npm $p : nom de paquet invalide, non vérifié"; continue; }
   out=$(curl -sf --max-time 10 -w '\n%{http_code}' "https://registry.npmjs.org/${p/\//%2F}/latest"); rc=$?; code=${out##*$'\n'}
   case "$rc:$code" in
     0:*) echo "npm $p $(grep -o '"version":"[^"]*"' <<<"$out" | head -1)" ;;
     22:404) echo "npm $p introuvable (404)" ;;
     *) echo "npm $p injoignable (curl $rc)" ;;
   esac
-done
-for p in '<paquet>'; do
-  [[ $p =~ ^[a-z0-9_]+$ ]] || { echo "pub $p nom invalide, ignoré"; continue; }
+done <<'WF_NPM_5e1a'
+<nom npm>
+WF_NPM_5e1a
+while IFS= read -r p; do
+  [ -n "$p" ] || continue
+  [[ $p =~ ^[a-z0-9_]+$ ]] || { echo "pub $p : nom de paquet invalide, non vérifié"; continue; }
   out=$(curl -sf --max-time 10 -w '\n%{http_code}' "https://pub.dev/api/packages/$p"); rc=$?; code=${out##*$'\n'}
   case "$rc:$code" in
     0:*) echo "pub $p $(grep -o '"latest":{"version":"[^"]*"' <<<"$out" | head -1)" ;;
     22:404) echo "pub $p introuvable (404)" ;;
     *) echo "pub $p injoignable (curl $rc)" ;;
   esac
-done
+done <<'WF_PUB_5e1a'
+<nom pub>
+WF_PUB_5e1a
 ```
+
+Écosystème absent du projet : son heredoc reste vide (aucune ligne entre les délimiteurs).
 
 - Cite chaque dépendance en retard d'au moins une version majeure sur une ligne : nom, version installée, dernière version publiée, registre interrogé.
 - Paquet introuvable (404) : le registre répond mais ne le connaît pas (paquet privé, renommé ou retiré) ; dis-le, sans le compter comme injoignable.
@@ -191,5 +199,5 @@ Effort **moyen** : justification par les risques listés ci-dessus.
 ## Points non déterminés
 
 - Hébergement de production : non déterminé.
-- (registre injoignable et repli sur le lockfile, historique tronqué, dossiers non lus, stack non couverte…)
+- (registre injoignable et repli sur le lockfile, nom de paquet invalide, historique tronqué, dossiers non lus, stack non couverte…)
 ```
