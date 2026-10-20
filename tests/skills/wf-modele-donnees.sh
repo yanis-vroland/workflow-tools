@@ -126,6 +126,8 @@ cite "CA9 identifiant d'encadré À décider" "D01"
 cite "CA9 champ de décision à remplir" "Décision :"
 cite "CA9 au moins deux options" "Option 2"
 cite "CA9 aucune option recommandée" "Ne recommande aucune option"
+# shellcheck disable=SC2016 # accents graves littéraux
+cite "CA9 élément dépendant d'un encadré ouvert renvoyé à cet encadré" 'provisoire, voir `Dnn`'
 
 # --- CA10 et CA11 : relance -------------------------------------------------------
 
