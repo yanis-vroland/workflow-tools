@@ -10,7 +10,7 @@ Tu rédiges, en français, un plan de montée de version du projet ouvert dans l
 ## Règles absolues
 
 - **Écriture** : un seul fichier, `docs/wf/montee-version.md`, écrit avec l'outil Write (qui crée `docs/wf/` au besoin ; pas de `mkdir`). Aucun autre fichier du projet n'est créé, modifié, déplacé ou supprimé : ni manifeste, ni lockfile, ni code, ni livrable d'un autre outil (`docs/wf/revue-securite.md` est seulement lu). Pas d'outil Edit sur un autre fichier, pas de redirection `>` ni de `curl -o`.
-- **Aucune installation ni exécution** : tu n'installes ni ne mets à jour aucune dépendance, tu ne lances pas le projet, n'exécutes pas ses tests ni ses scripts, et tu ne crées ni branche ni commit. Les commandes `npm install`, `pnpm add`, `yarn add`, `flutter pub add`, `flutter pub upgrade` et les commandes de vérification sont **écrites dans le livrable, jamais lancées**. Bash ne sert qu'à : `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F` (chacune seule, recopiée telle quelle) et aux commandes `curl` des blocs ci-dessous, où tu ne remplaces que les valeurs entre apostrophes `'<…>'`. N'y écris qu'un nom de paquet ou une version déjà vérifiés contre leur motif (étape 1 et étape 5), qui n'admettent ni apostrophe, ni guillemet, ni espace, ni `$` ; une valeur non conforme (argument, nom lu dans un manifeste) n'entre jamais dans une commande, ni entre guillemets doubles, ni hors des apostrophes. Aucune autre commande, même en lecture (`ls`, `cat`, `find`, `npm view`, `npm outdated`) : pour lire, utilise Read, Glob et Grep.
+- **Aucune installation ni exécution** : tu n'installes ni ne mets à jour aucune dépendance, tu ne lances pas le projet, n'exécutes pas ses tests ni ses scripts, et tu ne crées ni branche ni commit. Les commandes `npm install`, `pnpm add`, `yarn add`, `flutter pub add`, `flutter pub upgrade` et les commandes de vérification sont **écrites dans le livrable, jamais lancées**. Bash ne sert qu'à : `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F` (chacune seule, recopiée telle quelle) et aux commandes `curl` des blocs ci-dessous, recopiées telles quelles. Les noms de paquets et les versions, qu'ils viennent de l'argument ou d'un manifeste, ne s'écrivent que dans le corps du heredoc qui termine chaque bloc (une ligne `<paquet> [<version>]` par paquet, entre `<<'WF_NOMS_7c1e'` et `WF_NOMS_7c1e`), jamais sur la ligne de commande, ni entre apostrophes, ni entre guillemets : le corps d'un heredoc à délimiteur entre apostrophes n'est jamais interprété par le shell, et la boucle vérifie chaque nom contre son motif avant tout appel. N'écris jamais dans ce corps une ligne égale au délimiteur ou un nom qui tient sur plusieurs lignes : signale-le directement comme non vérifié. Ainsi, une valeur non conforme n'entre jamais dans une commande. Aucune autre commande, même en lecture (`ls`, `cat`, `find`, `npm view`, `npm outdated`) : pour lire, utilise Read, Glob et Grep.
 - **Réseau** : seulement des noms et versions de paquets, jamais de code ni de contenu du projet. Registres et calendriers par `curl` (blocs ci-dessous) ; notes de version, changelogs et guides de migration officiels par WebFetch. Aucune base d'avis de sécurité (OSV.dev, `npm audit`, GitHub Advisories) : tu ne recherches pas toi-même les vulnérabilités.
 - **Secrets** : ne lis jamais, ni avec Read, ni avec Grep, ni avec Bash, un fichier d'environnement (`.env`, `.env.local`, `.env.production`…, sauf `.env.example`) ni un fichier de secrets ou d'identifiants (`.envrc`, `.npmrc`, `android/key.properties`, clés et certificats). Avec Grep, passe toujours soit le paramètre `glob` limité à des extensions de code (ex. `*.{ts,tsx,js,jsx,mjs,cjs,vue,dart}`), soit un `path` qui désigne un seul fichier nommé (manifeste ou lockfile), jamais un dossier sans `glob` : en mode contenu, Grep afficherait les lignes d'un fichier d'environnement. Le livrable ne contient aucune valeur de variable d'environnement.
 - **Données personnelles** : aucune adresse e-mail (de contributeur ou autre) dans le livrable.
@@ -21,7 +21,7 @@ Tu rédiges, en français, un plan de montée de version du projet ouvert dans l
 Lis l'argument passé après `/wf-montee-version` (par exemple `/wf-montee-version vue 3` ou `/wf-montee-version flutter 3.27`). Formes reconnues :
 
 - aucun argument : toutes les dépendances en retard (étape 6) ;
-- `<paquet> [version]` : un paquet npm (nom conforme à `^(@[a-z0-9._-]+/)?[a-z0-9._-]+$`) ou pub (`^[a-z0-9_]+$`) ;
+- `<paquet> [version]` : un paquet npm (nom conforme à `^(@[a-z0-9._~-]+/)?[A-Za-z0-9._~-]+$`, majuscules des anciens noms comprises) ou pub (`^[a-z0-9_]+$`) ;
 - `node [version]` ou `flutter [version]` : l'environnement d'exécution ou le SDK.
 
 La version est complète (`3.4.0`) ou partielle (`3`, `3.27`) ; elle doit être conforme à `^[0-9]+(\.[0-9]+){0,2}$`. Une version partielle désigne la plus récente version stable publiée qui commence par elle ; sans version, la cible est la dernière version stable publiée. Argument mal formé : réponds « Argument non reconnu : <argument> : aucun livrable n'a été écrit. » et arrête-toi.
@@ -47,7 +47,7 @@ Applications : chaque dossier qui porte un `package.json` (avec dépendances) ou
 ## Étape 4 : livrable existant et livrable de sécurité
 
 - Si `docs/wf/montee-version.md` existe, lis-le d'abord. Tu le réécriras en entier avec Write : un seul plan dans le fichier (jamais l'ancien suivi du nouveau), aucune copie datée ou numérotée. L'inventaire reflète les versions actuelles du lockfile ; conserve seulement ce qui reste vrai, et mets à jour la date, le commit et l'argument. L'historique est porté par git : le livrable mis à jour ne cite plus aucune valeur périmée de l'ancien, ni son ancienne date, ni son ancien commit, ni une version qui n'est plus installée ou plus la dernière publiée, même pour signaler le changement (pas de note « mis à jour depuis… », pas de colonne ni de ligne « avant / après »). La date et le commit de l'en-tête viennent des commandes de l'étape 3, jamais de l'ancien livrable.
-- Si `docs/wf/revue-securite.md` existe, lis sa section « Dépendances vulnérables » : chaque entrée a un identifiant `Sn`, un nom, un écosystème, une version installée et une première version corrigée (ou « aucune correction publiée »). Ne reprends que ces entrées (pas les constats dans le code ni les secrets), et ne modifie jamais ce fichier. S'il est absent, n'en tiens pas compte.
+- Si `docs/wf/revue-securite.md` existe, lis sa section « Dépendances vulnérables » : chaque entrée a un identifiant `Sn`, l'application concernée (en monorepo), un nom, un écosystème, une version installée et une première version corrigée (ou « aucune correction publiée »). Ne reprends que ces entrées (pas les constats dans le code ni les secrets), et ne modifie jamais ce fichier. Si la section indique « non déterminé (base d'avis injoignable) », aucune entrée n'est reprise : signale dans « Points non déterminés » que les dépendances vulnérables n'ont pas pu être établies par `wf-revue-securite`, sans les rechercher toi-même. S'il est absent, n'en tiens pas compte.
 
 ## Étape 5 : inventaire des versions
 
@@ -55,35 +55,55 @@ Pour chaque application, lis le manifeste et le lockfile de son dossier ou de la
 
 - **Dépendances directes** : toutes celles de `dependencies` et `devDependencies` (`package.json`), ou de `dependencies` et `dev_dependencies` (`pubspec.yaml`) ; l'usage est le nom de cette section. Les dépendances du SDK (`sdk: flutter`) sont citées avec l'usage, sans version publiée.
 - **Version installée** : tirée du lockfile : `package-lock.json` (entrée `node_modules/<paquet>`, ou `<dossier>/node_modules/<paquet>` en espace de travail), `pnpm-lock.yaml` (`importers` → dossier → `version`), `yarn.lock`, `pubspec.lock`. Le lockfile donne aussi le gestionnaire détecté : npm, pnpm, yarn ou pub. Sans lockfile (aucun lockfile pour une application JS/TS ou Flutter), la version installée est « non déterminé », l'inventaire se fonde sur la contrainte déclarée, le gestionnaire JS/TS est « non déterminé », et « Points non déterminés » le signale. Ne déduis jamais une version installée d'une contrainte.
-- **Dernière version publiée** : interroge les registres, une commande par écosystème, avec tous les noms de paquets vérifiés (un nom non conforme n'est jamais écrit dans une commande : signale-le comme non vérifié). Écris chaque nom entre apostrophes simples.
+- **Dernière version publiée** : interroge les registres, une commande par écosystème, avec tous les noms de paquets dans le heredoc (une ligne par paquet, nom seul pour la dernière version). La boucle écarte un nom non conforme (`nom invalide`, sans appel réseau) : il figure dans l'inventaire avec la mention « non vérifié (nom invalide) ».
+
+npm (sortie : version, `engines` et `peerDependencies` de la dernière version, ou d'une version précise `x.y.z` donnée après le nom) :
 
 ```bash
-for p in '<paquet>' '<@scope/paquet>'; do
-  [[ $p =~ ^(@[a-z0-9._-]+/)?[a-z0-9._-]+$ ]] || { echo "npm $p nom invalide, ignoré"; continue; }
-  out=$(curl -s --max-time 10 -w '\n%{http_code}' "https://registry.npmjs.org/${p/\//%2F}/latest"); rc=$?; code=${out##*$'\n'}
+while IFS=' ' read -r p v; do
+  [[ $p =~ ^(@[a-z0-9._~-]+/)?[A-Za-z0-9._~-]+$ ]] || { echo "npm $p nom invalide, ignoré : non vérifié"; continue; }
+  [[ -z $v || $v =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "npm $p version $v invalide, ignorée : non vérifiée"; continue; }
+  out=$(curl -s --max-time 10 -w '\n%{http_code}' "https://registry.npmjs.org/${p/\//%2F}/${v:-latest}"); rc=$?; code=${out##*$'\n'}
   case "$rc:$code" in
-    0:200) echo "npm $p $(grep -oE '"(version|engines|peerDependencies)":("[^"]*"|\{[^}]*\})' <<<"$out" | tr '\n' ' ')" ;;
-    0:404) echo "npm $p introuvable (404)" ;;
+    0:200) echo "npm $p ${v:-latest} $(grep -oE '"(version|engines|peerDependencies)":("[^"]*"|\{[^}]*\})' <<<"$out" | tr '\n' ' ')" ;;
+    0:404) echo "npm $p ${v:-latest} introuvable (404)" ;;
+    0:*) echo "npm $p injoignable (HTTP $code)" ;;
     *) echo "npm $p injoignable (curl $rc)" ;;
   esac
-done
+done <<'WF_NOMS_7c1e'
+<paquet>
+<@scope/paquet> <x.y.z>
+WF_NOMS_7c1e
 ```
 
+pub (sans version : dernière version et son `environment`, et, après une version partielle `x` ou `x.y`, les plus récentes versions qui commencent par elle ; avec une version précise `x.y.z` : son existence et son `environment`) :
+
 ```bash
-for p in '<paquet>'; do
-  [[ $p =~ ^[a-z0-9_]+$ ]] || { echo "pub $p nom invalide, ignoré"; continue; }
-  out=$(curl -s --max-time 10 -w '\n%{http_code}' "https://pub.dev/api/packages/$p"); rc=$?; code=${out##*$'\n'}
+while IFS=' ' read -r p v; do
+  [[ $p =~ ^[a-z0-9_]+$ ]] || { echo "pub $p nom invalide, ignoré : non vérifié"; continue; }
+  [[ -z $v || $v =~ ^[0-9]+(\.[0-9]+){0,2}$ ]] || { echo "pub $p version $v invalide, ignorée : non vérifiée"; continue; }
+  if [[ $v =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then url="https://pub.dev/api/packages/$p/versions/$v"; else url="https://pub.dev/api/packages/$p"; fi
+  out=$(curl -s --max-time 10 -w '\n%{http_code}' "$url"); rc=$?; code=${out##*$'\n'}
   case "$rc:$code" in
-    0:200) echo "pub $p $(grep -oE '"latest":\{"version":"[^"]*"' <<<"$out" | head -1) $(grep -oE '"latest":\{.*' <<<"$out" | grep -oE '"environment":\{[^}]*\}' | head -1)" ;;
-    0:404) echo "pub $p introuvable (404)" ;;
+    0:200)
+      if [[ $v =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "pub $p $v $(grep -oE '"environment":\{[^}]*\}' <<<"$out" | head -1)"
+      else
+        echo "pub $p $(grep -oE '"latest":\{"version":"[^"]*"' <<<"$out" | head -1) $(grep -oE '"latest":\{.*' <<<"$out" | grep -oE '"environment":\{[^}]*\}' | head -1)${v:+ ; versions $v : $(grep -oE '"version":"[0-9]+\.[0-9]+\.[0-9]+","pubspec"' <<<"$out" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | grep -E "^${v//./\\.}(\\.|$)" | sort -t. -k1,1n -k2,2n -k3,3n | tail -3 | tr '\n' ' ')}"
+      fi ;;
+    0:404) echo "pub $p ${v:-} introuvable (404)" ;;
+    0:*) echo "pub $p injoignable (HTTP $code)" ;;
     *) echo "pub $p injoignable (curl $rc)" ;;
   esac
-done
+done <<'WF_NOMS_7c1e'
+<paquet>
+<paquet> <version>
+WF_NOMS_7c1e
 ```
 
 - **Écart** entre la version installée (à défaut, la plus basse version admise par la contrainte) et la dernière version publiée : « majeur » si le premier nombre diffère, « mineur » si le deuxième diffère, « correctif » si le troisième diffère, « à jour » sinon. Écart « non déterminé » si l'une des deux versions l'est.
 - **Monorepo** : une sous-section `###` par application. Une même dépendance installée dans plusieurs applications à des versions différentes est signalée sous l'inventaire : « Versions différentes entre applications : `<paquet>` <version> (`<application>`) et <version> (`<application>`) ».
-- **Registre injoignable** (`injoignable` dans la sortie) : garde les versions du lockfile, écris « non déterminé » pour la dernière version publiée et l'écart, signale dans « Points non déterminés » le registre injoignable et le repli sur le lockfile, et produis tout de même le livrable. Ne complète jamais une version de mémoire. Un paquet introuvable (404) n'est pas un registre injoignable : le registre ne le connaît pas (paquet privé, renommé ou retiré), dis-le.
+- **Registre injoignable** (`injoignable` dans la sortie, avec le code d'erreur de `curl` ou le code HTTP reçu) : garde les versions du lockfile, écris « non déterminé » pour la dernière version publiée et l'écart, signale dans « Points non déterminés » le registre injoignable et le repli sur le lockfile, et produis tout de même le livrable. Ne complète jamais une version de mémoire. Un paquet introuvable (404) n'est pas un registre injoignable : le registre ne le connaît pas (paquet privé, renommé ou retiré), dis-le.
 
 ### Environnement d'exécution et SDK
 
@@ -97,12 +117,14 @@ for product in 'nodejs' 'flutter'; do
   case "$rc:$code" in
     0:200) echo "endoflife.date $product :"; grep -oE '\{"cycle":"[^"]*"[^}]*\}' <<<"$out" ;;
     0:404) echo "endoflife.date $product : aucun calendrier publié (404)" ;;
+    0:*) echo "endoflife.date $product injoignable (HTTP $code)" ;;
     *) echo "endoflife.date $product injoignable (curl $rc)" ;;
   esac
 done
 out=$(curl -s --max-time 20 -w '\n%{http_code}' 'https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json'); rc=$?; code=${out##*$'\n'}
 case "$rc:$code" in
   0:200) echo "Flutter stable :"; grep -A2 '"channel": "stable"' <<<"$out" | grep -oE '"(version|dart_sdk_version)": "[^"]*"' | paste -d' ' - - ;;
+  0:*) echo "versions de Flutter injoignables (HTTP $code)" ;;
   *) echo "versions de Flutter injoignables (curl $rc)" ;;
 esac
 ```
@@ -112,28 +134,31 @@ N'interroge que les produits présents dans le projet. La dernière LTS de Node.
 ## Étape 6 : cibles retenues
 
 - **Sans argument** : toutes les dépendances en retard. Les dépendances en écart mineur ou correctif forment un **lot unique** (une seule cible, application par application en monorepo) ; puis une cible par dépendance en écart majeur ; puis une cible pour Node.js ou Flutter s'il n'est pas à la dernière version LTS ou stable (dernière version non déterminée : pas de cible, le dire et le reprendre dans « Points non déterminés »). Aucune cible pour une dépendance à jour, d'écart non déterminé, ou d'une stack non couverte.
-- **Avec argument** : « Cibles retenues » ne contient que cette cible, et les sections suivantes ne portent que sur elle et sur les dépendances qu'elle entraîne (exigences ci-dessous). Une dépendance n'est entraînée que si les métadonnées du registre de la version visée l'exigent : aucune cible, étape ni commande « recommandée », « d'alignement » ou « conseillée » (paquets de types, outillage, plugins) qui ne serait pas exigée ainsi. Tu peux la mentionner dans « Points non déterminés », sans version visée ni commande. Pour un paquet, vérifie sa présence dans les manifestes, puis ses versions publiées :
+- **Avec argument** : « Cibles retenues » ne contient que cette cible, et les sections suivantes ne portent que sur elle et sur les dépendances qu'elle entraîne (exigences ci-dessous). Une dépendance n'est entraînée que si les métadonnées du registre de la version visée l'exigent : aucune cible, étape ni commande « recommandée », « d'alignement » ou « conseillée » qui ne serait pas exigée ainsi. Pour un paquet, vérifie sa présence dans les manifestes, puis ses versions publiées. Paquet passé sans version : la commande de son écosystème à l'étape 5, avec le nom seul, donne la dernière version, qui est la version visée. Paquet npm avec une version (complète ou partielle) :
 
 ```bash
-for pv in '<paquet>@<version>'; do
-  p=${pv%@*}; v=${pv##*@}
-  [[ $p =~ ^(@[a-z0-9._-]+/)?[a-z0-9._-]+$ && $v =~ ^[0-9]+(\.[0-9]+){0,2}$ ]] || { echo "npm $pv invalide, ignoré"; continue; }
+while IFS=' ' read -r p v; do
+  [[ $p =~ ^(@[a-z0-9._~-]+/)?[A-Za-z0-9._~-]+$ ]] || { echo "npm $p nom invalide, ignoré : non vérifié"; continue; }
+  [[ $v =~ ^[0-9]+(\.[0-9]+){0,2}$ ]] || { echo "npm $p version $v invalide, ignorée : non vérifiée"; continue; }
   out=$(curl -s --max-time 20 -H 'Accept: application/vnd.npm.install-v1+json' -w '\n%{http_code}' "https://registry.npmjs.org/${p/\//%2F}"); rc=$?; code=${out##*$'\n'}
   case "$rc:$code" in
     0:200) echo "npm $p $(grep -oE '"latest":"[^"]*"' <<<"$out" | head -1) ; versions $v : $(grep -oE '"[0-9]+\.[0-9]+\.[0-9]+":\{"name"' <<<"$out" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | grep -E "^${v//./\\.}(\\.|$)" | sort -t. -k1,1n -k2,2n -k3,3n | tail -3 | tr '\n' ' ')" ;;
     0:404) echo "npm $p introuvable (404)" ;;
+    0:*) echo "npm $p injoignable (HTTP $code)" ;;
     *) echo "npm $p injoignable (curl $rc)" ;;
   esac
-done
+done <<'WF_NOMS_7c1e'
+<paquet> <version>
+WF_NOMS_7c1e
 ```
 
-  Pour un paquet pub, la commande pub de l'étape 5 donne la dernière version, et `https://pub.dev/api/packages/<paquet>/versions/<x.y.z>` (même forme de commande, `0:404` = version inexistante) vérifie une version précise. Pour `node` ou `flutter`, cherche la version dans les sorties de l'étape 5.
+  Paquet pub avec une version : la commande pub de l'étape 5, avec `<paquet> <version>` dans le heredoc, vérifie une version précise (`/versions/<x.y.z>`, `404` = version inexistante) ou liste les plus récentes versions qui commencent par une version partielle (aucune = version inexistante). Les métadonnées npm d'une version précise (`peerDependencies`, `engines`) viennent de la commande npm de l'étape 5, avec `<paquet> <x.y.z>`. Pour `node` ou `flutter`, cherche la version dans les sorties de l'étape 5.
   - Paquet absent des manifestes du projet : n'écris aucun livrable et termine par « Le paquet `<paquet>` n'est pas une dépendance du projet (dernière version publiée : <x.y.z>, registre <npm|pub.dev>) : aucun livrable n'a été écrit. » (dernière version « non déterminée » si le registre est injoignable ; s'il répond 404, dis que le paquet n'existe pas non plus sur le registre).
   - Version inexistante (aucune version publiée ne correspond) : n'écris aucun livrable et termine par « La version `<version>` de `<paquet>` n'existe pas sur le registre <npm|pub.dev> (dernière version publiée : <x.y.z>) : aucun livrable n'a été écrit. »
   - Registre injoignable : produis le livrable avec la version demandée, « non vérifiée sur le registre », et signale-le dans « Points non déterminés ».
   - Cible déjà à la version visée (ou au-delà) : « Synthèse » l'indique, aucune rupture, et « Plan de montée » ne contient aucune étape.
 - **Livrable de sécurité** : chaque montée dont la version visée est supérieure ou égale à la première version corrigée d'une entrée `Sn` de « Dépendances vulnérables » (même paquet, même application) cite cet identifiant et est placée en tête de « Cibles retenues » et du plan.
-- **Exigences d'une cible** (selon les métadonnées du registre, jamais de mémoire) : pour npm, `peerDependencies` et `engines` de la version visée (commande de l'étape 5 avec `/<version>` à la place de `/latest` pour une version qui n'est pas la dernière) ; pour pub, `environment.sdk` et `environment.flutter` de la version visée. Si la version visée exige une version d'une autre dépendance du projet, de Node.js, du SDK Dart ou de Flutter que le projet ne satisfait pas, cette autre dépendance est ajoutée au plan, dans une étape qui précède ou accompagne celle de la cible, avec la mention de l'exigence et de sa source. Pour le SDK Dart, la version de Flutter qui le livre est tirée de la sortie « Flutter stable ».
+- **Exigences d'une cible** (selon les métadonnées du registre, jamais de mémoire) : pour npm, `peerDependencies` et `engines` de la version visée (commande npm de l'étape 5, avec la version précise après le nom pour une version qui n'est pas la dernière) ; pour pub, `environment.sdk` et `environment.flutter` de la version visée. Si la version visée exige une version d'une autre dépendance du projet, de Node.js, du SDK Dart ou de Flutter que le projet ne satisfait pas, cette autre dépendance est ajoutée au plan, dans une étape qui précède ou accompagne celle de la cible, avec la mention de l'exigence et de sa source. Pour le SDK Dart, la version de Flutter qui le livre est tirée de la sortie « Flutter stable ».
 
 ## Étape 7 : ruptures et impacts
 
