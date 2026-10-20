@@ -81,6 +81,12 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
     pattern: '\n#{1,6} [^\n]*Configuration[^\n]*\n(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?DATABASE_URL)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?JWT_SECRET)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?MAP_API_KEY)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?MAIL_API_KEY)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?PAYMENT_API_KEY)(?=(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?SEED_PASSWORD)'
+  # Tableau Variable | Utilisé pour | Où la renseigner | Comment l'obtenir (détail
+  # des colonnes : cas doc-projet-ca04-tableau-des-variables)
+  - name: ca04-tableau-en-tete-dans-configuration
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet.md" }
+    pattern: '\n#{1,6} [^\n]*Configuration[^\n]*\n(?:(?!\n#{1,6} [^\n]*Fonctionnalités)[\s\S])*?\n\|\s*Variable\s*\|\s*Utilisé pour\s*\|\s*Où la renseigner\s*\|\s*Comment l[’'']obtenir\s*\|'
   - name: ca04-aucune-valeur-de-variable
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }

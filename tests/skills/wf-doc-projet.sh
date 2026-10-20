@@ -2,8 +2,8 @@
 # Tests structurels de la skill wf-doc-projet (spec 002, ADR-001 tests à deux
 # niveaux). Sans modèle : vérifie que SKILL.md existe, respecte les conventions
 # communes (verifier-skills.sh) et cite le contrat de la spec 002 : chemins du
-# livrable, fichiers du format dossier, sections dans l'ordre, seuil de 500 lignes
-# et schéma Mermaid. Le comportement réel est vérifié par les evals
+# livrable, fichiers du format dossier, sections dans l'ordre, tableau des
+# variables d'environnement, seuil de 500 lignes et schéma Mermaid. Le comportement réel est vérifié par les evals
 # evals/doc-projet-*.
 # Usage : tests/skills/wf-doc-projet.sh [répertoire des skills, par défaut skills/]
 set -u
@@ -91,6 +91,16 @@ if [ -n "$body" ] && tr '\n' ' ' <<<"$body" | LC_ALL=C grep -q -- "$ordered"; th
 else
   ko "CA2 : les huit sections ne sont jamais citées dans l'ordre de la spec"
 fi
+
+# --- CA4 : tableau des variables d'environnement ---------------------------------
+# En-tête exact du tableau, une règle par colonne, et service nommé seulement
+# s'il est établi par le code (SDK ou API).
+
+cite CA4 "| Variable | Utilisé pour | Où la renseigner | Comment l'obtenir |"
+cite CA4 'SDK'
+cite CA4 '**Utilisé pour**'
+cite CA4 '**Où la renseigner**'
+cite CA4 '**Comment l'"'"'obtenir**'
 
 # --- CA5, CA9, CA11 : schéma et seuil ------------------------------------------
 
