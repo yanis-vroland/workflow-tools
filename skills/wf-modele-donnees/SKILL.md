@@ -196,7 +196,7 @@ erDiagram
 
 ### Écarts aux conventions
 
-- <table.colonne du schéma existant> : <écart aux conventions fixes (ex. pas de `created_at`)>. (niveau C seulement)
+- <table.colonne du schéma existant> : <écart aux conventions fixes (ex. clé primaire qui ne s'appelle pas `id`)>. (niveau C seulement)
 
 ### Relations n-n sans table de jointure
 
@@ -314,8 +314,8 @@ Le schéma traduit le modèle conceptuel mis à jour (avec toutes les réponses 
 1. **Lire l'existant** : lis avec Read chaque schéma détecté (étape 3) et, s'il y en a, ses migrations existantes (`prisma/migrations/`, classes `MigrationInterface` de TypeORM, dossier de migrations SQL numérotées, `version` et `onUpgrade` de sqflite, `schemaVersion` et `MigrationStrategy` de Drift). Pour chaque schéma, note la base ou l'ORM et l'outil de migration ; s'il n'y en a pas, l'outil de migration est « aucun ». Ne lis jamais un fichier d'environnement, même pour connaître la base.
 2. **Modèle demandé** : les sections communes décrivent l'état visé : les entités existantes, tirées du schéma (source : son chemin), et ce que la demande ajoute ou change (source : la phrase de la demande).
 3. **Différences** : liste chaque table ou colonne ajoutée, modifiée, renommée ou supprimée, avec sa source. Un changement de nom demandé est un renommage, jamais une suppression suivie d'un ajout.
-4. **Migration sans perte**, qui suit les conventions du schéma existant (noms, types, présence ou non de `created_at`), même quand elles s'écartent des conventions fixes du niveau B. Chaque écart du schéma existant à ces conventions est signalé dans « Revue du modèle », sous « Écarts aux conventions », sans être corrigé par la migration si la demande ne le prévoit pas.
-   - **Colonne obligatoire ajoutée à une table existante** : soit avec une valeur par défaut dans la même instruction (`ADD COLUMN level TEXT NOT NULL DEFAULT 'standard'`), soit ajoutée sans contrainte, remplie par une reprise des lignes existantes (`UPDATE … SET …`), puis rendue obligatoire (`ALTER COLUMN … SET NOT NULL`). Jamais une contrainte `NOT NULL` seule.
+4. **Migration sans perte**, qui suit les conventions du schéma existant (noms, types, colonnes techniques), même quand elles s'écartent des conventions fixes du niveau B. Chaque écart du schéma existant à ces conventions est signalé dans « Revue du modèle », sous « Écarts aux conventions », sans être corrigé par la migration si la demande ne le prévoit pas.
+   - **Colonne obligatoire ajoutée à une table existante** : soit avec une valeur par défaut dans la même instruction (`ADD COLUMN <colonne> <type> NOT NULL DEFAULT <valeur>`), soit ajoutée sans contrainte, remplie par une reprise des lignes existantes (`UPDATE … SET …`), puis rendue obligatoire (`ALTER COLUMN … SET NOT NULL`). Jamais une contrainte `NOT NULL` seule.
    - **Renommage** d'une colonne ou d'une table : `RENAME COLUMN` ou `RENAME TO` (ou l'équivalent de l'ORM), jamais une suppression suivie d'une recréation.
    - **Suppression** d'une colonne ou d'une table : écrite dans la migration uniquement si elle est confirmée par une décision saisie dans un encadré `Dnn` qui la retient (citée : « décision saisie en `Dnn` »). Sinon, crée ou conserve un encadré « À décider » (supprimer, conserver, archiver…, chacune avec ses conséquences, dont la perte des données), et n'écris la suppression nulle part dans la migration, pas même en commentaire ; « Évolution » la présente « en attente de `Dnn` ».
    - Chaque élément qui dépend d'une question ou d'une décision vide est marqué « supposé » en commentaire dans la migration et dans `index.md`.
