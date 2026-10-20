@@ -295,7 +295,8 @@ add mobile/lib/db/local_db.dart
 commit "2026-06-17T15:55:00Z" nora "feat(mobile): cache local des interventions"
 
 stage "$H1" 85 "$MARKERS"
-commit "2026-07-01T10:25:00Z" lea "feat(interventions): suppression d'une intervention annulée"
+add src/jobs/purge-closed-interventions.ts .github/workflows/purge.yml
+commit "2026-07-01T10:25:00Z" lea "feat(interventions): suppression d'une intervention annulée et purge nocturne des clôturées"
 
 add src/domain/invoice.test.ts
 commit "2026-07-15T16:30:00Z" hugo "test(invoice): frais de déplacement et facture vide"

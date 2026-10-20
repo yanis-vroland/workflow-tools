@@ -50,16 +50,16 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
     pattern: '\n#{1,6} [^\n]*Installation et lancement[^\n]*\n(?:(?!\n#{1,6} [^\n]*Configuration)[\s\S])*?npm run dev\b'
-  # 903dded : HEAD du scaffold (commit du livrable), rejouable ; l'ancien en-tête
-  # citait 35377d4 et le 2026-10-02
+  # 81c55c7 : HEAD du scaffold (commit du livrable), rejouable ; l'ancien en-tête
+  # citait be04389 et le 2026-10-02
   - name: ca07-en-tete-commit-mis-a-jour
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '^(?:[^\n]*\n){0,15}[^\n]*\b903dded'
+    pattern: '^(?:[^\n]*\n){0,15}[^\n]*\b81c55c7'
   - name: ca07-en-tete-ancienne-date-retiree
     type: regex
     target: { source: file, path: "docs/wf/doc-projet.md" }
-    pattern: '^(?:[^\n]*\n){0,15}[^\n]*(?:2026-10-02|35377d4)'
+    pattern: '^(?:[^\n]*\n){0,15}[^\n]*(?:2026-10-02|be04389)'
     match: not_contains
   - name: ca01-aucune-ecriture-hors-docs-wf
     type: tool_used

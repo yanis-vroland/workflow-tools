@@ -1,6 +1,6 @@
 # Documentation du projet FieldOps
 
-> Généré par `wf-doc-projet` le 2026-09-30, commit `5b26289`.
+> Généré par `wf-doc-projet` le 2026-09-30, commit `2fc99c0`.
 
 ## Présentation
 

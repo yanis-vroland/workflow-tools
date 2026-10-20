@@ -55,7 +55,7 @@ fixture_values=(
   "invoice"
   "scheduling"
   "mobile/"
-  "5b26289"
+  "2fc99c0"
   "FieldOps"
 )
 

@@ -4,7 +4,7 @@ Projets fictifs sur lesquels les evals lancent les outils `wf-*` (ADR-001, secti
 
 | Fixture | Rôle | Outils visés |
 |---|---|---|
-| `fieldops/` | Monorepo FieldOps volontairement imparfait : API et back-office web JS/TS à la racine, application compagnon Flutter dans `mobile/`, specs internes dans `docs/specs/` | outils de diagnostic et de documentation (001 à 003, 008 à 016) |
+| `fieldops/` | Monorepo FieldOps volontairement imparfait : API et back-office web JS/TS à la racine, application compagnon Flutter dans `mobile/`, specs internes dans `docs/specs/` | outils de diagnostic et de documentation (001 à 003, 008 à 016, 018) |
 | `build-fieldops.sh` | Copie `fieldops/` et y construit un historique git déterministe | outils qui lisent l'historique (001, 008, 009, 012, 014, 016) |
 | `build-fieldops-web.sh` | Variante « web seul » : `build-fieldops.sh` puis retrait de `mobile/` dans un commit rejouable ; le projet n'est plus un monorepo | 002 (CA9, CA12) |
 | `commit-livrable.sh` | Dépose et commite un livrable existant dans `docs/wf/` d'un FieldOps déjà construit | 002 (CA7, CA12) |
@@ -73,6 +73,9 @@ Les références `NNN-CAn` renvoient aux specs `docs/specs/` de ce dépôt.
 | Services tiers repérés par variables : cartographie, e-mail transactionnel, paiement | `.env.example`, `src/services/*.ts` | 003-CA6, 016-CA7 |
 | Déploiement recette (branche `main`) et production (tags), secrets `REGISTRY_TOKEN`, `DEPLOY_TOKEN` | `.github/workflows/deploy.yml`, `Dockerfile`, `docker-compose.yml` | 016-CA5, 016-CA8 |
 | Lint configuré, CI, Vitest | `.eslintrc.json`, `.github/workflows/deploy.yml`, `package.json` | 003-CA9, 012-CA3, 013-CA16 |
+| Tâche planifiée : workflow de CI programmé (`schedule`, cron `30 2 * * *`, plus `workflow_dispatch`) qui lance la purge des interventions clôturées depuis plus de 24 mois ; secret `PRODUCTION_DATABASE_URL` | `.github/workflows/purge.yml`, `src/jobs/purge-closed-interventions.ts` | 018-CA6 |
+| Obligation non automatisée : date d'expiration de la clé de cartographie (`MAP_API_KEY_EXPIRES_AT`), lue par le client de cartographie qui désactive le géocodage une fois la clé expirée (`console.warn`) | `.env.example`, `src/services/mapClient.ts` | 018-CA8, 018-CA15 |
+| Exploitation : sortie standard et d'erreur seules (`console.log`, `console.warn`), aucune journalisation des requêtes, route `/api/health`, `docker-compose.yml` sans clé `restart`, redémarrage distant par webhook | `src/api/server.ts`, `docker-compose.yml`, `.github/workflows/deploy.yml` | 018-CA4, 018-CA5, 018-CA10, 018-CA13, 018-CA14 |
 | Domaine métier : `Intervention`, `Technician`, `WorkOrder` | `src/domain/types.ts`, `src/db/schema.sql` | 003-CA11 |
 
 ### Application compagnon Flutter (`mobile/`)
