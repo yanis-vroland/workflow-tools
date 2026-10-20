@@ -59,3 +59,48 @@ Couverts par CA7, CA9, CA11 (livrable de sécurité absent), CA17 à CA19, et CA
 ## Questions ouvertes
 
 - Aucune.
+
+## Amendement 1 (proposé)
+
+Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+
+- CA1 : l'en-tête indique « hors git » quand le répertoire n'est pas dans un dépôt ou que le dépôt n'a aucun commit ; la mention « modifications non commitées » ignore le livrable lui-même.
+- CA3 : un nom de paquet npm est conforme s'il respecte la forme `(@portée/)nom` du registre, majuscules des anciens noms comprises ; un nom pub est conforme s'il ne contient que des minuscules, des chiffres et `_`.
+- CA3 : une dépendance dont le nom n'est pas conforme figure dans l'inventaire avec la mention « non vérifié (nom invalide) » et n'est jamais envoyée au registre.
+- CA3 : une dépendance du SDK Flutter (`sdk: flutter`) est citée avec son usage, sans dernière version publiée ni écart.
+- CA3 : l'écart compare la version installée (à défaut, la plus basse version admise par la contrainte déclarée) et la dernière version publiée : « majeur » si le premier nombre diffère, « mineur » si c'est le deuxième, « correctif » si c'est le troisième ; il est « non déterminé » si l'une des deux versions l'est.
+- CA4 : quand plusieurs fichiers déclarent la version de Node.js et qu'ils divergent, l'inventaire le signale.
+- CA5 : la dernière version stable de Flutter, et la version de Dart qu'elle livre, sont tirées de la liste des versions publiées par Flutter.
+- CA6 : la dernière version LTS de Node.js est le cycle le plus récent dont la date d'entrée en LTS est passée ; la date de fin de support est celle du cycle de la version déclarée ; un calendrier non publié ou injoignable donne « non déterminé », repris dans « Points non déterminés ».
+- CA7 : un paquet inconnu du registre (réponse « introuvable ») est signalé comme tel et n'est pas compté comme registre injoignable ; un registre injoignable est signalé avec le code d'erreur réseau ou le code HTTP reçu.
+- CA8 : l'argument prend l'une des formes `<paquet> [version]`, `node [version]` ou `flutter [version]` ; la version est complète (x.y.z) ou partielle (x ou x.y).
+- CA8 : une version partielle désigne la plus récente version stable publiée qui commence par elle ; un argument sans version vise la dernière version stable publiée.
+- CA8 : avec un argument, « Inventaire des versions » reste complet ; seules les sections à partir de « Cibles retenues » se limitent à la cible.
+- CA8 : une dépendance n'est entraînée par la cible que si les métadonnées du registre de la version visée l'exigent ; aucune cible, étape ni commande « recommandée » ou « d'alignement » n'est ajoutée.
+- CA9 : les vérifications de l'argument (présence dans les manifestes, existence de la version) ont lieu avant l'inventaire ; en cas d'échec, aucun livrable n'est écrit.
+- CA9 : un argument mal formé (nom ou version non conformes) est signalé (« Argument non reconnu ») et aucun livrable n'est écrit.
+- CA9 : pour un paquet absent du projet, le message cite la dernière version publiée, ou « non déterminée » si le registre est injoignable, et indique si le paquet n'existe pas non plus sur le registre.
+- CA9 : avec un argument et un registre injoignable, le livrable est produit, la cible est marquée « non vérifiée sur le registre » et « Points non déterminés » le signale.
+- CA10 : en monorepo, le lot mineur et correctif est formé application par application.
+- CA10 : aucune cible n'est proposée pour une dépendance d'écart non déterminé, ni pour l'environnement d'exécution ou le SDK dont la dernière version n'a pas pu être établie ; « Points non déterminés » le signale.
+- CA11 : une montée correspond à une entrée `Sn` si elle porte sur le même paquet, dans la même application, et que sa version visée est supérieure ou égale à la première version corrigée ; une entrée « aucune correction publiée » n'est atteinte par aucune montée.
+- CA11 : si la section « Dépendances vulnérables » indique « non déterminé (base d'avis injoignable) », aucune entrée n'est reprise et « Points non déterminés » signale que les dépendances vulnérables n'ont pas pu être établies ; l'outil ne les recherche pas lui-même.
+- CA12 : une rupture est recherchée pour toute cible qui change de version majeure, ou de version mineure pour une version 0.x, et pour l'environnement d'exécution ou le SDK.
+- CA12 : une URL n'est citée comme source que si sa consultation a réussi pendant l'exécution ; sinon la rupture est « non vérifiée », sans URL présentée comme source.
+- CA13 : la recherche des usages porte sur tout le code des applications concernées, hors dépendances installées, dossiers de build et fichiers générés ; chaque usage est cité sous la forme `<chemin>:<ligne>`.
+- CA14 : quand la version visée exige une version du SDK Dart, la version de Flutter qui la livre est tirée de la liste des versions publiées par Flutter.
+- CA15 : les étapes sont ordonnées ainsi : montées qui corrigent une entrée `Sn`, prérequis exigés par une autre cible (ou dans la même étape), lot mineur et correctif, cibles en écart majeur, puis environnement d'exécution ou SDK.
+- CA15 : une étape d'environnement d'exécution ou de SDK indique les fichiers de version à modifier au lieu d'une commande du gestionnaire ; en espace de travail pnpm, la commande cible l'application (`--filter`).
+- CA15 et CA19 : sans lockfile pour une application JS/TS, le gestionnaire est « non déterminé » et l'étape indique « commande non déterminée (aucun lockfile) » au lieu d'inventer une commande.
+- CA16 : les commandes de vérification utilisent le gestionnaire détecté ; une application qui ne définit qu'une partie des scripts (test, lint, build) ne reçoit que ceux-là.
+- CA18 : sans étape, « Plan de montée » contient seulement la phrase « Le plan ne contient aucune étape. ».
+- CA20 : les seules commandes lancées sont la date, le commit, l'état du dépôt git et les interrogations en lecture des registres et calendriers ; aucune autre commande, même en lecture (y compris les commandes de consultation des gestionnaires de paquets).
+- CA20 : les noms de paquets et les versions, qu'ils viennent de l'argument, d'un manifeste ou d'un lockfile, ne sont jamais interprétés par le shell : ils sont transmis aux commandes par l'entrée standard, puis validés avant tout appel réseau ; un nom sur plusieurs lignes ou identique au marqueur de fin de cette entrée est signalé comme non vérifié sans être transmis.
+- CA21 : l'effort est « faible » si aucune rupture n'a d'impact identifié, « moyen » si les ruptures touchent au plus 10 fichiers, « élevé » au-delà ou si l'environnement d'exécution ou le SDK change de version majeure.
+- CA22 : les manifestes des stacks non couvertes recherchés sont au moins `composer.json`, `pyproject.toml`, `requirements.txt`, `Gemfile`, `go.mod`, `Cargo.toml`, `pom.xml` et `build.gradle`.
+- CA23 : le livrable mis à jour ne cite aucune valeur périmée de l'ancien (date, commit, version qui n'est plus installée ni la dernière publiée), même pour signaler le changement ; la date et le commit de l'en-tête sont relevés à l'exécution.
+- CA24 : sans argument, l'en-tête ne comporte aucune mention d'argument.
+- CA25 : les fichiers de secrets ou d'identifiants (configuration de registre, propriétés de signature, clés, certificats) ne sont pas lus non plus ; une recherche dans le contenu ne porte que sur des fichiers de code ou sur un manifeste ou lockfile nommé, jamais sur un dossier entier.
+- CA26 : un répertoire vide et un répertoire sans manifeste donnent deux messages distincts ; dans les deux cas, aucun registre n'est interrogé.
+- CA27 : un `package.json` racine qui ne déclare que des espaces de travail n'est pas une application.
+- CA28 : quand les impacts sont partiels, « Ruptures et impacts » l'indique en tête de section.
