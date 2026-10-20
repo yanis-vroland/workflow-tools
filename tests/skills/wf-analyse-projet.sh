@@ -293,6 +293,77 @@ ${step6//"$placeholder"/inventory}"
   done
 fi
 
+# --- Injection shell par un nom de paquet (amendement de CA3) -----------------------
+# Un nom de paquet vient d'un manifeste ou d'un lockfile du projet : il n'est jamais
+# recopié dans le texte d'une commande (une apostrophe dans le nom refermerait les
+# apostrophes, et `$(…)` s'exécuterait). Il passe par un heredoc à délimiteur entre
+# apostrophes, est validé par le shell, puis n'est employé qu'en variable.
+
+skill_md="$real/SKILL.md"
+inj="$work/injection"
+mkdir -p "$inj/run" "$inj/bin"
+injection_ok=1
+
+# shellcheck disable=SC2016 # motifs littéraux
+if grep -qE "\"<[^>]+>\"|'<[^>]+>'" "$skill_md"; then
+  echo "ÉCHEC  injection : un nom est recopié entre guillemets ou apostrophes dans une commande ($(grep -oE "\"<[^>]+>\"|'<[^>]+>'" "$skill_md" | sort -u | tr '\n' ' '))"
+  injection_ok=0
+fi
+if ! grep -qF 'nom de paquet invalide, non vérifié' "$skill_md"; then
+  echo "ÉCHEC  injection : mention « nom de paquet invalide, non vérifié » absente de la skill"
+  injection_ok=0
+fi
+
+# Bloc ```bash des registres : celui qui contient les deux heredocs
+registry_block=$(awk '
+  /^```bash$/ { on = 1; buf = ""; next }
+  on && /^```$/ { if (index(buf, "<<'"'"'WF_NPM_5e1a'"'"'") && index(buf, "<<'"'"'WF_PUB_5e1a'"'"'")) { printf "%s", buf; exit } on = 0; next }
+  on { buf = buf $0 "\n" }
+' "$skill_md")
+if [ -z "$registry_block" ]; then
+  echo "ÉCHEC  injection : bloc bash des registres avec heredocs <<'WF_NPM_5e1a' et <<'WF_PUB_5e1a' absent"
+  injection_ok=0
+fi
+
+# Faux curl : note son dernier argument (l'URL) et répond comme un registre
+cat >"$inj/bin/curl" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "${@: -1}" >>"$FAKE_LOG"
+printf '{"version":"9.9.9","latest":{"version":"9.9.9"}}\n200'
+SH
+chmod +x "$inj/bin/curl"
+
+# shellcheck disable=SC2016 # noms piégés : substitutions littérales
+npm_names=('vite' '@scope/outil' "x'\$(touch pwned1)'" '$(touch pwned2)' '`touch pwned3`' 'y";touch pwned4;"')
+# shellcheck disable=SC2016
+pub_names=('path_utils' "z'\$(touch pwned5)'")
+shells=(bash)
+[ -x /bin/zsh ] && shells+=(/bin/zsh)
+for sh in "${shells[@]}"; do
+  [ -n "$registry_block" ] || break
+  : >"$inj/log"
+  script=$(NPM_BODY="$(printf '%s\n' "${npm_names[@]}")" PUB_BODY="$(printf '%s\n' "${pub_names[@]}")" awk '
+    $0 == "<nom npm>" { print ENVIRON["NPM_BODY"]; next }
+    $0 == "<nom pub>" { print ENVIRON["PUB_BODY"]; next }
+    { print }' <<<"$registry_block")
+  out=$(cd "$inj/run" && PATH="$inj/bin:$PATH" FAKE_LOG="$inj/log" "$sh" -c "$script" 2>&1)
+  if compgen -G "$inj/run/pwned*" >/dev/null; then
+    echo "ÉCHEC  injection ($sh) : un nom piégé a exécuté une commande"
+    for f in "$inj"/run/pwned*; do rm -f "$f"; done
+    injection_ok=0
+  fi
+  expected_urls=$'https://registry.npmjs.org/vite/latest\nhttps://registry.npmjs.org/@scope%2Foutil/latest\nhttps://pub.dev/api/packages/path_utils'
+  if [ "$(cat "$inj/log")" != "$expected_urls" ]; then
+    echo "ÉCHEC  injection ($sh) : registres interrogés inattendus ($(tr '\n' ' ' <"$inj/log"))"
+    injection_ok=0
+  fi
+  if [ "$(grep -c 'nom de paquet invalide, non vérifié' <<<"$out")" -ne 5 ]; then
+    echo "ÉCHEC  injection ($sh) : 5 noms invalides signalés attendus ($out)"
+    injection_ok=0
+  fi
+done
+[ "$injection_ok" -eq 1 ] && echo "OK     injection : noms de paquets transmis par heredoc, validés par le shell, noms piégés refusés (bash, zsh)"
+[ "$injection_ok" -eq 1 ] || fail=1
 # --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------------
 
 if ! command -v node >/dev/null 2>&1; then
