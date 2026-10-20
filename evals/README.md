@@ -130,12 +130,14 @@ Spec 004, tous les cas tagués `hors-reseau`. Chaque grader porte dans son nom l
 
 ### wf-revue-securite
 
-Spec 010, lancée par `/wf-revue-securite` (tag `wf-revue-securite` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca12-…`) ; les graders `temoin-…` vérifient que le scaffold a bien planté la faille ou la valeur dont un grader d'absence vérifie qu'elle n'est pas reprise. Les failles propres à un cas sont plantées par son `scaffold.sh` et commitées (arbre propre), avec des valeurs manifestement factices (`FAUX_…`) ; celles du FieldOps commun sont décrites dans `tests/fixtures/README.md`. Les deux cas `reseau` ont besoin d'OSV.dev : la passe `reseau` accorde `WebFetch(domain:api.osv.dev)`.
+Spec 010, lancée par `/wf-revue-securite` (tag `wf-revue-securite` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca12-…`) ; les graders `temoin-…` vérifient que le scaffold a bien planté la faille ou la valeur dont un grader d'absence vérifie qu'elle n'est pas reprise. Les failles propres à un cas sont plantées par son `scaffold.sh` et commitées (arbre propre), avec des valeurs manifestement factices (`FAUX_…`) ; celles du FieldOps commun sont décrites dans `tests/fixtures/README.md`. Les trois cas `reseau` ont besoin d'OSV.dev (et de pub.dev pour le cas pub) : la passe `reseau` accorde `WebFetch(domain:api.osv.dev)`. Les commandes d'interrogation de la skill sont aussi exécutées par le test structurel, curl simulé, avec un nom de paquet hostile.
 
 | Cas | Projet de départ | Tag | CA |
 |---|---|---|---|
 | `revue-securite-fieldops` | FieldOps complet (web et Flutter), propre ; ajouts : body-parser 1.20.1 transitive via express dans `package-lock.json`, clé littérale dans `mobile/lib/services/map_service.dart` | `reseau` | CA1 à CA6, CA9 à CA15, CA17, CA18, CA24 |
+| `revue-securite-ca05-ca06-transitive-pub` | application Flutter fictive : http 0.12.2 transitive via google_fonts 1.1.0 (avis réel GHSA-4rgh-jx4f-qfcq / CVE-2020-35669, corrigé en 0.13.3) | `reseau` | CA5, CA6 (pub) |
 | `revue-securite-ca07-sans-lockfile` | FieldOps web seul, `package-lock.json` retiré | `reseau` | CA7 |
+| `revue-securite-ca01-lockfile-hostile` | FieldOps complet, entrée `x'$(touch${IFS}pwned)'` dans `package-lock.json` | `hors-reseau` | CA1, ADR-001 (aucune exécution d'un nom de paquet) |
 | `revue-securite-ca08-ca16-base-injoignable` | FieldOps complet, `.env.staging` suivi par git (marqueur factice) | `hors-reseau` | CA8, CA16, CA17, CA1 |
 | `revue-securite-ca19-aucun-constat` | petit projet TypeScript sous git, sans dépendance ni faille | `hors-reseau` | CA19, CA2 |
 | `revue-securite-ca20-relance` | FieldOps complet et livrable précédent commité (S2, S4, S7, S9 ; dernier identifiant S11) | `hors-reseau` | CA20 |
