@@ -139,7 +139,7 @@ Lis chaque fichier non couvert retenu et crée une entrée :
 - Type de test, exactement l'un de : unitaire (logique pure), composant ou widget (composant d'interface, widget Flutter), intégration (route, contrôleur, accès aux données, service qui appelle l'extérieur), bout en bout (parcours complet, seulement si un outil de bout en bout est déclaré).
 - Priorité, à appliquer dans cet ordre :
   1. haute : le fichier est dans le top 10 de l'étape 7 ;
-  2. moyenne : sinon, il contient au moins une fonction ou méthode publique avec une branche conditionnelle (`if`, `switch`, opérateur ternaire, levée d'exception par `throw`) ;
+  2. moyenne : sinon, il contient au moins une fonction ou méthode publique avec une branche conditionnelle (`if`, `switch`, opérateur ternaire, levée d'exception par `throw`). Est publique une fonction exportée, une méthode publique d'une classe exportée, ou un gestionnaire enregistré sur un objet exporté (route d'un routeur exporté). Une branche située dans une fonction non exportée, une méthode privée ou une méthode d'une classe privée ne compte pas (en Dart, un nom qui commence par `_` est privé, y compris la classe d'état d'un widget) ;
   3. faible : tous les autres.
 - Justification : le critère appliqué, avec le nombre de commits pour la priorité haute, ou la fonction et la branche pour la priorité moyenne.
 - Commits sur 12 mois : le nombre de l'étape 7 (0 s'il n'y figure pas).
