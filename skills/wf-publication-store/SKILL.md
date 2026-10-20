@@ -32,7 +32,7 @@ Avec Glob, cherche les `pubspec.yaml` du projet (racine et sous-dossiers), hors 
 
 S'il n'y a aucune application Flutter, détermine ce que contient le projet, sans rien écrire et sans créer de dossier :
 
-- application mobile d'une autre technologie, repérée par ses fichiers :
+- application mobile d'une autre technologie, repérée par ses fichiers (Glob ne renvoie que des fichiers, jamais des dossiers : un projet Xcode se repère par `**/*.xcodeproj/project.pbxproj` ou `**/*.xcworkspace/contents.xcworkspacedata`, complété par `**/*.swift`) :
   - `package.json` qui dépend de `expo` : **Expo** ;
   - `package.json` qui dépend de `react-native` (sans `expo`) : **React Native** ;
   - projet Xcode (`*.xcodeproj`, `*.xcworkspace`) sans application Flutter ni JavaScript : **iOS natif (Swift/Xcode)** ;
