@@ -242,6 +242,9 @@ cite "option git : règle du tiret" \
 cite "injection : règle de l'apostrophe et du heredoc" \
   "Une valeur ne s'écrit que dans le corps du heredoc"
 cite "injection : branche refusée signalée" "branche non lue : nom refusé"
+cite "injection : une ligne par branche refusée, nommée" "une ligne par branche refusée"
+cite "CA10 branche sans commit dans la période absente du rapport" \
+  "n'apparaît nulle part dans le rapport"
 cite "Grep non utilisé (fichiers d'environnement)" "n'utilise pas Grep"
 
 # --- CA4 : bornes de la période indépendantes du fuseau de la machine ------------
