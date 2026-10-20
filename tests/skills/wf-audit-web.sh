@@ -162,10 +162,11 @@ cite "CA27 Glob tronqué" "tronqué"
 bash_rule=$(awk '/^- \*\*Bash\*\*/ { on = 1; print; next } on && /^- \*\*/ { exit } on' <<<"$body")
 # Commande Lighthouse : le bloc ```bash de la règle « Bash », sans son indentation
 lighthouse_block=$(awk '/^[[:space:]]*```bash$/ { on = 1; next } on && /^[[:space:]]*```$/ { exit } on { sub(/^[[:space:]]+/, ""); print }' <<<"$bash_rule")
-# Commandes d'une ligne entre accents graves, hors du bloc
+# Commandes d'une ligne de la liste numérotée (ligne qui se termine par une commande
+# entre accents graves), hors du bloc
 # shellcheck disable=SC2016 # accents graves littéraux
 inline=$(awk '/^[[:space:]]*```bash$/ { skip = 1; next } skip && /^[[:space:]]*```$/ { skip = 0; next } !skip' <<<"$bash_rule" |
-  grep -oE '`[^`]+`' | sed 's/^`//; s/`$//')
+  grep -E '^[[:space:]]+([0-9]+\.[[:space:]]+[^`]*)?`[^`]+`[[:space:]]*$' | sed -E 's/.*`([^`]+)`[[:space:]]*$/\1/')
 
 injection_ok=1
 if grep -qiF "'<url>'" <<<"$body"; then
@@ -185,7 +186,8 @@ while IFS= read -r command; do
   fi
 done <<<"$inline"
 # Dans le bloc, <URL> n'apparaît que seul sur sa ligne (corps du heredoc)
-if grep -vxF '<URL>' <<<"$lighthouse_block" | sed "s/'[^']*'//g" | grep -qE '<[^>]+>'; then
+# (les apostrophes échappées \' de l'expression régulière ne délimitent rien)
+if grep -vxF '<URL>' <<<"$lighthouse_block" | sed -e "s/\\\\'//g" -e "s/'[^']*'//g" | grep -qE '<[^>]+>'; then
   ko "injection : texte variable hors du heredoc et des apostrophes dans la commande Lighthouse"
   injection_ok=0
 fi
