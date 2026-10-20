@@ -435,6 +435,11 @@ sampleCase(c08, argDoc, [
   ["ca24-argument-en-tete.md", livrable("Outil : wf-montee-version · Date : 2026-10-19 · Commit : 2fc99c0", argParts)],
   ["ca08-aucune-autre-cible.md", livrable(argHeader, swap(argParts, "Cibles retenues", "registre npm).", "registre npm).\n2. Node.js 18 → 24."))],
   ["ca08-aucune-autre-commande.md", livrable(argHeader, swap(argParts, "Plan de montée", "react-dom@19.2.0`", "react-dom@19.2.0 express@5.1.0`"))],
+  // Défaut observé en eval : cible « recommandée » d'alignement des types, non exigée par react-dom
+  ["ca08-aucune-autre-cible.md", livrable(argHeader, swap(argParts, "Cibles retenues", "registre npm).", "registre npm).\n2. Alignement des types (recommandé) : `@types/react` 17.0.70 → 19.3.0."))],
+  ["ca08-au-plus-deux-cibles.md", livrable(argHeader, swap(argParts, "Cibles retenues", "registre npm).", "registre npm).\n2. `react` 17.0.2 → 19.2.0.\n3. Alignement recommandé."))],
+  ["ca08-aucune-autre-commande.md", livrable(argHeader, swap(argParts, "Plan de montée", "react-dom@19.2.0`", "react-dom@19.2.0` puis `npm install --save-dev @types/react@19.3.0`"))],
+  ["ca08-plan-sans-autre-paquet.md", livrable(argHeader, swap(argParts, "Plan de montée", "`react-dom` 17.0.2 → 19.2.0\n", "`react-dom` 17.0.2 → 19.2.0, `@types/react` 17.0.70 → 19.3.0\n"))],
   ["ca09-version-visee-resolue.md", livrable(argHeader, { ...argParts, "Cibles retenues": "1. `react-dom` 17.0.2 → 19 (version précise non déterminée)." })],
   ["ca14-react-entraine.md", livrable(argHeader, swap(argParts, "Plan de montée", "react@19.2.0 ", ""))],
   ["ca13-main-tsx-ligne-5.md", livrable(argHeader, swap(argParts, "Ruptures et impacts", "src/web/main.tsx:5", "src/web/App.tsx:5"))],
