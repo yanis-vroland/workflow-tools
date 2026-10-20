@@ -69,3 +69,24 @@ Couverts par CA13, CA15, CA16, CA18, CA19, CA21 et CA22.
 Seuil à ajuster après les premiers essais sur de vrais projets :
 
 - Taille maximale d'un ticket : 5 jours d'estimation haute cumulée (CA10), aligné sur la taille maximale d'une tâche de la spec 005.
+
+## Amendement 1 (proposé)
+
+Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+
+- CA2 : une section sans élément est présente et contient la seule ligne « Aucun élément. ».
+- CA3 : l'en-tête liste les fichiers d'entrée sur une ligne « Fichiers d'entrée : » ; si le commit ne peut pas être lu (projet hors dépôt git ou dépôt sans commit), il est « non déterminé » ; les fichiers sous `docs/wf/` ne comptent pas pour la mention « modifications non commitées ».
+- CA4 : quand l'entrée ne précise pas le rôle de l'utilisateur, le récit commence par « En tant qu'utilisateur (rôle non déterminé) » ; une rubrique « Hors périmètre » sans élément indique « Aucun. », une rubrique « Dépendances » sans dépendance indique « aucune ».
+- CA6 : quand l'entrée ne donne aucune valeur mesurable pour un terme vague, le critère est écrit sans ce terme, sur un résultat observable, et la question ouverte correspondante reste dans « Points à clarifier ».
+- CA7, CA8 : quand le fichier passé en argument n'utilise pas d'identifiants `Bnn`, l'outil attribue lui-même `B01`, `B02`… dans l'ordre d'apparition, les liste dans « Synthèse » avec leur source (nom de fichier seul et section), et recommande dans « Points non déterminés » de passer d'abord par `/wf-cadrage-besoin`.
+- CA9 : la rubrique « Estimation » reprend pour chaque tâche citée son estimation basse et haute telle que dans le chiffrage ; un total éventuel est la somme exacte des estimations citées ; chaque tâche de « Détail par lot » est citée par au moins un ticket, sauf si son besoin figure dans « Besoins non couverts ».
+- CA9, CA10 : une tâche de « Activités transverses » n'est citée que par un ticket qui la réalise directement, et compte alors dans le seuil de CA10 ; les tâches transverses qui accompagnent toute la réalisation sans livrable propre ne font l'objet d'aucun ticket et sont mentionnées dans « Synthèse ».
+- CA11 : une question dont le champ « Réponse : » est rempli n'est jamais citée dans « Points à clarifier » ; une question ouverte qui ne porte sur aucun besoin n'est citée par aucun ticket et figure dans « Points non déterminés ».
+- CA12 : entre tickets sans dépendance mutuelle, l'ordre suit la priorité des besoins couverts (la plus haute d'abord), puis l'identifiant ; une dépendance ne vient que d'un ordre imposé par l'entrée (cité comme raison) ou d'un prérequis entre tickets (un ticket utilise ce qu'un autre crée).
+- CA13 : les ordres imposés par l'entrée sont repris tels quels, sans fusionner ni redécouper des tickets pour faire disparaître un cycle ; en cas de cycle, aucun ordre n'est proposé, même partiel, et le schéma Mermaid des dépendances reste présent, cycle compris.
+- CA14 : quand les fichiers concernés par un ticket ne peuvent pas être établis, la rubrique indique « non déterminé », sans chemin.
+- CA16 : l'en-tête porte une ligne « Derniers identifiants attribués : Tnn » (plus grand identifiant de ticket jamais attribué, y compris retiré), et la rubrique « Critères d'acceptation » de chaque ticket se termine par la ligne « Dernier critère attribué : CAn. » ; à la relance, un nouveau ticket reçoit l'identifiant qui suit le plus grand entre cette ligne et le plus grand `Tnn` présent, et un nouveau critère le numéro qui suit le plus grand entre la ligne du ticket et le plus grand `CAn` présent.
+- CA16 : un ticket dont les besoins couverts ont changé en partie mais qui porte toujours sur le même sujet conserve son identifiant ; un ticket supprimé est signalé dans « Points non déterminés » avec la raison (besoin disparu de l'entrée).
+- CA19 : plusieurs chemins passés en argument sont refusés avec un rappel de la syntaxe, et aucun livrable n'est écrit ; un chemin introuvable est signalé en le nommant, et aucun livrable n'est écrit.
+- CA21 : un argument dont le nom commence par `.env` est refusé sans être ouvert (« fichier d'environnement, jamais lu »), et aucun livrable n'est écrit.
+- CA22 : le livrable ne contient aucun nom de personne ni identifiant ou mot de passe de l'entrée ; les personnes sont désignées par leur rôle.
