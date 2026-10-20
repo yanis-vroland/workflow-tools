@@ -50,7 +50,7 @@ jobs:
           bash .github/scripts/evals-avec-relance.sh "$RUNNER_TEMP/evals-reseau"
           . --scaffold --trust-plugin --no-publish
           --tag reseau --judge-model sonnet --ablation none
-          --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)" "WebFetch(domain:developer.android.com)" "WebFetch(domain:developer.apple.com)"
+          --allow-tools Write Bash WebFetch "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)" "WebFetch(domain:developer.android.com)" "WebFetch(domain:developer.apple.com)"
 
       - name: Evals sans réseau (tag hors-reseau)
         if: success() || failure()
