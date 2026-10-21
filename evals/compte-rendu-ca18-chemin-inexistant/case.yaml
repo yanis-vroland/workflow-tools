@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: compte-rendu-ca18-chemin-inexistant
+description: >-
+  Spec 007, CA18 : chemin de notes inexistant
+  (notes/2026-10-21-point-hebdo.md). L'outil l'indique et n'écrit aucun
+  livrable.
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 10
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
+
+context:
+  scaffold_script: scaffold.sh

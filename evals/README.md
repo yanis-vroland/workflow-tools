@@ -55,8 +55,9 @@ Spec 002, lancée par `/wf-doc-projet`, tous les cas `hors-reseau` (tag `wf-doc-
 |---|---|---|
 | `doc-projet-ca09-fichier-unique` | FieldOps web seul, propre | CA1 à CA6, CA8, CA9, CA11, CA13 |
 | `doc-projet-ca10-monorepo` | FieldOps complet (web et Flutter), propre | CA10 (cas limite monorepo), CA1, CA3 à CA6, CA8, CA13 |
+| `doc-projet-ca04-tableau-des-variables` | FieldOps web seul, plus un paiement par carte via le SDK Stripe (commit rejouable), propre | CA4 (tableau des variables : chaque colonne, « non déterminé », aucun service ni procédure inventés), CA1 |
 | `doc-projet-ca08-modifications-non-commitees` | FieldOps web seul, `--dirty` | CA8 |
-| `doc-projet-ca07-mise-a-jour` | FieldOps web seul et livrable fichier déjà commité | CA7 |
+| `doc-projet-ca07-mise-a-jour` | FieldOps web seul et livrable fichier déjà commité | CA7, CA4 (ancienne liste des variables remplacée par le tableau) |
 | `doc-projet-ca12-dossier-vers-fichier` | FieldOps web seul et ancien livrable dossier | CA12 (cas limite) |
 | `doc-projet-ca12-fichier-vers-dossier` | FieldOps complet et ancien livrable fichier | CA12 (cas limite) |
 | `doc-projet-ca14-repertoire-vide` | répertoire vide | CA14 (cas limite) |
@@ -123,6 +124,29 @@ Spec 006, lancée par `/wf-specs-tickets`, tous les cas `hors-reseau` (tag `wf-s
 | `specs-tickets-ca03-modifications-non-commitees` | FieldOps complet `--dirty`, cadrage du cas CA14 | CA3 (mention « modifications non commitées ») |
 
 Hash de commit attendu : `2fc99c0` (FieldOps complet, cas CA14 et CA3) ; le cadrage déposé porte un commit antérieur (`921f57c`), pour que le hash attendu ne puisse pas être recopié. CA14 : les chemins existants sont listés dans le grader `ca14-chemins-existants-ou-a-creer` ; une modification de la fixture impose de le mettre à jour, ainsi que les hash. CA16 : le livrable précédent est déposé par le scaffold, puis réécrit ; `file_exists` ne voyant que les fichiers créés pendant l'exécution, sa présence et sa réécriture sont vérifiées par une regex `contains` sur la date de l'en-tête (`ca16-livrable-present-et-redate`). Le cas principal accorde Edit, WebFetch et WebSearch pour que ses graders « max: 0 » sur ces outils mesurent quelque chose. Les motifs des correcteurs sont vérifiés par `tests/correcteurs/wf-specs-tickets.mjs`, lancé par `tests/skills.sh`.
+### wf-compte-rendu
+
+Spec 007, lancée par `/wf-compte-rendu`, tous les cas `hors-reseau` (tag `wf-compte-rendu` pour ne lancer qu'eux). Chaque grader porte dans son nom l'identifiant du CA qu'il vérifie (`ca07-…`) ; un grader « témoin » prouve que le scénario a eu lieu là où les vérifications d'absence réussiraient sans rien prouver. Les notes propres à un cas (fictives) sont dans son dossier `donnees/`.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `compte-rendu-ca01-point-hebdo` | FieldOps brief, notes `notes/2026-10-07-point-hebdo.md` de la fixture | CA1, CA3 à CA12, CA19, CA20 |
+| `compte-rendu-ca03-ca04-index-existant` | FieldOps complet (code, git, faux secret), deux comptes rendus et leur index, notes hors du projet sans date dans le nom | CA1, CA3 (nom exact), CA4 (ordre de l'index), CA6, CA10, ADR-001 (fichier d'environnement) |
+| `compte-rendu-ca02-sans-argument` | FieldOps brief, aucun argument | CA2 (question posée, rien écrit) |
+| `compte-rendu-ca02-notes-collees` | FieldOps brief, texte des notes dans la commande | CA2 (« notes fournies dans la conversation »), CA4, CA5, CA7, CA9, CA11 |
+| `compte-rendu-ca13-transcription-vtt` | FieldOps brief, transcription `notes/2026-09-30-atelier.vtt` de la fixture | CA13, CA3 (objet tiré du nom de fichier), CA8, CA9, CA11 |
+| `compte-rendu-ca13-ca14-transcription-anglaise` | FieldOps brief, transcription anglaise horodatée `[hh:mm:ss]` en `.txt` | CA13, CA14, CA5, CA7, CA8 |
+| `compte-rendu-ca15-sans-date` | FieldOps brief, notes sans date, nom sans date | CA15 (question posée, rien écrit) |
+| `compte-rendu-ca16-relance` | FieldOps brief, compte rendu existant tiré des mêmes notes, notes complétées | CA16 |
+| `compte-rendu-ca17-autre-reunion-meme-nom` | FieldOps brief, compte rendu du même nom tiré d'autres notes | CA17 (question posée, rien écrit) |
+| `compte-rendu-ca17-nouvelle-reunion` | même départ, réponse « nouvelle réunion » donnée après le chemin | CA17 (suffixe `-2`, premier compte rendu intact), CA4 |
+| `compte-rendu-ca18-chemin-inexistant`, `compte-rendu-ca18-fichier-vide`, `compte-rendu-ca18-format-docx` | FieldOps brief | CA18 |
+
+Valeur déterministe : commit `2fc99c0` dans `compte-rendu-ca03-ca04-index-existant` (les comptes rendus déposés sont exclus par `.git/info/exclude`, l'arbre reste propre ; ils portent un hash factice, `a1b2c3d`, que le nouveau compte rendu ne doit pas reprendre).
+
+Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` mesurent ainsi un refus réel. Les interdictions de lecture couvrent Read, Bash (motif sur la commande) et Glob. `tests/correcteurs/wf-compte-rendu.mjs`, lancé par `tests/skills/wf-compte-rendu.sh`, compile tous les motifs, les essaie sur des exemples positifs et négatifs, vérifie que les commandes prescrites par la skill ne déclenchent aucune interdiction, et que la commande du nom de fichier donne les noms attendus.
+
+Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
 ## Correcteurs
 
