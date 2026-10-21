@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: compte-rendu-ca17-autre-reunion-meme-nom
+description: >-
+  Spec 007, CA17 : un compte rendu 2026-10-07-point-hebdomadaire.md existe
+  déjà, tiré d'autres notes (point-hebdo-equipe-nord.md) ; on lance l'outil sur
+  les notes d'une autre réunion du même jour au même objet
+  (notes/point-hebdo-equipe-sud.md). L'outil demande s'il s'agit d'une relance
+  ou d'une nouvelle réunion, et n'écrit rien avant la réponse (une eval n'a
+  qu'un tour : le suffixe -2 est vérifié par les tests structurels).
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
+
+context:
+  scaffold_script: scaffold.sh

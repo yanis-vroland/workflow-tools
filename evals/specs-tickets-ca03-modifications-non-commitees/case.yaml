@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: specs-tickets-ca03-modifications-non-commitees
+description: >-
+  Spec 006, CA3 (ADR-001) : wf-specs-tickets lancé dans la fixture FieldOps
+  construite avec --dirty (modification non commitée hors de docs/wf/). La ligne
+  « Commit analysé » de l'en-tête porte le commit et la mention « modifications
+  non commitées ».
+tags: [wf-specs-tickets, spec-006, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

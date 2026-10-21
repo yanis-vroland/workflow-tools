@@ -9,7 +9,7 @@ Les cas se lancent en deux passes, selon leur tag réseau (voir « Réseau ») :
 ```bash
 # Registres joignables (tag reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag reseau \
-  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)"
+  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)"
 
 # Aucun réseau (tag hors-reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag hors-reseau \
@@ -28,7 +28,7 @@ claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 
 Dès que `Bash` est accordé, ses commandes tournent dans le bac à sable de Claude Code, dont l'accès réseau est limité aux domaines accordés par `--allow-tools "WebFetch(domain:…)"`. Sans ces autorisations, aucun registre n'est joignable. D'où deux passes :
 
-- tag `reseau` : le cas a besoin des registres (npm, pub.dev) ;
+- tag `reseau` : le cas a besoin des registres (npm, pub.dev) ou de la base d'avis OSV.dev (`api.osv.dev`) ;
 - tag `hors-reseau` : le cas tourne sans aucun réseau, y compris ceux qui exigent un registre injoignable.
 
 Chaque cas porte exactement un de ces deux tags ; `.github/scripts/verifier-tags-evals.sh` le vérifie en CI, sinon le cas ne serait jamais lancé.
@@ -55,8 +55,9 @@ Spec 002, lancée par `/wf-doc-projet`, tous les cas `hors-reseau` (tag `wf-doc-
 |---|---|---|
 | `doc-projet-ca09-fichier-unique` | FieldOps web seul, propre | CA1 à CA6, CA8, CA9, CA11, CA13 |
 | `doc-projet-ca10-monorepo` | FieldOps complet (web et Flutter), propre | CA10 (cas limite monorepo), CA1, CA3 à CA6, CA8, CA13 |
+| `doc-projet-ca04-tableau-des-variables` | FieldOps web seul, plus un paiement par carte via le SDK Stripe (commit rejouable), propre | CA4 (tableau des variables : chaque colonne, « non déterminé », aucun service ni procédure inventés), CA1 |
 | `doc-projet-ca08-modifications-non-commitees` | FieldOps web seul, `--dirty` | CA8 |
-| `doc-projet-ca07-mise-a-jour` | FieldOps web seul et livrable fichier déjà commité | CA7 |
+| `doc-projet-ca07-mise-a-jour` | FieldOps web seul et livrable fichier déjà commité | CA7, CA4 (ancienne liste des variables remplacée par le tableau) |
 | `doc-projet-ca12-dossier-vers-fichier` | FieldOps web seul et ancien livrable dossier | CA12 (cas limite) |
 | `doc-projet-ca12-fichier-vers-dossier` | FieldOps complet et ancien livrable fichier | CA12 (cas limite) |
 | `doc-projet-ca14-repertoire-vide` | répertoire vide | CA14 (cas limite) |
@@ -129,6 +130,47 @@ Points chauds indépendants de la date (CA9, CA11) : le scaffold de `tests-manqu
 Juges `llm` remplacés sur les livrables longs du cas principal et de CA24 (22 000 à 25 000 caractères), où ils rendaient des verdicts contradictoires ou trop stricts sur des livrables conformes (CA8, CA9-CA10, CA14, CA15, CA24) : des motifs les remplacent, éprouvés sur le livrable réel de l'eval et sur ses mutations : une ligne obligatoire par entrée (« À tester » avec un nom, type, priorité, justification), identifiants uniques, noms exportés réels, au plus deux entrées hautes, un squelette par entrée haute avec un cas par comportement et sans bibliothèque de test non déclarée, priorités lues sur la seule ligne « - Priorité : », aucun code HTTP attendu absent du code, aucun montant ni date attendus, aucun décompte de « Couverture actuelle » incluant les dossiers non lus.
 
 Le livrable de la relance (CA20) fixe une convention que la spec laisse ouverte : la ligne d'en-tête « Dernier identifiant attribué : M<n> », qui garde la trace des identifiants retirés (même principe que `wf-cadrage-besoin`).
+### wf-specs-tickets
+
+Spec 006, lancée par `/wf-specs-tickets`, tous les cas `hors-reseau` (tag `wf-specs-tickets` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour. Les livrables d'entrée sont fabriqués par le scaffold selon les contrats des specs 004 (cadrage) et 005 (chiffrage) ; le cadrage du cas principal (`donnees/cadrage-besoin.md`) sert aussi aux cas CA9-CA10, CA16 et CA19 (texte saisi).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `specs-tickets-ca01-cadrage-sans-chiffrage` | FieldOps brief et cadrage (B01 à B07, questions ouvertes et répondues), sans chiffrage | CA1 à CA9, CA11, CA12, CA15, CA17, CA20 |
+| `specs-tickets-ca09-ca10-avec-chiffrage` | FieldOps brief, cadrage et chiffrage (C01 à C13 ; C01 + C02 et C04 + C05 dépassent 5 jours) | CA9, CA10, CA3, CA1 |
+| `specs-tickets-ca14-projet-avec-code` | FieldOps complet (git, faux secret) et cadrage de trois évolutions, `docs/wf/` ignoré par git | CA14 (module d'export PDF à créer), CA21, CA3, CA1 |
+| `specs-tickets-ca16-relance` | FieldOps brief, cadrage et livrable précédent (T01, T02, T04, T05 ; T03, T06 et T02-CA2 supprimés) | CA16 (cas limite) |
+| `specs-tickets-ca13-cycle` | FieldOps brief et cadrage dont les contraintes imposent un ordre circulaire | CA13 (cas limite) |
+| `specs-tickets-ca18-sans-cadrage` | FieldOps brief sans `docs/wf/` | CA18 (cas limite) |
+| `specs-tickets-ca19-texte-saisi` | FieldOps brief et cadrage, texte saisi dans la commande | CA19 (cas limite) |
+| `specs-tickets-ca19-aucun-besoin` | FieldOps brief et fichier d'organisation sans besoin, passé en argument | CA19 (cas limite) |
+| `specs-tickets-ca22-fichier-argument` | FieldOps brief et cahier des charges dans `besoins/`, avec e-mails, téléphones et noms, passé en argument | CA22 (cas limite), CA3, CA1 |
+| `specs-tickets-ca03-modifications-non-commitees` | FieldOps complet `--dirty`, cadrage du cas CA14 | CA3 (mention « modifications non commitées ») |
+
+Hash de commit attendu : `2fc99c0` (FieldOps complet, cas CA14 et CA3) ; le cadrage déposé porte un commit antérieur (`921f57c`), pour que le hash attendu ne puisse pas être recopié. CA14 : les chemins existants sont listés dans le grader `ca14-chemins-existants-ou-a-creer` ; une modification de la fixture impose de le mettre à jour, ainsi que les hash. CA16 : le livrable précédent est déposé par le scaffold, puis réécrit ; `file_exists` ne voyant que les fichiers créés pendant l'exécution, sa présence et sa réécriture sont vérifiées par une regex `contains` sur la date de l'en-tête (`ca16-livrable-present-et-redate`). Le cas principal accorde Edit, WebFetch et WebSearch pour que ses graders « max: 0 » sur ces outils mesurent quelque chose. Les motifs des correcteurs sont vérifiés par `tests/correcteurs/wf-specs-tickets.mjs`, lancé par `tests/skills.sh`.
+### wf-compte-rendu
+
+Spec 007, lancée par `/wf-compte-rendu`, tous les cas `hors-reseau` (tag `wf-compte-rendu` pour ne lancer qu'eux). Chaque grader porte dans son nom l'identifiant du CA qu'il vérifie (`ca07-…`) ; un grader « témoin » prouve que le scénario a eu lieu là où les vérifications d'absence réussiraient sans rien prouver. Les notes propres à un cas (fictives) sont dans son dossier `donnees/`.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `compte-rendu-ca01-point-hebdo` | FieldOps brief, notes `notes/2026-10-07-point-hebdo.md` de la fixture | CA1, CA3 à CA12, CA19, CA20 |
+| `compte-rendu-ca03-ca04-index-existant` | FieldOps complet (code, git, faux secret), deux comptes rendus et leur index, notes hors du projet sans date dans le nom | CA1, CA3 (nom exact), CA4 (ordre de l'index), CA6, CA10, ADR-001 (fichier d'environnement) |
+| `compte-rendu-ca02-sans-argument` | FieldOps brief, aucun argument | CA2 (question posée, rien écrit) |
+| `compte-rendu-ca02-notes-collees` | FieldOps brief, texte des notes dans la commande | CA2 (« notes fournies dans la conversation »), CA4, CA5, CA7, CA9, CA11 |
+| `compte-rendu-ca13-transcription-vtt` | FieldOps brief, transcription `notes/2026-09-30-atelier.vtt` de la fixture | CA13, CA3 (objet tiré du nom de fichier), CA8, CA9, CA11 |
+| `compte-rendu-ca13-ca14-transcription-anglaise` | FieldOps brief, transcription anglaise horodatée `[hh:mm:ss]` en `.txt` | CA13, CA14, CA5, CA7, CA8 |
+| `compte-rendu-ca15-sans-date` | FieldOps brief, notes sans date, nom sans date | CA15 (question posée, rien écrit) |
+| `compte-rendu-ca16-relance` | FieldOps brief, compte rendu existant tiré des mêmes notes, notes complétées | CA16 |
+| `compte-rendu-ca17-autre-reunion-meme-nom` | FieldOps brief, compte rendu du même nom tiré d'autres notes | CA17 (question posée, rien écrit) |
+| `compte-rendu-ca17-nouvelle-reunion` | même départ, réponse « nouvelle réunion » donnée après le chemin | CA17 (suffixe `-2`, premier compte rendu intact), CA4 |
+| `compte-rendu-ca18-chemin-inexistant`, `compte-rendu-ca18-fichier-vide`, `compte-rendu-ca18-format-docx` | FieldOps brief | CA18 |
+
+Valeur déterministe : commit `2fc99c0` dans `compte-rendu-ca03-ca04-index-existant` (les comptes rendus déposés sont exclus par `.git/info/exclude`, l'arbre reste propre ; ils portent un hash factice, `a1b2c3d`, que le nouveau compte rendu ne doit pas reprendre).
+
+Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` mesurent ainsi un refus réel. Les interdictions de lecture couvrent Read, Bash (motif sur la commande) et Glob. `tests/correcteurs/wf-compte-rendu.mjs`, lancé par `tests/skills/wf-compte-rendu.sh`, compile tous les motifs, les essaie sur des exemples positifs et négatifs, vérifie que les commandes prescrites par la skill ne déclenchent aucune interdiction, et que la commande du nom de fichier donne les noms attendus.
+
+Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
 ## Correcteurs
 
@@ -152,3 +194,28 @@ Spec 004, tous les cas tagués `hors-reseau`. Chaque grader porte dans son nom l
 - `cadrage-besoin-ca03-source-hors-projet` : source hors du projet, créée par le scaffold dans le répertoire parent et passée en `../briefs-externes/brief-externe.md`, gardée en relatif dans l'en-tête, aucun chemin absolu (CA3). Le bac à sable de l'eval n'autorise la lecture que sous ce parent (`home/`, la session tournant dans `home/cwd`) ; la conversion d'un argument absolu en chemin relatif n'est pas testable par une eval, le chemin absolu de la session n'étant pas connu à l'avance ;
 - `cadrage-besoin-ca20-source-anglaise` : source en anglais, priorités « essential » et « optional » (CA20, CA5) ;
 - `cadrage-besoin-ca22-projet-avec-code` : projet cible avec code et git, aucun fichier de `src/` ni `mobile/` lu (CA22, CA3, faux secret de l'ADR-001).
+
+### wf-revue-securite
+
+Spec 010, lancée par `/wf-revue-securite` (tag `wf-revue-securite` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca12-…`) ; les graders `temoin-…` vérifient que le scaffold a bien planté la faille ou la valeur dont un grader d'absence vérifie qu'elle n'est pas reprise. Les failles propres à un cas sont plantées par son `scaffold.sh` et commitées (arbre propre), avec des valeurs manifestement factices (`FAUX_…`) ; celles du FieldOps commun sont décrites dans `tests/fixtures/README.md`. Les trois cas `reseau` ont besoin d'OSV.dev (et de pub.dev pour le cas pub) : la passe `reseau` accorde `WebFetch(domain:api.osv.dev)`. Les commandes d'interrogation de la skill sont aussi exécutées par le test structurel, curl simulé, avec un nom de paquet hostile.
+
+| Cas | Projet de départ | Tag | CA |
+|---|---|---|---|
+| `revue-securite-fieldops` | FieldOps complet (web et Flutter), propre ; ajouts : body-parser 1.20.1 transitive via express dans `package-lock.json`, clé littérale dans `mobile/lib/services/map_service.dart` | `reseau` | CA1 à CA6, CA9 à CA15, CA17, CA18, CA24 |
+| `revue-securite-ca05-ca06-transitive-pub` | application Flutter fictive : http 0.12.2 transitive via google_fonts 1.1.0 (avis réel GHSA-4rgh-jx4f-qfcq / CVE-2020-35669, corrigé en 0.13.3) | `reseau` | CA5, CA6 (pub) |
+| `revue-securite-ca07-sans-lockfile` | FieldOps web seul, `package-lock.json` retiré | `reseau` | CA7 |
+| `revue-securite-ca01-lockfile-hostile` | FieldOps complet, entrée `x'$(touch${IFS}pwned)'` dans `package-lock.json` | `hors-reseau` | CA1, ADR-001 (aucune exécution d'un nom de paquet) |
+| `revue-securite-ca08-ca16-base-injoignable` | FieldOps complet, `.env.staging` suivi par git (marqueur factice) | `hors-reseau` | CA8, CA16, CA17, CA1 |
+| `revue-securite-ca19-aucun-constat` | petit projet TypeScript sous git, sans dépendance ni faille | `hors-reseau` | CA19, CA2 |
+| `revue-securite-ca20-relance` | FieldOps complet et livrable précédent commité (S2, S4, S7, S9 ; dernier identifiant S11) | `hors-reseau` | CA20 |
+| `revue-securite-ca22-stack-mixte` | FieldOps complet et outil d'import Python (`outils/import/`) | `hors-reseau` | CA22 |
+| `revue-securite-ca23-repertoire-vide` | répertoire vide | `hors-reseau` | CA23 (cas limite) |
+| `revue-securite-ca23-sans-code-source` | FieldOps brief (documents seuls) | `hors-reseau` | CA23 (cas limite) |
+| `revue-securite-ca25-projet-volumineux` | FieldOps et 2 000 modules générés sous `src/legacy/`, dont un porteur d'une injection et d'un jeton factices | `hors-reseau` | CA25 |
+
+- Commit attendu dans l'en-tête du cas principal : `fc765ad` (HEAD du scaffold, rejouable). Une modification de la fixture ou du scaffold le change : mettre à jour `ca03-en-tete-commit`.
+- CA8 : comme pour `wf-analyse-projet`, la base est coupée par le bac à sable (passe `hors-reseau`) ; le témoin `ca08-temoin-echec-reseau` exige dans la trace la sortie d'une interrogation échouée (`osv.dev injoignable (curl <code>…)`). Tous les cas `hors-reseau` qui ont des dépendances exercent donc aussi CA8.
+- Les avis évoluent (ADR-001) : seuls des avis publiés de longue date sont attendus (express 4.18.2, body-parser 1.20.1), et jamais une sévérité ou une version corrigée précise.
+- CA14 : « aucun caractère de la valeur » est vérifié sur la valeur entière et ses fragments distinctifs (`dev-secret`, `FAUX_JETON`, `c41d`), pas lettre par lettre.
+- CA21 (contrat lu par `wf-montee-version`) est vérifié par les tests structurels (`tests/skills/wf-revue-securite.sh`), pas par une eval.
+- Les motifs des graders sont compilés et vérifiés sur des exemples positifs et négatifs par `tests/correcteurs/wf-revue-securite.mjs`, lancé par `tests/skills.sh`.
