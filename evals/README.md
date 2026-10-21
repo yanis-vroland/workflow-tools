@@ -106,6 +106,24 @@ CA15 et CA20 : seul un sous-dossier effectivement suivi par un dépôt qui a des
 
 CA20 : le répertoire de la session est imposé par `claude plugin eval` et le scaffold n'écrit rien au-dessus. Le dépôt est donc construit avec `core.worktree` : répertoire git dans le répertoire de la session, racine de travail dans son parent, dont la session est le sous-dossier (`git rev-parse --show-prefix` non vide). Seul ce sous-dossier est extrait (`sparse-checkout`). L'historique de FieldOps y est réécrit, suivi de 12 commits plus récents dans `plateforme/` (hors du sous-dossier, une cinquième autrice) : dernier commit du dépôt 2026-10-06, du sous-dossier 2026-09-29. Les hash dépendent du nom du répertoire de la session et ne sont pas figés.
 
+### wf-specs-tickets
+
+Spec 006, lancée par `/wf-specs-tickets`, tous les cas `hors-reseau` (tag `wf-specs-tickets` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour. Les livrables d'entrée sont fabriqués par le scaffold selon les contrats des specs 004 (cadrage) et 005 (chiffrage) ; le cadrage du cas principal (`donnees/cadrage-besoin.md`) sert aussi aux cas CA9-CA10, CA16 et CA19 (texte saisi).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `specs-tickets-ca01-cadrage-sans-chiffrage` | FieldOps brief et cadrage (B01 à B07, questions ouvertes et répondues), sans chiffrage | CA1 à CA9, CA11, CA12, CA15, CA17, CA20 |
+| `specs-tickets-ca09-ca10-avec-chiffrage` | FieldOps brief, cadrage et chiffrage (C01 à C13 ; C01 + C02 et C04 + C05 dépassent 5 jours) | CA9, CA10, CA3, CA1 |
+| `specs-tickets-ca14-projet-avec-code` | FieldOps complet (git, faux secret) et cadrage de trois évolutions, `docs/wf/` ignoré par git | CA14 (module d'export PDF à créer), CA21, CA3, CA1 |
+| `specs-tickets-ca16-relance` | FieldOps brief, cadrage et livrable précédent (T01, T02, T04, T05 ; T03, T06 et T02-CA2 supprimés) | CA16 (cas limite) |
+| `specs-tickets-ca13-cycle` | FieldOps brief et cadrage dont les contraintes imposent un ordre circulaire | CA13 (cas limite) |
+| `specs-tickets-ca18-sans-cadrage` | FieldOps brief sans `docs/wf/` | CA18 (cas limite) |
+| `specs-tickets-ca19-texte-saisi` | FieldOps brief et cadrage, texte saisi dans la commande | CA19 (cas limite) |
+| `specs-tickets-ca19-aucun-besoin` | FieldOps brief et fichier d'organisation sans besoin, passé en argument | CA19 (cas limite) |
+| `specs-tickets-ca22-fichier-argument` | FieldOps brief et cahier des charges dans `besoins/`, avec e-mails, téléphones et noms, passé en argument | CA22 (cas limite), CA3, CA1 |
+| `specs-tickets-ca03-modifications-non-commitees` | FieldOps complet `--dirty`, cadrage du cas CA14 | CA3 (mention « modifications non commitées ») |
+
+Hash de commit attendu : `2fc99c0` (FieldOps complet, cas CA14 et CA3) ; le cadrage déposé porte un commit antérieur (`921f57c`), pour que le hash attendu ne puisse pas être recopié. CA14 : les chemins existants sont listés dans le grader `ca14-chemins-existants-ou-a-creer` ; une modification de la fixture impose de le mettre à jour, ainsi que les hash. CA16 : le livrable précédent est déposé par le scaffold, puis réécrit ; `file_exists` ne voyant que les fichiers créés pendant l'exécution, sa présence et sa réécriture sont vérifiées par une regex `contains` sur la date de l'en-tête (`ca16-livrable-present-et-redate`). Le cas principal accorde Edit, WebFetch et WebSearch pour que ses graders « max: 0 » sur ces outils mesurent quelque chose. Les motifs des correcteurs sont vérifiés par `tests/correcteurs/wf-specs-tickets.mjs`, lancé par `tests/skills.sh`.
 ### wf-compte-rendu
 
 Spec 007, lancée par `/wf-compte-rendu`, tous les cas `hors-reseau` (tag `wf-compte-rendu` pour ne lancer qu'eux). Chaque grader porte dans son nom l'identifiant du CA qu'il vérifie (`ca07-…`) ; un grader « témoin » prouve que le scénario a eu lieu là où les vérifications d'absence réussiraient sans rien prouver. Les notes propres à un cas (fictives) sont dans son dossier `donnees/`.

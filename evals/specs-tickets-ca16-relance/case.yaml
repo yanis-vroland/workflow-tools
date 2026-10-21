@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: specs-tickets-ca16-relance
+description: >-
+  Spec 006, CA16 : relance de wf-specs-tickets sur un livrable existant (T01,
+  T02, T04, T05 ; T03 et T06 supprimés ; critère CA2 de T02 supprimé) alors que
+  le cadrage compte désormais trois besoins de plus (B05 à B07). Le livrable est
+  mis à jour sans doublon, les identifiants Tnn et CAn sont conservés, aucun
+  identifiant supprimé n'est réattribué.
+tags: [wf-specs-tickets, spec-006, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

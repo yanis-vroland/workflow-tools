@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: specs-tickets-ca22-fichier-argument
+description: >-
+  Spec 006, CA22, CA3 et entrée alternative : wf-specs-tickets lancé avec un
+  cahier des charges en argument (sous-dossier besoins/, sans identifiants Bnn),
+  qui contient des adresses e-mail et des numéros de téléphone. Le livrable n'en
+  contient aucun et cite le fichier d'entrée par son nom seul.
+tags: [wf-specs-tickets, spec-006, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
