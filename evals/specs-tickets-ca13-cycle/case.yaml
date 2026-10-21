@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: specs-tickets-ca13-cycle
+description: >-
+  Spec 006, CA13 : le cadrage impose un ordre de livraison circulaire (import
+  des équipements après celui des contrats, et inversement). Le cycle est décrit
+  dans « Points non déterminés » en citant les tickets concernés, et « Ordre de
+  réalisation » l'indique au lieu de proposer un ordre.
+tags: [wf-specs-tickets, spec-006, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

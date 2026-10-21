@@ -118,6 +118,16 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/doc-projet/configuration.md" }
     pattern: '^(?=[\s\S]*DATABASE_URL)(?=[\s\S]*JWT_SECRET)(?=[\s\S]*MAP_API_KEY)(?=[\s\S]*MAIL_API_KEY)(?=[\s\S]*PAYMENT_API_KEY)(?=[\s\S]*SEED_PASSWORD)(?=[\s\S]*\bAPI_URL\b)'
+  # Tableau Variable | Utilisé pour | Où la renseigner | Comment l'obtenir, et
+  # API_URL renseignée au lancement par --dart-define (mobile/README.md)
+  - name: ca04-tableau-en-tete-dans-configuration
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet/configuration.md" }
+    pattern: '\n\|\s*Variable\s*\|\s*Utilisé pour\s*\|\s*Où la renseigner\s*\|\s*Comment l[’'']obtenir\s*\|'
+  - name: ca04-ou-la-renseigner-api-url-dart-define
+    type: regex
+    target: { source: file, path: "docs/wf/doc-projet/configuration.md" }
+    pattern: '\n\|\s*[\x60*]*API_URL[\x60*]*\s*\|[^|\n]*\|[^|\n]*--dart-define[^|\n]*\|'
   - name: ca04-aucune-valeur-dans-configuration
     type: regex
     target: { source: file, path: "docs/wf/doc-projet/configuration.md" }

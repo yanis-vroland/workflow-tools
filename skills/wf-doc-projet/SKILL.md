@@ -49,6 +49,7 @@ Lis `docs/wf/doc-projet.md` ou les fichiers de `docs/wf/doc-projet/` s'ils exist
 
 - vérifie chaque affirmation dans les fichiers qu'elle cite ; si elle est encore exacte, **recopie-la mot pour mot** ;
 - corrige ce qui a changé, complète ce qui manque, retire ce qui n'existe plus ;
+- une section dont la forme n'est plus celle de l'étape 5 est réécrite dans la forme attendue (ex. une « Configuration » qui liste les noms sans le tableau des variables) ;
 - remplace l'en-tête (nouvelle date, nouveau commit).
 
 ## Étape 5 : collecter, section par section
@@ -63,7 +64,21 @@ Lis les manifestes, fichiers de verrouillage, README, `Makefile`, `Dockerfile`, 
   - la commande d'installation des dépendances de l'outil désigné par le manifeste et le fichier de verrouillage (`npm install`, `pnpm install`, `yarn install`, `flutter pub get`) ;
   - les commandes d'un README seulement si elles existent bien dans le projet (script, cible ou fichier présent).
   - Sans manifeste, `Makefile` ni commande vérifiable : écris « Aucune commande d'installation ou de lancement identifiée dans le projet : non déterminé », cite les fichiers cherchés, et **n'écris aucune commande**, même à titre d'exemple.
-- **Configuration** : **tous** les noms de variables de `.env.example`, plus ceux lus dans le code (`process.env.X`, `import.meta.env.X`, `String.fromEnvironment('X')`, `os.environ`…), avec le fichier qui les utilise et leur rôle s'il est établi. Jamais de valeur. Dans un monorepo, traite chaque application : son `.env.example`, les variables lues dans son code et celles passées à son lancement (`--dart-define=X`…), chacune rangée sous l'application qui l'utilise.
+- **Configuration** : **toutes** les variables de `.env.example`, plus celles lues dans le code (`process.env.X`, `import.meta.env.X`, `String.fromEnvironment('X')`, `os.environ`…), dans un tableau, une ligne par variable, jamais de valeur :
+
+  ```markdown
+  | Variable | Utilisé pour | Où la renseigner | Comment l'obtenir |
+  |---|---|---|---|
+  | `DB_URL` | connexion à la base (`server/database.ts`) | `.env` d'après `.env.example`, `docker-compose.yml` | non déterminé |
+  | `SENDGRID_API_KEY` | envoi des e-mails (`server/notify.ts`) | secret de CI (`.gitlab-ci.yml`) | SendGrid (SDK `@sendgrid/mail`, `server/notify.ts`) |
+  | `LOG_LEVEL` | non déterminé | `.env` d'après `.env.example` | non déterminé |
+  ```
+
+  - **Variable** : le nom, tiré de `.env.example` ou du code.
+  - **Utilisé pour** : le rôle établi par l'usage de la variable dans le code, avec le fichier cité. Une variable que le code ne lit pas, ou dont l'usage ne dit pas le rôle : « non déterminé ». Un commentaire de `.env.example` ou le nom de la variable ne suffisent pas.
+  - **Où la renseigner** : le fichier ou le mécanisme qui la fournit, tel que le projet le montre : `.env` d'après `.env.example`, `docker-compose.yml` (`environment`, `env_file`), `Dockerfile` (`ENV`), secret de CI (`secrets.X` d'un workflow), option de lancement (`--dart-define=X`). Sans trace : « non déterminé ».
+  - **Comment l'obtenir** : le service qui délivre la valeur, **seulement** quand le code l'établit : SDK d'un service identifié (paquet importé, ex. `@sendgrid/mail`, `firebase_core`) ou appel à l'API d'un service nommé, avec le fichier cité. Sinon « non déterminé », même si le nom de la variable évoque un service (`WEATHER_API_KEY` envoyée à l'adresse lue dans `WEATHER_API_URL` ne désigne aucun service). Aucune procédure n'est décrite ni inventée : ni création de compte, ni menu de console, ni commande de génération.
+  - Dans un monorepo, un tableau par application, sous sa sous-section : son `.env.example`, les variables lues dans son code et celles passées à son lancement (`--dart-define=X`…).
 - **Fonctionnalités** : ce que fait le projet, tiré des routes, pages, écrans et modules métier, avec les fichiers cités. Pas de référence exhaustive d'API.
 - **Structure du code** : arborescence des dossiers principaux et rôle de chacun.
 - **Points non déterminés** :
@@ -131,5 +146,6 @@ Si l'ancien livrable est dans l'autre format, n'écris jamais à son emplacement
 
   Réécris tout passage trouvé (avec Write) ; une valeur indispensable dans une commande devient un paramètre `<…>`.
 - Les huit sections sont présentes, dans l'ordre, et l'en-tête figure dans les premières lignes.
+- « Configuration » présente les variables dans le tableau `| Variable | Utilisé pour | Où la renseigner | Comment l'obtenir |`, une ligne par variable, et chaque service nommé dans « Comment l'obtenir » s'appuie sur un SDK ou un appel d'API cité ; sinon la case vaut « non déterminé ».
 
 Termine par un message court : chemin du livrable, format retenu et pourquoi, nombre de lignes, points non déterminés relevés et, le cas échéant, les fichiers restés dans l'ancien dossier `docs/wf/doc-projet/`.

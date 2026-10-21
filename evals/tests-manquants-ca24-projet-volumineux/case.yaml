@@ -1,0 +1,56 @@
+schema_version: "1.1"
+name: tests-manquants-ca24-projet-volumineux
+description: >-
+  Spec 012 (wf-tests-manquants), CA24 : FieldOps augmenté de src/legacy/ (2 000
+  modules générés, sans test, avec branches conditionnelles). « Points non
+  déterminés » liste les dossiers non lus, et aucune conclusion ne porte sur
+  eux (aucune entrée, aucun cas, aucun squelette).
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/tests-manquants.md"
+  - name: ca24-dossiers-non-lus-listes
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Points non d[ée]termin[ée]s[^\n]*\n(?:(?!\n## )[\s\S])*?src/legacy'
+  - name: ca24-aucune-entree-sur-les-dossiers-non-lus
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*(?:Tests manquants|Cas manquants dans le code test[ée]|Squelettes de tests)[^\n]*\n(?:(?!\n## )[\s\S])*?src/legacy'
+    match: not_contains
+  - name: ca24-temoin-reste-du-projet-analyse
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/routes/interventions\.ts'
+  # Le juge llm (FAIL x3) refusait la simple mention des dossiers non lus dans
+  # la synthèse, que la spec permet. Remplacé par un motif : aucun décompte de
+  # « Couverture actuelle » n'inclut les 2 000 modules non lus (budget de 300).
+  - name: ca24-aucun-decompte-sur-les-dossiers-non-lus
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Couverture actuelle[^\n]*\n(?:(?!\n## )[\s\S])*?(?:analys[ée]s|couverts|exclus)[^\n]*?(?<![\d.,])(?:[3-9]\d\d|\d{1,3}(?:[   ]?\d{3})+)(?![\d.,])'
+    match: not_contains
+  - name: ca07-aucun-lanceur-ni-installation
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|\\n|&&|\|\||;|\s\||(?:"command"\s*:\s*"|[\s$])\(|(?<![\w.-])(?:xargs|env|time|sudo|exec|nohup))\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
+    min: 0
+    max: 0
+  - name: ca01-aucune-ecriture-hors-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/tests-manquants\.md")'
+    min: 0
+    max: 0

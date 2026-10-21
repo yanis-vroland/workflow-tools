@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: compte-rendu-ca01-point-hebdo
+description: >-
+  Spec 007, cas principal : wf-compte-rendu lancé sur la fixture FieldOps brief
+  (ni code ni git) avec les notes brutes notes/2026-10-07-point-hebdo.md
+  (participants avec rôles et coordonnées, décisions, proposition sans accord,
+  actions dont une sans échéance et une au responsable ambigu, mot de passe de
+  recette). Couvre CA1, CA3 à CA12, CA19 et CA20.
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
+
+context:
+  scaffold_script: scaffold.sh

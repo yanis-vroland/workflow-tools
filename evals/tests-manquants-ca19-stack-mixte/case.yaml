@@ -1,0 +1,64 @@
+schema_version: "1.1"
+name: tests-manquants-ca19-stack-mixte
+description: >-
+  Spec 012 (wf-tests-manquants), CA19 : FieldOps complet et un service Python
+  (relay/), stack non couverte en v1. « Outillage de test » la signale « non
+  couverte », aucune entrée ne porte sur elle, les parties JS/TS et Flutter
+  sont analysées normalement.
+tags: [wf-tests-manquants, spec-012, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca01-livrable-cree
+    type: file_exists
+    path: "docs/wf/tests-manquants.md"
+  - name: ca19-python-non-couverte
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Outillage de test[^\n]*\n(?:(?!\n## )[\s\S])*?(?:(?<=\n)(?=[^\n]*\bPython\b)(?=[^\n]*non couverte)|\n### [^\n]*(?:Python|relay)[^\n]*\n(?:(?!\n#{2,3} )[\s\S])*?non couverte)'
+    flags: i
+  - name: ca19-aucune-entree-python
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*(?:Tests manquants|Cas manquants dans le code test[ée]|Squelettes de tests)[^\n]*\n(?:(?!\n## )[\s\S])*?(?:\.py\b|pick_channel|relay/relay)'
+    match: not_contains
+  - name: ca19-js-analyse-normalement
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*src/api/routes/interventions\.ts'
+  - name: ca19-flutter-analyse-normalement
+    type: regex
+    target: { source: file, path: "docs/wf/tests-manquants.md" }
+    pattern: '\n## [^\n]*Tests manquants[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*mobile/lib/'
+  - name: ca19-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/tests-manquants.md" }
+    criteria: >-
+      Le projet mêle une application web JS/TS, une application Flutter
+      (mobile/) et un service Python (relay/, pyproject.toml, sans test). PASS
+      si « Outillage de test » signale la partie Python comme stack « non
+      couverte » (en v1), si aucune entrée de « Tests manquants », aucun cas
+      de « Cas manquants dans le code testé » et aucun squelette ne porte sur
+      un fichier de relay/, et si les applications JS/TS et Flutter sont
+      analysées comme d'habitude (outillage, couverture, entrées). FAIL sinon.
+  - name: ca07-aucun-lanceur-ni-installation
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?(?:--coverage\b|(?<=(?:"command"\s*:\s*"|\\n|&&|\|\||;|\s\||(?:"command"\s*:\s*"|[\s$])\(|(?<![\w.-])(?:xargs|env|time|sudo|exec|nohup))\s*(?:[A-Z_][A-Z0-9_]*=\S*\s+)*)(?:npx|pnpx|bunx|vitest|jest|playwright|cypress|mocha|c8|nyc|node|tsx|ts-node|deno|bun|dart|flutter|fvm|npm|pnpm|yarn|python3?|pytest|pip3?)(?=[\s;&|)]|\\n|"|$))'
+    min: 0
+    max: 0
+  - name: ca01-aucune-ecriture-hors-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/tests-manquants\.md")'
+    min: 0
+    max: 0
