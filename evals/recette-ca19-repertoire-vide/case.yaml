@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: recette-ca19-repertoire-vide
+description: >-
+  Spec 014 (wf-recette). Répertoire de travail vide, ni code, ni spec, ni git
+  : l'outil l'indique et n'écrit aucun livrable (CA19).
+tags: [wf-recette, spec-014, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,21 @@
+schema_version: "1.1"
+name: recette-ca09-ca16-hors-campagne
+description: >-
+  Spec 014 (wf-recette). FieldOps avec un cahier précédent commité qui porte
+  des saisies humaines dans le tableau et sous « Cas hors campagne », relancé
+  par /wf-recette v1.3.0 : seule la spec 001 a changé depuis v1.3.0. Le cas
+  hors campagne de la spec 001 revient au tableau avec son ID, son statut et
+  son commentaire ; les cas de la spec 002 et de la spec 003 sont reconduits
+  sous « Cas hors campagne » avec leurs saisies, mot pour mot. Couvre CA9,
+  CA16, CA8.
+tags: [wf-recette, spec-014, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

@@ -106,6 +106,30 @@ CA15 et CA20 : seul un sous-dossier effectivement suivi par un dépôt qui a des
 
 CA20 : le répertoire de la session est imposé par `claude plugin eval` et le scaffold n'écrit rien au-dessus. Le dépôt est donc construit avec `core.worktree` : répertoire git dans le répertoire de la session, racine de travail dans son parent, dont la session est le sous-dossier (`git rev-parse --show-prefix` non vide). Seul ce sous-dossier est extrait (`sparse-checkout`). L'historique de FieldOps y est réécrit, suivi de 12 commits plus récents dans `plateforme/` (hors du sous-dossier, une cinquième autrice) : dernier commit du dépôt 2026-10-06, du sous-dossier 2026-09-29. Les hash dépendent du nom du répertoire de la session et ne sont pas figés.
 
+### wf-recette
+
+Spec 014, lancée par `/wf-recette` (ou `/wf-recette <référence>`), tous les cas `hors-reseau` (tag `wf-recette` pour ne lancer qu'eux). Chaque correcteur porte dans son nom l'identifiant du CA qu'il vérifie (`ca04-…`) ; les correcteurs `temoin-…` et les témoins positifs des cas sans livrable vérifient que le scénario a bien eu lieu. Les livrables d'entrée de `wf-specs-tickets` sont fabriqués par le scaffold selon le contrat de la spec 006 (sous-sections `Tnn : <titre>`, critères `CAn` propres à chaque ticket).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `recette-ca04-specs-fieldops` | FieldOps complet, propre, sans argument : specs 001 et 002 validées, 003 en brouillon | CA1 à CA4, CA7, CA8, CA12 à CA16 (sans argument), CA20, CA21 |
+| `recette-ca05-specs-tickets` | FieldOps et, commités, un livrable `docs/wf/specs-tickets.md` (T01 à T03, dont un critère interne) et une spec 004 à critère de performance | CA5, CA11, CA4, CA7, CA1, CA20, CA21 |
+| `recette-ca06-depuis-le-code` | FieldOps sans `docs/specs/` (retiré par un commit), `--dirty` | CA6, CA7, CA3, CA8, CA20 (modifications non commitées) |
+| `recette-ca09-ca10-relance` | FieldOps et cahier précédent commité : statuts et commentaires saisis, sources disparues, identifiant déjà retiré | CA9, CA10, CA8, CA14, CA3 |
+| `recette-ca16-reference` | FieldOps, livrable `wf-specs-tickets` étiqueté `v1.3.0`, puis spec 002 et ticket T02 modifiés ; `/wf-recette v1.3.0` | CA16, CA5, CA1, CA20 |
+| `recette-ca09-ca16-hors-campagne` | FieldOps, tag `v1.3.0`, puis cahier commité avec saisies dans le tableau et sous « Cas hors campagne », puis spec 001 modifiée ; `/wf-recette v1.3.0` | CA9 (saisies des cas hors campagne réintégrées ou reconduites), CA16, CA8, CA3, CA20 |
+| `recette-ca17-reference-inconnue` | FieldOps et cahier précédent commité ; `/wf-recette v9.9.9` | CA17 (cas limite), CA21 |
+| `recette-ca18-stack-non-couverte` | projet Python sans spec | CA18 (cas limite) |
+| `recette-ca19-repertoire-vide` | répertoire vide | CA19 (cas limite) |
+| `recette-ca19-sans-code-source` | FieldOps brief (documents seuls) | CA19 (cas limite) |
+
+Tous les cas portent un correcteur `…-aucune-commande-hors-liste` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `date +%F` et, avec une référence, `git log -1 --format=%h --end-of-options <ref> --`, `git diff --name-only --end-of-options <ref> HEAD` et `git show --end-of-options <ref>:docs/wf/specs-tickets.md` (liste blanche). Les juges `llm` sont réservés à ce qu'une regex ne vérifie pas : CA14 (synthèse exacte, le juge recompte le tableau), CA11 (raisons des critères non recettables), CA10 (fonctionnalités retirées) et les messages de fin des cas sans livrable. Les motifs sont compilés et vérifiés sur des exemples par `tests/correcteurs/wf-recette.mjs`, lancé par `tests/skills/wf-recette.sh`.
+
+Dans les cas où le scaffold dépose un cahier précédent (CA9-CA10, CA9-CA16), chaque correcteur que ce cahier satisferait de lui-même exige aussi que sa date (2026-09-15) ait disparu.
+
+Hash rejouables des scaffolds, vérifiés dans les en-têtes : `2fc99c0` (FieldOps complet), `54ff0b9` (CA5), `dd66a1d` (CA6), `355fc68` (CA9-CA10), `19c4ec9` (CA16, HEAD), `85e1db9` (CA16, commit de `v1.3.0`) et `d9945a4` (CA9-CA16). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `ca20-entete-commit` et `ca16-reference-et-commit`.
+
+Limite : `file_exists` ne voit que les fichiers créés pendant l'exécution. Dans les cas où un cahier précédent est commité (CA9-CA10, CA17), l'écriture est vérifiée par l'outil Write (`tool_used`) et par un témoin de date, pas par `file_exists`.
 ### wf-tests-manquants
 
 Spec 012, lancée par `/wf-tests-manquants`, tous les cas `hors-reseau` (tag `wf-tests-manquants` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca13-…`). Tous les cas qui produisent un livrable portent `ca07-aucun-lanceur-…` et `ca01-aucune-ecriture-hors-livrable` : aucune commande Bash ne lance `npm`, `npx`, `node`, `vitest`, `jest`, `flutter`, `dart`, `python`, `pip`… ni l'option `--coverage`.

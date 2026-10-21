@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: recette-ca17-reference-inconnue
+description: >-
+  Spec 014 (wf-recette), lancée avec une référence git inexistante
+  (/wf-recette v9.9.9) sur FieldOps, dont un cahier de recette précédent est
+  commité : l'outil l'indique et n'écrit ni ne modifie aucun livrable (CA17).
+tags: [wf-recette, spec-014, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
