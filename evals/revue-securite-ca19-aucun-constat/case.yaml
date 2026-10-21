@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: revue-securite-ca19-aucun-constat
+description: >-
+  Spec 010, CA19 : petit projet TypeScript sous git, sans dépendance ni
+  faille. Les sections indiquent « aucun constat » et la synthèse rappelle les
+  limites sans affirmer que le projet est sûr.
+tags: [wf-revue-securite, spec-010, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
