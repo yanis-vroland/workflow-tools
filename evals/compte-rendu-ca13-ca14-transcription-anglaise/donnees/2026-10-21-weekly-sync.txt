@@ -1,0 +1,8 @@
+Weekly sync
+[00:00:05] Camille Durand (product owner): Hi all. Quick sync on the offline mode of the mobile app.
+[00:00:12] Tom Becker (backend developer): The sync queue is done. Photos are uploaded when the network comes back.
+[00:00:30] Camille Durand (product owner): Great. We agree: the offline mode ships in release 1.3.
+[00:00:41] Tom Becker (backend developer): I'll write the migration guide by October 28.
+[00:00:55] Priya Natarajan (QA engineer): I can test on Android, but we still don't know if iOS 16 must be supported.
+[00:01:10] Camille Durand (product owner): Let's keep that open, I'll ask the customer.
+[00:01:20] Priya Natarajan (QA engineer): Maybe we could also drop the legacy CSV export? Just an idea.

@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: compte-rendu-ca03-ca04-index-existant
+description: >-
+  Spec 007 : projet FieldOps avec code et git (faux secret compris), deux
+  comptes rendus déjà présents (2026-10-14 et 2026-09-30) avec leur index, et des
+  notes hors du projet (../reunions/notes-reunion.md) dont la date n'est que dans
+  le contenu (07/10/2026) et dont l'objet est « Point hebdomadaire ». Couvre CA1
+  (fichier hors du projet, autres comptes rendus intacts), CA3 (nom exact), CA4
+  (ordre de l'index), CA6 (commit, source sans chemin) et CA10 (aucun code lu).
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
+
+context:
+  scaffold_script: scaffold.sh

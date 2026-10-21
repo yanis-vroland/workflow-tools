@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: compte-rendu-ca17-nouvelle-reunion
+description: >-
+  Spec 007, CA17 (seconde moitié) : même situation que
+  compte-rendu-ca17-autre-reunion-meme-nom, mais la réponse à la question
+  « relance ou nouvelle réunion » est donnée d'avance après le chemin
+  (« nouvelle réunion »). Le compte rendu est nommé avec le suffixe -2 et le
+  premier n'est pas modifié ; l'index liste les deux.
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 25
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
+
+context:
+  scaffold_script: scaffold.sh

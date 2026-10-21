@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: compte-rendu-ca13-ca14-transcription-anglaise
+description: >-
+  Spec 007, CA13 et CA14 : transcription en anglais, horodatée entre crochets
+  avec tours de parole ([00:00:05] Camille Durand: …), en .txt, datée par son
+  nom de fichier. Le compte rendu est rédigé en français, sans horodatage ni
+  verbatim, avec les noms propres et termes techniques conservés. Couvre aussi
+  CA7 et CA8.
+tags: [wf-compte-rendu, spec-007, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 25
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
+
+context:
+  scaffold_script: scaffold.sh
