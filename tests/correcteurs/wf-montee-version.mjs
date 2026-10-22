@@ -389,6 +389,13 @@ sampleCase(nominal, nominalDoc, [
   ["ca11-s3-en-tete-des-cibles.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", /^1\. (.*)\n2\. (.*)$/m, "1. $2\n2. $1"))],
   ["ca11-s3-en-tete-du-plan.md", livrable(nominalHeader, swap(nominalParts, "Plan de montée", "### Étape 1 : express 5 (S3)", "### Étape 1 : express 5"))],
   ["ca11-s1-non-cite.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "corrige S3", "corrige S1 et S3"))],
+  // Défauts observés en eval r12 : source « métadonnées du registre », rupture sans impacts, étape incomplète
+  ["ca12-chaque-rupture-sourcee.md", livrable(nominalHeader, swap(nominalParts, "Ruptures et impacts", "- Source : non vérifiée (aucune source consultée).", "- Source : métadonnées du registre npm (peerDependencies)."))],
+  ["ca12-ruptures-identifiees.md", livrable(nominalHeader, { ...nominalParts, "Ruptures et impacts": "Aucune rupture." })],
+  ["ca13-chaque-rupture-impacts.md", livrable(nominalHeader, swap(nominalParts, "Ruptures et impacts", "- Impacts (1 occurrence) : `src/web/main.tsx:5`.", "- Impacts : non déterminés."))],
+  ["ca15-chaque-etape-complete.md", livrable(nominalHeader, swap(nominalParts, "Plan de montée", "- Ruptures à traiter : R1\n", ""))],
+  ["ca15-chaque-etape-complete.md", livrable(nominalHeader, swap(nominalParts, "Plan de montée", "- Paquets : `express` 4.18.2 → 5.1.0 (application web)", "- Paquets : `express`"))],
+  ["ca04-node-et-ses-fichiers.md", livrable(nominalHeader, swap(nominalParts, "Inventaire des versions", "`>=18` (`engines` de `package.json`), ", ""))],
   ["ca13-react-dom-render.md", livrable(nominalHeader, swap(nominalParts, "Ruptures et impacts", "`src/web/main.tsx:5`", "`src/web/main.tsx:7`"))],
   ["ca15-commande-npm.md", livrable(nominalHeader, swap(nominalParts, "Plan de montée", "react-dom@19.2.0", "react-dom"))],
   ["ca15-commande-flutter-pub.md", livrable(nominalHeader, swap(nominalParts, "Plan de montée", "flutter pub add http:^1.6.0", "modifier mobile/pubspec.yaml"))],
