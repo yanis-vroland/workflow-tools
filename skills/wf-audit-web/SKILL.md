@@ -84,7 +84,7 @@ Pour chaque front audité, liste avec Glob ses documents HTML, gabarits de mise 
 
 **Inventaire** : lance d'abord la commande 5. Elle donne, pour chaque dossier, le nombre exact de gabarits et de composants : c'est la seule source pour compter les fichiers et lister les dossiers, car le résultat de Glob peut être tronqué (au-delà d'une centaine de fichiers) et ne montrerait alors qu'une partie des dossiers.
 
-**Projet volumineux** : au-delà de 150 fichiers de gabarits et de composants (total de la commande 5), lis d'abord les documents racine, les gabarits de mise en page et les pages, puis les composants dossier par dossier, sans dépasser 150 fichiers lus. Chaque dossier de la commande 5 dont tous les fichiers n'ont pas été lus figure dans « Points non déterminés », sous la mention « dossiers non lus » (ou « lus en partie »), un par ligne avec son nombre de fichiers tel que la commande 5 le donne (un dossier parent entièrement non lu peut regrouper ses sous-dossiers, à condition de les nommer tous), et aucune conclusion ne porte sur lui : ni constat général, ni affirmation qu'il est exempt de problème. Une correspondance Grep dans un fichier non lu n'est pas un constat.
+**Projet volumineux** : au-delà de 150 fichiers de gabarits et de composants (total de la commande 5), lis d'abord les documents racine, les gabarits de mise en page et les pages, puis les composants dossier par dossier, sans dépasser 150 fichiers lus. Chaque dossier de la commande 5 dont tous les fichiers n'ont pas été lus figure dans « Points non déterminés », sous la mention « dossiers non lus » (ou « lus en partie »), un par ligne avec son nombre de fichiers tel que la commande 5 le donne (un dossier parent entièrement non lu peut regrouper ses sous-dossiers, à condition de les nommer tous), et aucune conclusion ne porte sur lui : ni constat général, ni affirmation qu'il est exempt de problème. Une correspondance Grep dans un fichier non lu n'est pas un constat. Un tel dossier n'apparaît pas dans la ligne « Dossiers analysés » de « Périmètre et méthode », qui cite seulement les dossiers lus en entier. Tant qu'un dossier n'a pas été lu en entier, aucune phrase ne généralise à tout le front ou à tout le projet (ex. « ces corrections portent sur l'ensemble du front ») : la Synthèse parle des défauts relevés parmi les fichiers lus.
 
 ## Règles de constat
 
@@ -177,7 +177,7 @@ Cet audit ne vaut pas audit de conformité RGAA : il relève des défauts repér
 - Applications auditées : <nom> (`<dossier>`)…
 - Exclues : <nom> (`<dossier>`) : application mobile, cible web Flutter non couverte en v1.
 - Non couvert : <nom> (`<dossier>`) : <stack> non couverte en v1, aucun constat rapporté.
-- Dossiers analysés : `<dossier>`…
+- Dossiers analysés : `<dossier lu en entier>`…
 - Mesure : <« aucune (mode code seul) » ou « Lighthouse <version>, profil mobile, AAAA-MM-JJ HH:MM UTC, une seule page »>.
 
 ## Performance
