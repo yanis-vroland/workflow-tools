@@ -137,7 +137,7 @@ Ce dossier a été établi par lecture des fichiers du projet, sans exécution.
 
 - Périmètre transmis : API et back-office web (racine), application mobile (\`mobile/\`).
 - Commit de référence : \`2fc99c0\`.
-- Checklist de passation : 6 lignes, dont 6 « à faire ».
+- Checklist de passation : 10 lignes, dont 10 « à faire ».
 - Interlocuteurs :
   - Responsable du projet côté client : à compléter
   - Prestataire sortant : à compléter
@@ -154,8 +154,9 @@ Ce dossier a été établi par lecture des fichiers du projet, sans exécution.
 ### API et back-office web (racine)
 
 - **recette** : déclencheur : push sur \`main\` (\`.github/workflows/deploy.yml\`).
-  1. \`docker push <registre>/fieldops:recette\` (\`.github/workflows/deploy.yml\` l. 31)
-  2. \`curl -fsS -X POST https://<serveur>/hooks/fieldops-recette\` (\`.github/workflows/deploy.yml\` l. 33)
+  1. \`docker build -t <registre>/fieldops:recette .\` (\`.github/workflows/deploy.yml\` l. 30)
+  2. \`docker push <registre>/fieldops:recette\` (\`.github/workflows/deploy.yml\` l. 31)
+  3. \`curl -fsS -X POST https://<serveur>/hooks/fieldops-recette\` (\`.github/workflows/deploy.yml\` l. 33)
 - **production** : déclencheur : tag \`v*\`.
 
 ### Application mobile (\`mobile/\`)
@@ -180,10 +181,10 @@ Valeurs à transmettre par un canal sécurisé, hors de ce document.
 
 | Secret | Utilisé pour | Référencé dans | Comment l'obtenir |
 |---|---|---|---|
-| \`REGISTRY_TOKEN\` | registre | \`.github/workflows/deploy.yml\` | à compléter |
-| \`DEPLOY_TOKEN\` | webhook | \`.github/workflows/deploy.yml\` | à compléter |
-| \`PRODUCTION_DATABASE_URL\` | purge | \`.github/workflows/purge.yml\` | à compléter |
-| \`JWT_SECRET\` | jetons | \`.env.example\` | à compléter |
+| \`REGISTRY_TOKEN\` | connexion au registre (\`.github/workflows/deploy.yml\` l. 29) | \`.github/workflows/deploy.yml\` | à compléter |
+| \`DEPLOY_TOKEN\` | appel du webhook (\`.github/workflows/deploy.yml\` l. 33) | \`.github/workflows/deploy.yml\` | à compléter |
+| \`PRODUCTION_DATABASE_URL\` | base de la purge (\`.github/workflows/purge.yml\` l. 21) | \`.github/workflows/purge.yml\` | à compléter |
+| \`JWT_SECRET\` | signature des jetons (\`src/api/middleware/auth.ts\` l. 6) | \`.env.example\` | à compléter |
 | \`PAYMENT_WEBHOOK_SECRET\` | à compléter | \`.env.example\` | à compléter |
 
 ## Travaux en cours
@@ -200,6 +201,22 @@ Modifications non commitées : aucune.
 
 15 marqueurs au total.
 
+| Fichier | Marqueurs |
+|---|---|
+| \`src/api/routes/interventions.ts\` | 3 |
+| \`Dockerfile\` | 1 |
+| \`mobile/android/app/build.gradle\` | 1 |
+| \`mobile/lib/db/local_db.dart\` | 1 |
+| \`mobile/lib/screens/intervention_detail_screen.dart\` | 1 |
+| \`mobile/lib/screens/intervention_list_screen.dart\` | 1 |
+| \`mobile/lib/services/auth_service.dart\` | 1 |
+| \`src/api/routes/auth.ts\` | 1 |
+| \`src/api/server.ts\` | 1 |
+| \`src/domain/invoice.ts\` | 1 |
+| \`src/domain/scheduling.ts\` | 1 |
+| \`src/services/mailer.ts\` | 1 |
+| \`src/web/api.ts\` | 1 |
+
 - \`README.md\` indique \`npm run start:dev\`, absent de \`package.json\`.
 - \`.github/workflows/deploy.yml\` l. 29, 30, 31, 44, 45, 46 : registre d'images (\`<registre>\`) : à paramétrer au redéploiement.
 - \`.github/workflows/deploy.yml\` l. 33, 48 : webhook (\`<serveur>\`) : à paramétrer au redéploiement.
@@ -208,9 +225,14 @@ Modifications non commitées : aucune.
 
 | Action | Source | Statut |
 |---|---|---|
+| Transférer l'accès au service de cartographie | \`src/services/mapClient.ts\` | à faire |
+| Transférer l'accès au service d'e-mail transactionnel | \`src/services/mailer.ts\` | à faire |
 | Transférer l'accès au service de paiement | \`src/services/payment.ts\` | à faire |
 | Transmettre le secret \`REGISTRY_TOKEN\` | \`.github/workflows/deploy.yml\` | à faire |
 | Transmettre le secret \`PRODUCTION_DATABASE_URL\` | \`.github/workflows/purge.yml\` | à faire |
+| Transmettre le secret \`DEPLOY_TOKEN\` | \`.github/workflows/deploy.yml\` | à faire |
+| Transmettre le secret \`JWT_SECRET\` | \`.env.example\` | à faire |
+| Transmettre le secret \`PAYMENT_WEBHOOK_SECRET\` | \`.env.example\` | à faire |
 | Transférer les droits sur le dépôt de code | dépôt git | à faire |
 | Fusionner, abandonner ou transmettre la branche \`feat/export-pdf\` | git | à faire |
 
@@ -248,7 +270,29 @@ const mutations = [
   ["ca23-webhook-signale", good.replace("l. 33, 48 : webhook (`<serveur>`) : à paramétrer au redéploiement.", "webhook.")],
   ["ca23-webhook-parametre", good.replace("https://<serveur>/hooks", "https://hooks")],
   ["ca05-purge-non-deploiement", good.replace("- **production**", "- **purge** : `npx tsx src/jobs/purge-closed-interventions.ts`\n- **production**")],
-  ["ca08-production-database-url", good.replace("| `PRODUCTION_DATABASE_URL` | purge | `.github/workflows/purge.yml` | à compléter |\n", "")],
+  ["ca08-production-database-url", good.replace("| `PRODUCTION_DATABASE_URL` | base de la purge (`.github/workflows/purge.yml` l. 21) | `.github/workflows/purge.yml` | à compléter |\n", "")],
+  // Correcteurs regex qui remplacent les juges llm (série r17)
+  ["ca05-declencheur-recette", good.replace("push sur `main`", "push")],
+  ["ca05-declencheur-production", good.replace("tag `v*`", "tag de version")],
+  ["ca05-commande-docker-build", good.replace("`docker build -t <registre>/fieldops:recette .`", "`docker build -t registre/fieldops:recette .`")],
+  ["ca05-aucune-etape-inventee", good.replace("  3. `curl", "  3. `ssh deploy@<serveur> ./restart.sh`\n  4. `curl")],
+  ["ca20-mobile-procedure-non-trouvee", good.replace("procédure de déploiement non trouvée dans le dépôt\n", "Publication manuelle.\n")],
+  ["ca20-mobile-aucune-procedure-inventee", good.replace("procédure de déploiement non trouvée dans le dépôt\n", "procédure de déploiement non trouvée dans le dépôt\n\n1. `flutter build appbundle`\n")],
+  ["ca07-chaque-service-titulaire", good.replace("`src/services/mailer.ts` · titulaire du compte : à compléter", "`src/services/mailer.ts`")],
+  ["ca07-chaque-service-indice", good.replace("- **Service d'e-mail** : `src/services/mailer.ts` ·", "- **Service d'e-mail** : repéré dans le code ·")],
+  ["ca07-aucun-fournisseur-invente", good.replace("**Service de paiement**", "**Service de paiement (Stripe)**")],
+  ["ca08-jwt-secret-a-completer", good.replace("(`src/api/middleware/auth.ts` l. 6) | `.env.example` | à compléter |", "(`src/api/middleware/auth.ts` l. 6) | `.env.example` | générer une chaîne aléatoire |")],
+  ["ca08-utilise-pour-etabli", good.replace("| `JWT_SECRET` | signature des jetons (`src/api/middleware/auth.ts` l. 6) |", "| `JWT_SECRET` | signature des jetons |")],
+  ["ca08-comment-l-obtenir-etabli", good.replace("| `.github/workflows/deploy.yml` | à compléter |\n| `DEPLOY_TOKEN`", "| `.github/workflows/deploy.yml` | auprès de l'hébergeur |\n| `DEPLOY_TOKEN`")],
+  ["ca08-aucune-procedure-inventee", good.replace("| `.env.example` | à compléter |\n| `PAYMENT_WEBHOOK_SECRET`", "| `.env.example` | à compléter (générer avec openssl) |\n| `PAYMENT_WEBHOOK_SECRET`")],
+  ["ca12-premier-fichier", good.replace("| `src/api/routes/interventions.ts` | 3 |\n", "").replace("| `src/web/api.ts` | 1 |\n", "| `src/web/api.ts` | 1 |\n| `src/api/routes/interventions.ts` | 3 |\n")],
+  ["ca12-tri-decroissant", good.replace("| `src/api/routes/interventions.ts` | 3 |\n", "").replace("| `src/web/api.ts` | 1 |\n", "| `src/web/api.ts` | 1 |\n| `src/api/routes/interventions.ts` | 3 |\n")],
+  ["ca12-treize-fichiers", good.replace("| `src/web/api.ts` | 1 |\n", "")],
+  ["ca12-au-plus-20-fichiers", good.replace("| `src/web/api.ts` | 1 |\n", "| `src/web/api.ts` | 1 |\n" + "| `src/x.ts` | 1 |\n".repeat(8))],
+  ["ca14-ligne-secret-jwt-secret", good.replace("| Transmettre le secret `JWT_SECRET` | `.env.example` | à faire |\n", "")],
+  ["ca14-ligne-service-cartographie", good.replace("| Transférer l'accès au service de cartographie | `src/services/mapClient.ts` | à faire |\n", "")],
+  ["ca14-toutes-a-faire", good.replace("| Transférer les droits sur le dépôt de code | dépôt git | à faire |", "| Transférer les droits sur le dépôt de code | dépôt git | fait |")],
+  ["ca14-source-renseignee", good.replace("| Transférer les droits sur le dépôt de code | dépôt git | à faire |", "| Transférer les droits sur le dépôt de code |  | à faire |")],
   ["ca08-date-expiration-non-secret", good.replace("| `JWT_SECRET`", "| `MAP_API_KEY_EXPIRES_AT` | à compléter | `.env.example` | à compléter |\n| `JWT_SECRET`")],
   ["ca08-aucune-valeur", good.replace("15 marqueurs au total.", "15 marqueurs au total. Clé valable jusqu'au 2027-03-31.")],
   ["ca14-ligne-production-database-url", good.replace("| Transmettre le secret `PRODUCTION_DATABASE_URL` | `.github/workflows/purge.yml` | à faire |\n", "")],
