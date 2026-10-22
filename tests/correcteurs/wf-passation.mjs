@@ -230,6 +230,8 @@ if (checked < 40) fail(`passation-fieldops : ${checked} correcteurs regex vérif
 
 // Variantes conformes : paramètre qui remplace aussi le schéma de l'adresse
 const variants = [
+  // Tableau des marqueurs avec sa ligne d'en-tête (sans fichier) : conforme
+  ["ca13-chaque-point-cite-son-fichier", good.replace("15 marqueurs au total.", "15 marqueurs au total :\n\n| Fichier | Marqueurs |\n|---|---|\n| `src/a.ts` | 3 |\n")],
   ["ca23-webhook-parametre", good.replace("https://<serveur>/hooks", "<serveur-de-déploiement>/hooks")],
 ];
 for (const [name, text] of variants) {
@@ -252,6 +254,11 @@ const mutations = [
   ["ca14-ligne-production-database-url", good.replace("| Transmettre le secret `PRODUCTION_DATABASE_URL` | `.github/workflows/purge.yml` | à faire |\n", "")],
   ["ca17-interlocuteurs-a-completer", good.replace(/  - (Responsable du projet côté client|Prestataire sortant) : à compléter\n/g, "")],
   ["ca17-interlocuteurs-a-completer", good.replace(/ : à compléter\n  - Prestataire sortant : à compléter/, " : la direction technique\n  - Prestataire sortant : une agence")],
+  ["ca04-aucune-version-de-stack", good.replace("## Environnements", "Le projet repose sur React 17 et Node.js 18.\n\n## Environnements")],
+  ["ca04-aucune-section-systeme", good.replace("## Environnements", "### Architecture\n\nUne API et un client.\n\n## Environnements")],
+  ["ca13-aucun-niveau-ni-jugement", good.replace("15 marqueurs au total.", "15 marqueurs au total (risque élevé).")],
+  ["ca13-aucun-niveau-ni-jugement", good.replace("15 marqueurs au total.", "15 marqueurs au total, signe d'une dette importante.")],
+  ["ca13-chaque-point-cite-son-fichier", good.replace("## Checklist", "- Code difficile à maintenir.\n\n## Checklist")],
   ["ca21-arbre-propre-sans-mention", good.replace("Commit : 2fc99c0\n", "Commit : 2fc99c0 · modifications non commitées\n")],
 ];
 for (const [name, text] of mutations) {
