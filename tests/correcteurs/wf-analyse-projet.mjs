@@ -346,6 +346,32 @@ const suites = [
     positive: [doc("En-tête", { "Activité du dépôt": "- dernier commit : 2026-10-06." })],
     negative: [doc("Date : 2026-10-06", { "Activité du dépôt": "- dernier commit : 2026-09-29." })],
   },
+  // CA8, correcteur not_contains : un positif est un livrable en défaut
+  {
+    file: "nominal/graders/ca8-niveau-et-fichier-pour-chaque-risque.md",
+    input: text,
+    positive: [
+      // Série r17 : risque transverse sans fichier, renvoi à une autre section
+      doc("En-tête", {
+        "Dette et risques":
+          "- **élevé** : injection SQL (`src/api/routes/interventions.ts`).\n- **moyen** : couverture de tests très faible : routes, authentification, services, back-office et écrans mobiles sans test (liste dans « Qualité et tests »).\n- **faible** : conteneur en root (`Dockerfile`, `docker-compose.yml`).",
+      }),
+      doc("En-tête", { "Dette et risques": "- **critique** : secret en dur (`src/api/middleware/auth.ts`)." }),
+      doc("En-tête", { "Dette et risques": "- Secret en dur (`src/api/middleware/auth.ts`)." }),
+      doc("En-tête", { "Dette et risques": "- **moyen** : Flutter figé (`3.13.9`)." }),
+      doc("En-tête", { "Dette et risques": "- **faible** : script `npm run start:dev` absent." }),
+      doc("En-tête", { "Dette et risques": "1. **élevé** : route sans authentification." }),
+    ],
+    negative: [
+      doc("En-tête", {
+        "Dette et risques":
+          "- **élevé** : suppression sans authentification (`src/api/routes/interventions.ts`).\n- **moyen** : dépendances en retard (React 17 : `package.json`, `mobile/pubspec.yaml`) et Flutter figé à 3.13.9 (`mobile/.fvmrc`).\n- **faible** : conteneur en root (`Dockerfile`).\n- **moyen** : couverture faible, fichiers les plus exposés non couverts (`src/api/routes/auth.ts`, `mobile/lib/screens/intervention_detail_screen.dart`).",
+        "Qualité et tests": "- Aucun test pour les routes.",
+        "Points non déterminés": "- Hébergement : non déterminé.",
+      }),
+      doc("En-tête", { "Dette et risques": "Risques classés par niveau.\n\n- **faible** : documentation (`README.md`)." }),
+    ],
+  },
   // CA18, correcteurs not_contains : un positif est un livrable en défaut
   {
     file: "ca18-projet-volumineux/graders/ca18-aucun-risque-sur-les-dossiers-non-lus.md",

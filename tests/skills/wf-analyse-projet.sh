@@ -376,6 +376,18 @@ for sh in "${shells[@]}"; do
 done
 [ "$injection_ok" -eq 1 ] && echo "OK     injection : noms de paquets transmis par heredoc, validés par le shell, noms piégés refusés (bash, zsh)"
 [ "$injection_ok" -eq 1 ] || fail=1
+
+
+
+# --- Risque transverse (amendement de CA8) -------------------------------------------
+# Un risque transverse (couverture, dépendances…) cite lui aussi un fichier : un renvoi
+# à une autre section du livrable ne le remplace pas (série r17).
+if grep -qE "risque transverse.*cite.*fichier.*renvoi à une autre section" "$real/SKILL.md"; then
+  echo "OK     CA8 : un risque transverse cite un fichier, pas un renvoi à une autre section"
+else
+  echo "ÉCHEC  CA8 : règle du risque transverse (fichier cité, pas de renvoi à une autre section) absente de la skill"
+  fail=1
+fi
 # --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------------
 
 if ! command -v node >/dev/null 2>&1; then
