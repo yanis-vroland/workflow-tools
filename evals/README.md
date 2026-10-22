@@ -219,6 +219,8 @@ CA10 : aucune branche distante ne peut être récupérée en eval ; le scaffold 
 
 CA23 : les adresses en dur de FieldOps sont celles du registre d'images et du webhook de `.github/workflows/deploy.yml` (lignes 29 à 33 et 44 à 48) ; `localhost`, le service `db` de `docker-compose.yml`, `.env.example` et les README sont exclus. Le cas Python ajoute une adresse IP de la plage de documentation (`203.0.113.42`) et une adresse d'écoute `0.0.0.0`, exclue comme adresse locale. Les exclusions sont vérifiées par regex, ligne par ligne (`ca23-exclusions-non-signalees`) : le juge `llm` qui les vérifiait était bruité sur ce long livrable.
 
+Juges `llm` : le livrable de `passation-fieldops` dépasse 10 Ko et les juges y ont donné des faux rouges répétés (séries r8, r14, r17, sur des livrables conformes). Tous ses critères sont donc vérifiés par regex, sauf `ca16-synthese-coherente`, seul juge restant : comparer les nombres annoncés par la Synthèse au nombre de lignes du tableau de la checklist demande un comptage qu'une regex ne fait pas.
+
 CA5 et CA8 : `.github/workflows/purge.yml` (tâche planifiée, spec 018) n'est pas une procédure de déploiement, mais son secret `PRODUCTION_DATABASE_URL` est à transmettre ; `MAP_API_KEY_EXPIRES_AT` (`.env.example`) est une date d'expiration, pas un secret.
 
 CA15 : le dossier déposé suit un format antérieur (statut en colonne du milieu, « Titulaire : »…), pour que les correcteurs de conservation n'y réussissent pas sans relance.
