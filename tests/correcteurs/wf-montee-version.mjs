@@ -329,7 +329,18 @@ const nominalParts = {
   "Inventaire des versions": inventaire(webRows, mobileRows, "24.11.0 (endoflife.date)", "non déterminé (source injoignable)", "2025-04-30 (endoflife.date)"),
   "Cibles retenues": `1. \`express\` 4.18.2 → 5.1.0 (corrige S3, première version corrigée 4.19.2).
 2. Lot mineur et correctif : \`pg\`, \`tsx\`, \`typescript\`, \`sqflite\`…
-3. \`react-dom\` 17.0.2 → 19.2.0, avec \`react\` (dépendance pair).`,
+3. \`react-dom\` 17.0.2 → 19.2.0, avec \`react\` (dépendance pair).
+4. \`bcryptjs\` 2.4.3 → 3.0.2.
+5. \`@types/express\` 4.17.21 → 5.0.3.
+6. \`@types/react\` 17.0.70 → 19.2.2, avec \`@types/react-dom\` (dépendance pair).
+7. \`@vitejs/plugin-react\` 4.2.0 → 5.0.4.
+8. \`eslint\` 8.54.0 → 9.37.0.
+9. \`vite\` 5.0.4 → 7.1.9.
+10. \`vitest\` 1.0.1 → 3.2.4.
+11. \`http\` 0.13.6 → 1.6.0.
+12. \`geolocator\` 9.0.2 → 14.0.2.
+13. \`flutter_lints\` 2.0.3 → 6.0.0.
+14. Node.js 18.19.0 → 24.11.0 (dernière LTS).`,
   "Ruptures et impacts": `### R1 : suppression de \`ReactDOM.render\` (\`react-dom\` 17 → 19)
 
 - Source : non vérifiée (aucune source consultée).
@@ -389,6 +400,13 @@ sampleCase(nominal, nominalDoc, [
   ["ca11-s3-en-tete-des-cibles.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", /^1\. (.*)\n2\. (.*)$/m, "1. $2\n2. $1"))],
   ["ca11-s3-en-tete-du-plan.md", livrable(nominalHeader, swap(nominalParts, "Plan de montée", "### Étape 1 : express 5 (S3)", "### Étape 1 : express 5"))],
   ["ca11-s1-non-cite.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "corrige S3", "corrige S1 et S3"))],
+  // Règles de CA10 (regex qui remplacent le juge llm ca10-lot-et-cibles-majeures, série r15)
+  ["ca10-chaque-ecart-majeur-cible.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", /\n12\. `geolocator`[^\n]*/, ""))],
+  ["ca10-un-seul-lot.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "\n4. `bcryptjs`", "\n4. Lot mobile : `sqflite` 2.3.0 → 2.4.2.\n5. `bcryptjs`"))],
+  ["ca10-lot-present.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", /\n2\. Lot[^\n]*/, ""))],
+  ["ca10-pas-de-cible-propre-hors-majeur.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "\n4. `bcryptjs`", "\n4. `pg` 8.11.3 → 8.16.3.\n5. `bcryptjs`"))],
+  ["ca10-cible-node-ou-lts-non-determinee.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", /\n14\. Node\.js[^\n]*/, ""))],
+  ["ca10-environnement-en-dernier.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "\n4. `bcryptjs`", "\n4. Node.js 18.19.0 → 24.11.0.\n5. `bcryptjs`"))],
   // Défauts observés en eval r12 : source « métadonnées du registre », rupture sans impacts, étape incomplète
   ["ca12-chaque-rupture-sourcee.md", livrable(nominalHeader, swap(nominalParts, "Ruptures et impacts", "- Source : non vérifiée (aucune source consultée).", "- Source : métadonnées du registre npm (peerDependencies)."))],
   ["ca12-ruptures-identifiees.md", livrable(nominalHeader, { ...nominalParts, "Ruptures et impacts": "Aucune rupture." })],
