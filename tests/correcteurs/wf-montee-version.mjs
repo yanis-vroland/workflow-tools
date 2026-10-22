@@ -427,6 +427,12 @@ sampleCase(nominal, nominalDoc, [
 ]);
 
 check(
+  "CA10 un seul lot : une entrée qui mentionne le lot n'est pas un second lot (faux rouge r16)",
+  `${nominal}/ca10-un-seul-lot.md`,
+  [livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "(dernière LTS).", "(dernière LTS) ; exigé par le lot (cible 2)."))],
+  [livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "\n4. `bcryptjs`", "\n4. **Lot** mobile : `sqflite`.\n5. `bcryptjs`"))],
+);
+check(
   "CA11 S1 hors des sections du plan",
   `${nominal}/ca11-s1-non-cite.md`,
   [livrable(nominalHeader, swap(nominalParts, "Points non déterminés", "- Dernière", "- Le constat S1 (code) est hors périmètre.\n- Dernière"))],
