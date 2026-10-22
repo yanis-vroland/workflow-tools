@@ -59,9 +59,9 @@ Couverts par CA6 (aucune spec), CA10 (source disparue), CA11 (critère non recet
 
 - Aucune.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA3 : le tableau des cas est trié par identifiant ; dans la colonne Étapes, les actions sont numérotées et séparées par `<br>` ; une barre verticale qui figurerait dans une cellule est remplacée par « / ».
 - CA4 : chaque cas a une seule source ; un critère qui mêle plusieurs vérifications peut produire plusieurs cas. Une spec sans critère numéroté est citée dans « Périmètre et sources » et dans « Points non déterminés », sans produire de cas.

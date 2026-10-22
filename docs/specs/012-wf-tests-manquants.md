@@ -54,9 +54,9 @@ Couverts par CA6, CA12, et CA16 à CA24.
 
 - Aucune.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA3 : la commande de lancement suit le gestionnaire de paquets dont le lockfile est présent (npm, pnpm ou yarn) ; sans script de test dans `package.json`, la commande est « non déterminée ».
 - CA4 : la commande `flutter test` est préfixée de `fvm` quand le projet fixe sa version de Flutter par fvm.

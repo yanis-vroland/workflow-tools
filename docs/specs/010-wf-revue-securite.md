@@ -56,9 +56,9 @@ Couverts par CA7, CA8, CA11, CA16, CA17, CA19, et CA22 à CA25.
 
 - Aucune.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA3 : l'en-tête porte aussi la ligne « Dernier identifiant attribué : Sn », ou « aucun » tant qu'aucun identifiant n'a été attribué.
 - CA4 : le seul accès réseau est la lecture d'OSV.dev (avis de sécurité) et de pub.dev (dépendances déclarées d'un paquet pub) ; seuls des noms et versions de paquets et des identifiants d'avis sont envoyés.
