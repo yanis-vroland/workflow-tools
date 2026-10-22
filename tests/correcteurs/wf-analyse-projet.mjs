@@ -97,6 +97,12 @@ const suites = [
       "python3 manage.py migrate",
       "vite",
       "tsc",
+      // Le corps du heredoc des registres n'est pas exécuté, mais ce qui l'entoure l'est
+      "while IFS= read -r p; do echo \"$p\"; done <<'WF_NPM_5e1a'\nvite\nWF_NPM_5e1a\nnpm install",
+      "npm test; while IFS= read -r p; do echo \"$p\"; done <<'WF_NPM_5e1a'\nvite\nWF_NPM_5e1a",
+      "while IFS= read -r p; do vitest run; done <<'WF_NPM_5e1a'\nvite\nWF_NPM_5e1a",
+      // Un autre heredoc, ou un corps passé à un shell, reste visé
+      "cat <<'EOF'\nx\nEOF\nvite build",
     ],
     negative: [
       "for f in lib/*.dart test/*.dart; do cat $f; done",
@@ -460,7 +466,16 @@ const suites = [
 // déclencher aucun correcteur d'interdiction : sinon une exécution conforme à la
 // skill échouerait.
 const skill = readFileSync(join(root, "skills", "wf-analyse-projet", "SKILL.md"), "utf8");
-const skillCommands = [...skill.matchAll(/^```bash\n([\s\S]*?)^```$/gm)].map((m) => m[1].trimEnd());
+const skillTemplates = [...skill.matchAll(/^```bash\n([\s\S]*?)^```$/gm)].map((m) => m[1].trimEnd());
+// Commandes de la skill telles qu'un modèle les écrit : les gabarits <nom npm> et
+// <nom pub> remplacés par des noms réels, dont des noms d'outils seuls sur leur
+// ligne dans le corps du heredoc (`vite`, `tsx`…), qui ne sont pas des commandes
+// (faux rouge de la série r17 sur ca1-ni-installation-ni-execution).
+const npmNames = ["express", "react", "@vitejs/plugin-react", "eslint", "tsx", "typescript", "vite", "vitest", "jest", "nodemon", "webpack", "make"];
+const pubNames = ["http", "sqflite", "path", "build_runner", "flutter_lints"];
+const skillCommands = skillTemplates.flatMap((t) =>
+  t.includes("<nom npm>") ? [t, t.replace("<nom npm>", npmNames.join("\n")).replace("<nom pub>", pubNames.join("\n"))] : [t],
+);
 for (const file of [
   "nominal/graders/ca1-ni-installation-ni-execution.md",
   "nominal/graders/ca1-aucune-modification-par-bash.md",
