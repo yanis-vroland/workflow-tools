@@ -70,7 +70,7 @@ Couverts par CA5 à CA8, CA15 à CA23.
 
 - Aucune.
 
-## Amendement (proposé)
+## Amendement 1 (proposé)
 
 Précisions issues d'une revue de sécurité, à valider. Chacune complète le CA indiqué.
 
