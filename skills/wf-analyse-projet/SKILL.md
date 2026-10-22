@@ -131,7 +131,7 @@ Limite : la recherche se fait ligne à ligne. Un import réparti sur plusieurs l
 ### 7. Sécurité, dette, effort
 
 - Sécurité : seulement les signaux visibles (requêtes concaténées, secrets en dur, authentification faible, dépendances très anciennes), chemins cités. Pas d'audit approfondi.
-- Dette et risques : chaque risque a un niveau, exactement « élevé », « moyen » ou « faible », et cite au moins un fichier. Tout fichier à la fois dans le top 10 et non couvert y figure obligatoirement.
+- Dette et risques : chaque risque a un niveau, exactement « élevé », « moyen » ou « faible », et cite au moins un fichier. Un risque transverse (couverture de tests, dépendances, configuration…) cite lui aussi au moins un fichier, le plus exposé : un renvoi à une autre section du livrable ne le remplace pas. Tout fichier à la fois dans le top 10 et non couvert y figure obligatoirement.
 - Effort de reprise : faible, moyen ou élevé, justifié en renvoyant aux risques listés. Aucun chiffrage : aucun nombre de jours, semaines, heures ou mois-homme (c'est `wf-chiffrage`).
 
 ### 8. Écriture
