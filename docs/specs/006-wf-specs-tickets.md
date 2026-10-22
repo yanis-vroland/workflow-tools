@@ -70,9 +70,9 @@ Seuil à ajuster après les premiers essais sur de vrais projets :
 
 - Taille maximale d'un ticket : 5 jours d'estimation haute cumulée (CA10), aligné sur la taille maximale d'une tâche de la spec 005.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA2 : une section sans élément est présente et contient la seule ligne « Aucun élément. ».
 - CA3 : l'en-tête liste les fichiers d'entrée sur une ligne « Fichiers d'entrée : » ; si le commit ne peut pas être lu (projet hors dépôt git ou dépôt sans commit), il est « non déterminé » ; les fichiers sous `docs/wf/` ne comptent pas pour la mention « modifications non commitées ».

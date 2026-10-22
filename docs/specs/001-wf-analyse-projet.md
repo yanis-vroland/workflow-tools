@@ -47,7 +47,7 @@ Couverts par CA4 et CA14 à CA20.
 
 - Aucune.
 
-## Amendement (proposé)
+## Amendement 1 (validé)
 
 Date : 2026-10-20
 
