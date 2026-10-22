@@ -42,7 +42,7 @@ graders:
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)\|(?=[^\n]*(?:SDK|Xcode))(?=[^\n]*\|\s*à vérifier\s*\|)(?=[^\n]*https://developer\.apple\.com/)(?=[^\n]*consulté le \d{4}-\d{2}-\d{2})'
-  - name: ca15-pas-de-repli-hors-reseau
+  - name: ca15-pas-de-repli-sans-reseau
     type: regex
     target: { source: file, path: "docs/wf/publication-store.md" }
     pattern: 'documentation des stores n.a pas pu être consultée'

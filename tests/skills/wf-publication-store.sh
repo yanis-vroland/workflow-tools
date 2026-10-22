@@ -297,6 +297,21 @@ done < <({
   awk 'length($0) >= 6' | sort -u)
 [ "$auto_ok" -eq 1 ] && ok "aucun nom des cas ni de la fixture mobile dans la skill (extraction automatique)"
 
+# --- Cas reseau sans la chaîne « hors-reseau » ----------------------------------------
+# Un lanceur qui choisit la passe par une recherche de « hors-reseau » dans le
+# case.yaml (série r15) lancerait un cas reseau sans WebFetch si un nom de
+# correcteur contenait cette chaîne.
+
+reseau_ok=1
+for case_file in "$root"/evals/publication-store-*/case.yaml; do
+  if grep -qE '^tags:.*\breseau\b' "$case_file" && ! grep -qE '^tags:.*hors-reseau' "$case_file" &&
+    grep -q 'hors-reseau' "$case_file"; then
+    ko "cas reseau sans la chaîne hors-reseau (${case_file#"$root"/})"
+    reseau_ok=0
+  fi
+done
+[ "$reseau_ok" -eq 1 ] && ok "cas reseau sans la chaîne hors-reseau"
+
 # --- Motifs des correcteurs des evals (compilation, exemples) -----------------------
 
 if out=$(node "$root/tests/correcteurs/wf-publication-store.mjs" 2>&1); then
