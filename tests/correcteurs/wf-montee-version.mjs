@@ -400,6 +400,12 @@ sampleCase(nominal, nominalDoc, [
   ["ca11-s3-en-tete-des-cibles.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", /^1\. (.*)\n2\. (.*)$/m, "1. $2\n2. $1"))],
   ["ca11-s3-en-tete-du-plan.md", livrable(nominalHeader, swap(nominalParts, "Plan de montée", "### Étape 1 : express 5 (S3)", "### Étape 1 : express 5"))],
   ["ca11-s1-non-cite.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "corrige S3", "corrige S1 et S3"))],
+  // CA11 (regex qui remplacent le juge llm ca11-express-en-tete, série r17)
+  ["ca11-express-premiere-cible.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", /^1\. (.*)\n2\. (.*)$/m, "1. $2\n2. $1"))],
+  ["ca11-express-premiere-cible.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "4.18.2 → 5.1.0", "4.18.2 → 4.18.3"))],
+  ["ca11-express-premiere-etape.md", livrable(nominalHeader, swap(nominalParts, "Plan de montée", "- Paquets : `express` 4.18.2 → 5.1.0", "- Paquets : `pg` 8.11.3 → 8.16.3"))],
+  ["ca11-aucun-autre-avis.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "(corrige S3", "(corrige S3 et CVE-2024-0001"))],
+  ["ca11-aucun-autre-avis.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "(corrige S3", "(corrige S2 et S3"))],
   // Règles de CA10 (regex qui remplacent le juge llm ca10-lot-et-cibles-majeures, série r15)
   ["ca10-chaque-ecart-majeur-cible.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", /\n12\. `geolocator`[^\n]*/, ""))],
   ["ca10-un-seul-lot.md", livrable(nominalHeader, swap(nominalParts, "Cibles retenues", "\n4. `bcryptjs`", "\n4. Lot mobile : `sqflite` 2.3.0 → 2.4.2.\n5. `bcryptjs`"))],

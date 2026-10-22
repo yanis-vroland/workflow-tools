@@ -133,6 +133,7 @@ cite "CA3 nom invalide cité tel quel" "cité tel qu'il figure dans le manifeste
 cite "CA19 écart sans lockfile fondé sur la contrainte" "Sans lockfile, l'écart se calcule"
 cite "CA13 rupture = changement précis" "Une rupture est un changement précis"
 cite "CA12 changement précis connu sans source : listé « non vérifiée »" "même sans source consultée"
+cite "CA12 consultation obligatoire du changelog pub.dev" "consultation est obligatoire"
 cite "CA12 exigence du registre : pas une rupture" "n'est pas une rupture : elle relève des exigences"
 
 # --- CA11 : livrable de wf-revue-securite -----------------------------------------
