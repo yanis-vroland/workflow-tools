@@ -151,6 +151,21 @@ const suites = [
     ],
   },
   {
+    file: "audit-web-ca27-projet-volumineux/graders/ca27-dossiers-non-lus-absents-des-dossiers-analyses.md",
+    input: text,
+    pass: [
+      doc({
+        "Périmètre et méthode": "- Dossiers analysés : `src/web`, `src/web/pages`, `public/img`.",
+        "Points non déterminés": "- Dossiers lus en partie : `src/web/legacy/contrats` (500 fichiers).",
+      }),
+    ],
+    fail: [
+      // Forme relevée dans l'eval r14
+      doc({ "Périmètre et méthode": "- Dossiers analysés : `src/web`, `src/web/legacy/contrats`, `src/web/legacy/devis`, `public/img`." }),
+      NO_DELIVERABLE,
+    ],
+  },
+  {
     // Relance : l'ancien livrable déposé par le scaffold ne fait passer aucun correcteur
     file: "audit-web-ca24-relance/graders/ca24-w1-conserve.md",
     input: text,

@@ -150,6 +150,8 @@ cite "CA28 hébergeur" "hébergeur"
 cite "ADR-001 en-tête hors git" "hors git"
 cite "CA27 décompte exact des fichiers par dossier" "-exec dirname {} + | sort | uniq -c"
 cite "CA27 Glob tronqué" "tronqué"
+cite "CA27 dossiers analysés : seulement ceux lus en entier" "seulement les dossiers lus en entier"
+cite "CA27 aucune généralisation à tout le front" "parmi les fichiers lus"
 
 # --- Injection shell ---------------------------------------------------------------
 # L'URL vient de l'utilisateur : elle ne doit jamais être recopiée dans le texte d'une
