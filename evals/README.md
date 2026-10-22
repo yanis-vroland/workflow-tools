@@ -9,10 +9,7 @@ Les cas se lancent en deux passes, selon leur tag réseau (voir « Réseau ») :
 ```bash
 # Registres joignables (tag reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag reseau \
-  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)"
-
-  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" \
-  "WebFetch(domain:endoflife.date)" "WebFetch(domain:storage.googleapis.com)"
+  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)" "WebFetch(domain:endoflife.date)" "WebFetch(domain:storage.googleapis.com)"
 
 # Aucun réseau (tag hors-reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag hors-reseau \
@@ -31,9 +28,7 @@ claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 
 Dès que `Bash` est accordé, ses commandes tournent dans le bac à sable de Claude Code, dont l'accès réseau est limité aux domaines accordés par `--allow-tools "WebFetch(domain:…)"`. Sans ces autorisations, aucun registre n'est joignable. D'où deux passes :
 
-- tag `reseau` : le cas a besoin des registres (npm, pub.dev) ou de la base d'avis OSV.dev (`api.osv.dev`) ;
-
-- tag `reseau` : le cas a besoin des registres (npm, pub.dev) ou des calendriers de versions (endoflife.date, versions publiées de Flutter sur `storage.googleapis.com`) ;
+- tag `reseau` : le cas a besoin des registres (npm, pub.dev), de la base d'avis OSV.dev (`api.osv.dev`) ou des calendriers de versions (endoflife.date, versions publiées de Flutter sur `storage.googleapis.com`) ;
 - tag `hors-reseau` : le cas tourne sans aucun réseau, y compris ceux qui exigent un registre injoignable.
 
 Chaque cas porte exactement un de ces deux tags ; `.github/scripts/verifier-tags-evals.sh` le vérifie en CI, sinon le cas ne serait jamais lancé.
