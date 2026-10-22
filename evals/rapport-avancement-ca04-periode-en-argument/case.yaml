@@ -217,7 +217,9 @@ graders:
   - name: ca11-tickets-cites-exclus
     type: regex
     target: { source: file, path: "docs/wf/rapport-avancement.md" }
-    pattern: '\n##? [^\n]*Prochaines [ée]tapes[^\n]*\n(?:(?!\n##? )[\s\S])*?\bT0[37]\b'
+    # Un ticket rapproché ne doit pas figurer comme élément de liste ; la
+    # section peut le citer dans une phrase qui dit qu'il est rapproché
+    pattern: '\n##? [^\n]*Prochaines [ée]tapes[^\n]*\n(?:(?!\n##? )[\s\S])*?\n[ \t]*(?:[-*+]|\d+[.)])[ \t]+(?:\*\*|`)?T0[37]\b'
     match: not_contains
   - name: ca11-rapprochement-approximatif-signale
     type: llm
