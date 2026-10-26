@@ -98,4 +98,189 @@ contract "CA15 : source introuvable conservée dans l'en-tête" '(introuvable)'
 contract "CA17 : nombre de pages d'un PDF (pdfinfo)" 'pdfinfo'
 contract "CA17 : texte d'une page de PDF (pdftotext)" 'pdftotext -f'
 
+# CA20 (amendement) : consigne explicite de langue, titres et libellés compris
+contract "CA20 : livrable entièrement en français" 'entièrement rédigé en français, y compris'
+
+# --- Injection shell par un chemin de source (amendement de CA17) ---------------
+# Un chemin de source vient de l'utilisateur (argument) ou du livrable (en-tête) :
+# il n'est jamais recopié dans le texte d'une commande (ni entre guillemets
+# doubles, où `$(…)` et les accents graves seraient interprétés, ni entre
+# apostrophes, qu'une apostrophe du nom refermerait). Il passe par un heredoc à
+# délimiteur entre apostrophes, est vérifié par le shell, préfixé par `./` s'il
+# est relatif (un nom qui commence par `-` n'est pas pris pour une option), puis
+# utilisé seulement en variable.
+
+inj=$(mktemp -d)
+trap 'rm -rf "${work:-}" "$inj"' EXIT
+
+# ko <description> / ok <description>
+ko() { echo "ÉCHEC  wf-cadrage-besoin, $1"; fail=1; }
+ok() { echo "OK     wf-cadrage-besoin, $1"; }
+
+if [ -f "$skill" ]; then
+  # shellcheck disable=SC2016 # motifs littéraux
+  if grep -qE "\"<[^>]+>\"|'<[^>]+>'" "$skill"; then
+    ko "injection : un chemin est recopié entre guillemets ou apostrophes dans une commande ($(grep -oE "\"<[^>]+>\"|'<[^>]+>'" "$skill" | sort -u | tr '\n' ' '))"
+  else
+    ok "injection : aucun chemin recopié entre guillemets ou apostrophes dans une commande"
+  fi
+fi
+
+contract "injection : raison du refus" 'nom de fichier refusé (caractère spécial), jamais lu'
+contract "injection : argument sur plusieurs lignes écarté" 'plusieurs lignes'
+# Un délimiteur de heredoc recopié dans le corps fermerait le heredoc : la suite
+# s'exécuterait. Le refus vaut pour les sources de l'en-tête autant que pour les
+# arguments (relance).
+contract "injection : délimiteur ou plusieurs lignes refusés, en-tête compris" \
+  'un chemin de source (argument ou en-tête) sur plusieurs lignes, ou qui contient le délimiteur'
+contract "injection : chemin jamais recopié dans une commande" "n'est jamais recopié dans le texte d'une commande"
+
+# Anti-recopie : dans un bloc ```bash, un chemin (<chemin>, <fichier>) ne figure
+# que dans le corps d'un heredoc, jamais dans le texte d'une commande, même sans
+# guillemets
+if [ -f "$skill" ]; then
+  # shellcheck disable=SC2016 # motifs awk littéraux
+  outside=$(awk '
+    /^[[:space:]]*```bash$/ { on = 1; d = ""; next }
+    on && /^[[:space:]]*```$/ { on = 0; next }
+    !on { next }
+    d != "" { line = $0; sub(/^[[:space:]]+/, "", line); if (line == d) d = ""; next }
+    /<(chemin|fichier)[^>]*>/ { print NR ": " $0 }
+    match($0, /<<-?[[:space:]]*[\047"]?[A-Za-z_][A-Za-z0-9_]*/) {
+      d = substr($0, RSTART, RLENGTH); sub(/^<<-?[[:space:]]*[\047"]?/, "", d)
+    }
+  ' "$skill")
+  if [ -n "$outside" ]; then
+    ko "injection : un chemin est recopié hors du corps d'un heredoc dans un bloc bash ($(tr '\n' ' ' <<<"$outside"))"
+  else
+    ok "injection : chemins des blocs bash seulement dans le corps d'un heredoc"
+  fi
+fi
+
+# bash_block <délimiteur> : bloc ```bash de SKILL.md qui contient le heredoc
+# <<'<délimiteur>', tel qu'écrit (indentation comprise : recopié tel quel avec
+# son indentation, le bloc garderait la ligne de fin du heredoc indentée, qui ne
+# le fermerait pas, et des espaces devant chaque chemin)
+bash_block() {
+  awk -v d="<<'$1'" '
+    /^[[:space:]]*```bash$/ { on = 1; buf = ""; has = 0; next }
+    on && /^[[:space:]]*```$/ { if (has) { printf "%s", buf; exit } on = 0; next }
+    on { buf = buf $0 "\n"; if (index($0, d)) has = 1 }
+  ' "$skill"
+}
+
+# Bloc à heredoc sans indentation : ```bash en début de ligne
+for delim in WF_SOURCES_7c3e WF_PDF_7c3e; do
+  [ -f "$skill" ] || break
+  fence=$(awk -v d="<<'$delim'" '
+    /^[[:space:]]*```bash$/ { on = 1; f = $0; next }
+    on && /^[[:space:]]*```$/ { on = 0; next }
+    on && index($0, d) { print f; exit }
+  ' "$skill")
+  if [ "$fence" = '```bash' ]; then
+    ok "injection : bloc <<'$delim' sans indentation"
+  else
+    ko "injection : bloc <<'$delim' indenté ou absent (recopié tel quel, sa ligne de fin ne fermerait pas le heredoc)"
+  fi
+done
+
+# run_block <shell> <bloc> <chemins, un par ligne> : lance le bloc dans $inj/run
+# avec les chemins dans le corps du heredoc, à la place de la ligne <chemin>
+# (par l'environnement : awk -v refuse les sauts de ligne et interprète les \)
+run_block() {
+  local script
+  script=$(PATHS_BODY="$3" awk '$0 == "<chemin>" { print ENVIRON["PATHS_BODY"]; next } { print }' <<<"$2")
+  (cd "$inj/run" && PATH="$inj/bin:$PATH" FAKE_LOG="$inj/log" "$1" -c "$script" 2>&1)
+}
+
+sources_block=$(bash_block WF_SOURCES_7c3e)
+pdf_block=$(bash_block WF_PDF_7c3e)
+for entry in "sources|$sources_block|WF_SOURCES_7c3e" "PDF|$pdf_block|WF_PDF_7c3e"; do
+  label=${entry%%|*}; delim=${entry##*|}; rest=${entry#*|}
+  if [ -n "${rest%|*}" ]; then
+    ok "injection : bloc $label avec heredoc <<'$delim'"
+  else
+    ko "injection : bloc bash $label avec heredoc <<'$delim' absent"
+  fi
+done
+
+mkdir -p "$inj/run" "$inj/bin"
+# Faux outils poppler : notent leurs arguments, un par ligne
+cat >"$inj/bin/pdfinfo" <<'SH'
+#!/usr/bin/env bash
+printf 'pdfinfo %s\n' "$@" >>"$FAKE_LOG"
+echo "Pages:          2"
+SH
+cat >"$inj/bin/pdftotext" <<'SH'
+#!/usr/bin/env bash
+printf 'pdftotext %s\n' "$@" >>"$FAKE_LOG"
+echo "texte"
+SH
+chmod +x "$inj/bin/pdfinfo" "$inj/bin/pdftotext"
+
+# shellcheck disable=SC2016 # noms piégés : substitutions littérales
+traps=('$(touch pwned1).md' '`touch pwned2`.md' "x'\$(touch pwned3)'.md" 'y"$(touch pwned4)".md' 'z\$(touch pwned5).md')
+for name in "${traps[@]}" "-n.md" "l'équipe.md" "-x.pdf"; do
+  : >"$inj/run/$name"
+done
+
+shells=(bash)
+[ -x /bin/zsh ] && shells+=(/bin/zsh)
+for sh in "${shells[@]}"; do
+  [ -n "$sources_block" ] || break
+  out=$(run_block "$sh" "$sources_block" "$(printf '%s\n' "${traps[@]}" "-n.md" "l'équipe.md" "absent.md")")
+  if compgen -G "$inj/run/pwned*" >/dev/null; then
+    ko "injection ($sh) : un nom piégé a exécuté une commande dans le bloc des sources"
+    for f in "$inj"/run/pwned*; do rm -f "$f"; done
+  else
+    ok "injection ($sh) : aucun nom piégé exécuté dans le bloc des sources"
+  fi
+  refused=$(grep -c '^refusé : ' <<<"$out")
+  if [ "$refused" -eq "${#traps[@]}" ]; then
+    ok "injection ($sh) : noms à caractère spécial refusés par le shell"
+  else
+    ko "injection ($sh) : ${#traps[@]} refus attendus, $refused obtenus ($out)"
+  fi
+  if grep -qxF 'fichier : -n.md' <<<"$out" && grep -qxF "fichier : l'équipe.md" <<<"$out" &&
+    grep -qxF 'introuvable : absent.md' <<<"$out"; then
+    ok "injection ($sh) : noms ordinaires (tiret initial, apostrophe) trouvés, absent signalé"
+  else
+    ko "injection ($sh) : sortie inattendue du bloc des sources ($out)"
+  fi
+done
+
+for sh in "${shells[@]}"; do
+  [ -n "$pdf_block" ] || break
+  pdf_ok=1
+  for name in "${traps[@]}"; do
+    : >"$inj/log"
+    out=$(run_block "$sh" "$pdf_block" "$name")
+    if compgen -G "$inj/run/pwned*" >/dev/null || [ -s "$inj/log" ]; then
+      ko "injection ($sh) : nom piégé exécuté ou transmis à poppler dans le bloc PDF ($name)"
+      pdf_ok=0
+      for f in "$inj"/run/pwned*; do rm -f "$f"; done
+    elif ! grep -qF 'nom de fichier refusé (caractère spécial), jamais lu' <<<"$out"; then
+      ko "injection ($sh) : refus non signalé par le bloc PDF ($name : $out)"
+      pdf_ok=0
+    fi
+  done
+  if [ "$pdf_ok" -eq 1 ]; then ok "injection ($sh) : bloc PDF, noms piégés refusés sans rien exécuter"; fi
+  : >"$inj/log"
+  out=$(run_block "$sh" "$pdf_block" "-x.pdf")
+  if grep -qxF 'pdfinfo ./-x.pdf' "$inj/log" && [ "$(grep -cxF 'pdftotext ./-x.pdf' "$inj/log")" -eq 2 ] &&
+    ! grep -qE '^pdf(info|totext) -x\.pdf$' "$inj/log" && grep -qF -- '--- page 2 ---' <<<"$out"; then
+    ok "injection ($sh) : bloc PDF, chemin relatif préfixé par ./ et chaque page extraite"
+  else
+    ko "injection ($sh) : bloc PDF, arguments inattendus ($(tr '\n' ' ' <"$inj/log") ; $out)"
+  fi
+done
+
+# --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------
+
+if ! command -v node >/dev/null 2>&1; then
+  ko "node introuvable : correcteurs des evals non vérifiés (tests/correcteurs/wf-cadrage-besoin.mjs)"
+elif ! node "$root/tests/correcteurs/wf-cadrage-besoin.mjs"; then
+  fail=1
+fi
+
 exit $fail

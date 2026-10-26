@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: passation-fieldops
+description: >-
+  Spec 016 (wf-passation) sur la fixture FieldOps complète : monorepo web
+  JS/TS et Flutter, déploiement recette et production par GitHub Actions,
+  services tiers repérés par variables, secrets de CI, branche non fusionnée
+  feat/export-pdf, 15 marqueurs, adresses en dur dans la CI, arbre propre,
+  faux fichier d'environnement, aucun livrable wf-* présent. Couvre CA1 à
+  CA5, CA7 à CA10, CA12 à CA14, CA16, CA17, CA20, CA21, CA23.
+tags: [wf-passation, spec-016, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

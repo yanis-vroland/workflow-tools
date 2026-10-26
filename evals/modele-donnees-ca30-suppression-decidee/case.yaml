@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: modele-donnees-ca30-suppression-decidee
+description: >-
+  Spec 017, CA30 (suppression confirmée) et CA10 : relance avec la demande
+  repassée en argument (source hors du projet), sur la
+  fixture FieldOps, d'un livrable au niveau C dont la décision D01 confirme la
+  suppression de la colonne hourly_rate. La migration contient désormais cette
+  suppression, la décision est conservée et citée comme source.
+tags: [wf-modele-donnees, spec-017, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1800
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

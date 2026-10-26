@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: audit-web-ca23-plusieurs-fronts
+description: >-
+  Spec 011, CA23 et CA22 : FieldOps web seul (src/web/, React) avec un second
+  front Next.js (portail/) et d'anciens gabarits PHP (legacy-php/, stack non
+  couverte). Couvre aussi CA6 (composant Image de Next.js), CA7 (textarea,
+  champs libellés sans constat) et CA9 (titre défini sans meta description :
+  référencement seul).
+tags: [wf-audit-web, spec-011, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

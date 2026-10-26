@@ -293,6 +293,101 @@ ${step6//"$placeholder"/inventory}"
   done
 fi
 
+# --- Injection shell par un nom de paquet (amendement de CA3) -----------------------
+# Un nom de paquet vient d'un manifeste ou d'un lockfile du projet : il n'est jamais
+# recopié dans le texte d'une commande (une apostrophe dans le nom refermerait les
+# apostrophes, et `$(…)` s'exécuterait). Il passe par un heredoc à délimiteur entre
+# apostrophes, est validé par le shell, puis n'est employé qu'en variable.
+
+skill_md="$real/SKILL.md"
+inj="$work/injection"
+mkdir -p "$inj/run" "$inj/bin"
+injection_ok=1
+
+# shellcheck disable=SC2016 # motifs littéraux
+if grep -qE "\"<[^>]+>\"|'<[^>]+>'" "$skill_md"; then
+  echo "ÉCHEC  injection : un nom est recopié entre guillemets ou apostrophes dans une commande ($(grep -oE "\"<[^>]+>\"|'<[^>]+>'" "$skill_md" | sort -u | tr '\n' ' '))"
+  injection_ok=0
+fi
+# Une boucle `for` recopie les noms dans le texte de la commande (revue, S4)
+if grep -qE '^[[:space:]]*for p in ' "$skill_md"; then
+  echo "ÉCHEC  injection : boucle « for p in » sur des noms écrits dans la commande"
+  injection_ok=0
+fi
+# Délimiteur public : un nom égal à une ligne de délimiteur fermerait le heredoc avant
+# la vérification du shell ; la skill le fait refuser avant l'écriture du heredoc (S1)
+if ! grep -qE "égal à une ligne de délimiteur \(\`WF_NPM_5e1a\`, \`WF_PUB_5e1a\`\).*refuse" "$skill_md"; then
+  echo "ÉCHEC  injection : refus préalable d'un nom égal à un délimiteur (WF_NPM_5e1a, WF_PUB_5e1a) absent de la skill"
+  injection_ok=0
+fi
+if ! grep -qF 'nom de paquet invalide, non vérifié' "$skill_md"; then
+  echo "ÉCHEC  injection : mention « nom de paquet invalide, non vérifié » absente de la skill"
+  injection_ok=0
+fi
+
+# Bloc ```bash des registres : celui qui contient les deux heredocs
+registry_block=$(awk '
+  /^```bash$/ { on = 1; buf = ""; next }
+  on && /^```$/ { if (index(buf, "<<'"'"'WF_NPM_5e1a'"'"'") && index(buf, "<<'"'"'WF_PUB_5e1a'"'"'")) { printf "%s", buf; exit } on = 0; next }
+  on { buf = buf $0 "\n" }
+' "$skill_md")
+if [ -z "$registry_block" ]; then
+  echo "ÉCHEC  injection : bloc bash des registres avec heredocs <<'WF_NPM_5e1a' et <<'WF_PUB_5e1a' absent"
+  injection_ok=0
+fi
+
+# Faux curl : note son dernier argument (l'URL) et répond comme un registre
+cat >"$inj/bin/curl" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "${@: -1}" >>"$FAKE_LOG"
+printf '{"version":"9.9.9","latest":{"version":"9.9.9"}}\n200'
+SH
+chmod +x "$inj/bin/curl"
+
+# shellcheck disable=SC2016 # noms piégés : substitutions littérales
+npm_names=('vite' '@scope/outil' "x'\$(touch pwned1)'" '$(touch pwned2)' '`touch pwned3`' 'y";touch pwned4;"' '.cache' '_priv' '@.x/outil' '@scope/_outil')
+# shellcheck disable=SC2016
+pub_names=('path_utils' "z'\$(touch pwned5)'")
+shells=(bash)
+[ -x /bin/zsh ] && shells+=(/bin/zsh)
+for sh in "${shells[@]}"; do
+  [ -n "$registry_block" ] || break
+  : >"$inj/log"
+  script=$(NPM_BODY="$(printf '%s\n' "${npm_names[@]}")" PUB_BODY="$(printf '%s\n' "${pub_names[@]}")" awk '
+    $0 == "<nom npm>" { print ENVIRON["NPM_BODY"]; next }
+    $0 == "<nom pub>" { print ENVIRON["PUB_BODY"]; next }
+    { print }' <<<"$registry_block")
+  out=$(cd "$inj/run" && PATH="$inj/bin:$PATH" FAKE_LOG="$inj/log" "$sh" -c "$script" 2>&1)
+  if compgen -G "$inj/run/pwned*" >/dev/null; then
+    echo "ÉCHEC  injection ($sh) : un nom piégé a exécuté une commande"
+    for f in "$inj"/run/pwned*; do rm -f "$f"; done
+    injection_ok=0
+  fi
+  expected_urls=$'https://registry.npmjs.org/vite/latest\nhttps://registry.npmjs.org/@scope%2Foutil/latest\nhttps://pub.dev/api/packages/path_utils'
+  if [ "$(cat "$inj/log")" != "$expected_urls" ]; then
+    echo "ÉCHEC  injection ($sh) : registres interrogés inattendus ($(tr '\n' ' ' <"$inj/log"))"
+    injection_ok=0
+  fi
+  # 9 : 4 noms piégés npm, 4 noms npm commençant par `.` ou `_` (nom ou portée), 1 nom piégé pub
+  if [ "$(grep -c 'nom de paquet invalide, non vérifié' <<<"$out")" -ne 9 ]; then
+    echo "ÉCHEC  injection ($sh) : 9 noms invalides signalés attendus ($out)"
+    injection_ok=0
+  fi
+done
+[ "$injection_ok" -eq 1 ] && echo "OK     injection : noms de paquets transmis par heredoc, validés par le shell, noms piégés refusés (bash, zsh)"
+[ "$injection_ok" -eq 1 ] || fail=1
+
+
+
+# --- Risque transverse (amendement de CA8) -------------------------------------------
+# Un risque transverse (couverture, dépendances…) cite lui aussi un fichier : un renvoi
+# à une autre section du livrable ne le remplace pas (série r17).
+if grep -qE "risque transverse.*cite.*fichier.*renvoi à une autre section" "$real/SKILL.md"; then
+  echo "OK     CA8 : un risque transverse cite un fichier, pas un renvoi à une autre section"
+else
+  echo "ÉCHEC  CA8 : règle du risque transverse (fichier cité, pas de renvoi à une autre section) absente de la skill"
+  fail=1
+fi
 # --- Correcteurs des evals : exemples positifs et négatifs (sans modèle) -------------
 
 if ! command -v node >/dev/null 2>&1; then

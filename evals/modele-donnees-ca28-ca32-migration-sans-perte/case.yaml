@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: modele-donnees-ca28-ca32-migration-sans-perte
+description: >-
+  Spec 017, CA28 à CA32 : sur la fixture FieldOps, une demande d'évolution hors
+  du projet ajoute une priorité obligatoire aux interventions existantes,
+  renomme le compte rendu (report) côté serveur et mobile, et rend inutile le
+  taux horaire (hourly_rate). La migration est sans perte, la suppression attend
+  une décision, la base sqflite monte de version, les impacts sur le code sont
+  listés. Couvre aussi CA14 (écarts aux conventions) et CA16.
+tags: [wf-modele-donnees, spec-017, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1800
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
