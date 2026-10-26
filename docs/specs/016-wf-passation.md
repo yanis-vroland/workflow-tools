@@ -64,9 +64,9 @@ Couverts par CA6 (pas de déploiement), CA11 (branche principale inconnue), CA15
 
 - Le plafond de 20 fichiers listés pour les marqueurs (CA12) est une proposition, à ajuster après les premiers essais sur de vrais projets.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA2 : une sous-section de « Points d'attention » sans élément porte « Aucun. » ; « Points non déterminés » est une liste à puces, « - Aucun. » s'il n'y a rien.
 - CA3 : la documentation propre du projet comprend chaque README (racine et applications), `CONTRIBUTING.md`, `CHANGELOG.md` et chaque document de `docs/` hors `docs/wf/`, un lien par fichier ; les livrables `wf-*` en dossier sont listés par leur `index.md` ; le dossier de passation ne se liste pas lui-même ; les livrables à usage interne n'y figurent ni par un lien ni par leur nom.
