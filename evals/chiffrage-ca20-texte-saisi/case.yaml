@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: chiffrage-ca20-texte-saisi
+description: >-
+  Spec 005, CA20 : un texte saisi dans la commande au lieu d'un chemin est
+  refusé, même quand docs/wf/cadrage-besoin.md existe (l'outil ne se rabat pas
+  sur l'entrée par défaut) ; aucun livrable n'est écrit.
+tags: [wf-chiffrage, spec-005, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

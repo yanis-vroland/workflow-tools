@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: chiffrage-ca01-cadrage-fieldops-brief
+description: >-
+  Spec 005, cas principal : wf-chiffrage lancé sans argument dans la fixture
+  FieldOps brief (projet sans code ni git) après cadrage, avec un livrable
+  docs/wf/cadrage-besoin.md conforme au contrat de la spec 004 : besoins B01 à
+  B07 dont un trop imprécis (B07), questions ouvertes et répondues, budget en
+  euros dans une réponse. Couvre CA1 à CA14 et CA22.
+tags: [wf-chiffrage, spec-005, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

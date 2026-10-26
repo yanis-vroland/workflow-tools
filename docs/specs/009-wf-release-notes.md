@@ -62,3 +62,28 @@ Couverts par CA7, CA9, CA10, CA14, CA15 et CA19 à CA26.
 ## Questions ouvertes
 
 - Aucune.
+
+## Amendement 1 (validé)
+
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
+
+- CA1 : l'outil ne lit aucun fichier du projet autre que le livrable ; tout ce qu'il établit (commits, diffs, manifeste) vient de l'historique git.
+- CA2 : le livrable commence par le titre `# Notes de version`, suivi de l'en-tête.
+- CA2 : sous chaque titre de version, une ligne « Plage » nomme les bornes telles qu'elles ont été passées ou trouvées (nom de tag, de branche ou `HEAD`, jamais un hash), indique le nombre de commits hors commits de fusion et la source du numéro de version.
+- CA2 : la date du titre de version est la date du commit de la borne haute.
+- CA5 : une seule référence passée en argument est la borne basse ; la borne haute est alors `HEAD`. Plus de deux références : l'outil rappelle la syntaxe et n'écrit rien.
+- CA6 : le numéro de version est passé par l'option `--version <numéro>`. Il est accepté s'il ne contient que lettres, chiffres, `.`, `+` et `-` sans commencer par `-` ; sinon l'outil indique « numéro de version refusé » et n'écrit rien.
+- CA6 : le manifeste lu est celui de la racine du projet, `package.json` puis `pubspec.yaml`, dans son état au commit de la borne haute (une modification non commitée n'est pas prise en compte). Un numéro n'est jamais déduit d'un tag ni des types de commits.
+- CA8 : un commit cassant ne produit qu'une entrée, dans « Points d'attention », même s'il est de type `feat` ou `fix`.
+- CA9 : un commit hors convention dont le message et le diff montrent un travail sans effet pour les utilisateurs est marqué « sans entrée » avec le type retenu et la mention « hors convention ».
+- CA12 : dans « Références », une ligne par entrée cite tous ses commits, une ligne par commit sans entrée porte « sans entrée (<type>) », et aucune ligne ne cite un autre hash que ceux de son entrée ou de son commit.
+- CA12 : un identifiant de ticket est un identifiant de la forme `PROJET-123` ou un identifiant entre parenthèses en fin de sujet ; un numéro de PR est de la forme `#123` ou `!123`.
+- CA14 : un `fix` est rattaché à une nouveauté de la même plage quand il porte la même portée et le même objet que le `feat`, ou quand son diff touche les fichiers de ce `feat`.
+- CA15 : un revert dont le commit annulé est hors de la plage ne produit aucune entrée ; il figure dans « Points non déterminés » avec son hash court.
+- CA17 : une section « Version non déterminée » n'est jamais remplacée par une relance : une relance sans numéro de version ajoute une nouvelle section.
+- CA18 : la nouvelle section est ajoutée en tête, sauf si une section existante porte un numéro supérieur : elle est alors insérée avant la première section de numéro inférieur, pour que la plus récente reste en tête.
+- CA17, CA18 : à la relance, l'outil ne réécrit jamais le livrable en entier ; il ne modifie que la ligne d'en-tête et la section de la version produite.
+- CA21 : une référence vide, commençant par `-`, sur plusieurs lignes, ou contenant un caractère hors de lettres, chiffres, `.`, `_`, `/`, `~`, `^`, `@`, `{`, `}`, `+` et `-` est refusée avant toute commande, avec le message « référence refusée : caractères non pris en charge » ; aucun livrable n'est écrit ni modifié.
+- CA21 : une valeur qui commence par `-` n'est jamais transmise à une commande git, afin qu'aucune référence ne soit interprétée comme une option de git.
+- CA22 : un dépôt parent sans commit, ou qui ne suit pas le dossier du projet, compte comme « pas un dépôt git ».
+- CA26 : en plus des fichiers `.env*`, l'outil ne lit le contenu ni le diff d'aucun fichier d'identifiants (`.envrc`, `.npmrc`, `key.properties`, clés et certificats), même versionné.
