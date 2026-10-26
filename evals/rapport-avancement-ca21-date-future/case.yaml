@@ -1,0 +1,42 @@
+schema_version: "1.1"
+name: rapport-avancement-ca21-date-future
+description: >-
+  Spec 008, CA21 (cas limite) : période passée en argument dont la date de début (2099-01-01) est postérieure à la date du jour. L'outil
+  l'indique et n'écrit aucun livrable.
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca21-aucun-livrable
+    type: file_exists
+    path: "docs/wf/**"
+    exists: false
+  - name: ca21-aucun-fichier-cree
+    type: regex
+    target: files
+    pattern: '^(?!\.git/).+$'
+    flags: m
+    match: not_contains
+  - name: ca21-periode-invalide-indiquee
+    type: llm
+    focus: last_message
+    criteria: >-
+      PASS si le dernier message indique que la période est invalide parce que
+      la date de début est postérieure à la date du jour, et ne prétend pas avoir
+      écrit un rapport. FAIL si l'outil corrige lui-même la date ou produit un
+      rapport.
+  - name: ca21-aucun-historique-lu
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*git (?:log|show) '
+    min: 0
+    max: 0

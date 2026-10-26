@@ -196,6 +196,30 @@ Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` me
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
+### wf-rapport-avancement
+
+Spec 008, lancée par `/wf-rapport-avancement [début fin]`, tous les cas `hors-reseau` (tag `wf-rapport-avancement` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca09-…`). Les cas qui lisent l'historique vérifient aussi que Bash ne sert qu'aux commandes prescrites par la skill : quelques commandes git en lecture et `date +%F` recopiées telles quelles, et des blocs dont les valeurs (dates, branches, hash, tickets) passent par un heredoc à délimiteur entre apostrophes (`WF_VALEURS_3b9e`), sans substitution de commande ni redirection, avec `--end-of-options` dans chaque `git log` et `git show`.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `rapport-avancement-ca04-periode-en-argument` | FieldOps complet, `docs/wf/specs-tickets.md` et deux comptes rendus (dans et hors période) commités ; période du 2026-01-13 au 2026-03-18, bornes sur deux commits | CA1 à CA4, CA6 (repli sur `main`), CA7 à CA9, CA10 (aucune branche dans la période), CA11, CA13 à CA17 |
+| `rapport-avancement-ca10-branche-en-cours` | FieldOps complet sans livrable `wf-` ; branche non fusionnée dans la période et une autre hors période, fichier d'environnement de recette versionné, commits « maj » (diff lisible) et « wip » (diff binaire) | CA8 à CA10, CA12, CA13 (sans compte rendu), CA18, CA24 |
+| `rapport-avancement-ca05-ca20-relance` | rapport précédent commité (période jusqu'au 2026-09-25), lancé sans argument | CA5, CA20, CA3 |
+| `rapport-avancement-ca05-sans-periode` | FieldOps complet, ni rapport précédent ni argument | CA5 (cas limite) |
+| `rapport-avancement-ca06-origin-head` | clone dont `origin/HEAD` désigne `principale`, branche locale `main` restée sur v1.0.0 | CA6, CA10 (branche distante) |
+| `rapport-avancement-ca06-branche-introuvable` | branche principale renommée `develop` | CA6 (cas limite) |
+| `rapport-avancement-ca19-ca06-sans-commit-master` | branche principale renommée `master`, période sans aucun commit | CA19, CA6 (repli sur `master`) |
+| `rapport-avancement-ca23-clone-superficiel` | clone superficiel (3 commits, à partir du 2026-09-22), période à partir du 2026-09-01 | CA23 |
+| `rapport-avancement-ca22-hors-git` | copie de FieldOps sans historique | CA22 |
+| `rapport-avancement-ca21-periode-inversee` | date de fin antérieure à la date de début | CA21 (cas limite) |
+| `rapport-avancement-ca21-date-future` | date de début postérieure à la date du jour (2099) | CA21 (cas limite) |
+| `rapport-avancement-ca21-date-mal-formee` | date de début absente du calendrier (30 février) | CA21 (cas limite) |
+| `rapport-avancement-ca04-fuseaux-branches-piegees` | quatre commits aux bornes dans des fuseaux décalés (seule la date de commit `%cs` compte) ; deux branches non fusionnées aux noms piégés (apostrophe et substitution de commande ; `--output=…`, créée par `update-ref`) | CA4 (bornes), sécurité : aucun nom piégé inséré dans une commande, aucun fichier créé, branches signalées dans « Points non déterminés » |
+
+Les hash attendus sont ceux des scaffolds, rejouables : `2d9eb2a` (HEAD du cas principal), `4e7a5d4` (branche en cours), `21a6d55` (relance), et ceux de la fixture FieldOps (HEAD de `main` : `2fc99c0`). Les dates de la période sont comparées à la date de commit en UTC (fixture) ; la date du jour n'est jamais figée, seulement bornée (postérieure à 2026-10).
+
+Limites : l'eval ne joue qu'un tour, sans réponse de l'utilisateur. Les reprises de ce qu'il fournit (prochaines étapes, décisions attendues, points de vigilance « réponse de l'utilisateur », CA12 à CA14) ne sont donc pas jouées : seule la question finale l'est (`ca12-ca13-questions-posees`).
+
 ### wf-publication-store
 
 Spec 015, lancée par `/wf-publication-store`, tous les cas `hors-reseau` sauf `publication-store-ca15-documentation-lue` (tag `wf-publication-store` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca10-…`). Les cas qui produisent un livrable portent `…-bash-liste-blanche` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain`, `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'` et `date +%F`.
@@ -252,7 +276,6 @@ Spec 005, lancée par `/wf-chiffrage`, tous les cas `hors-reseau` (tags `wf-chif
 | `chiffrage-ca21-ca24-cahier-des-charges-brut` | FieldOps brief, cahier des charges brut sans `Bnn` dans un sous-dossier, avec e-mail et téléphones | CA21, CA24 (cas limites), CA1, CA3, CA9, CA10, CA14 |
 
 L'en-tête (CA3) est vérifié par motifs : un juge `llm` refusait un « non déterminé (le dépôt git ne contient aucun commit) » pourtant juste, `claude plugin eval` créant un dépôt vide dans le dossier parent. CA5, CA6 et CA10 sont vérifiés à la fois par des motifs sur les lignes de tableau (`| Cnn | … |`, valeurs hors pas de 0,5, estimation haute au-delà de 5 jours, tâche de lot sans `Bnn`) et par un juge `llm` ligne à ligne ; CA8 (totaux exacts) ne peut l'être que par un juge, qui refait la somme. CA7 et CA22 (cas principal) sont vérifiés par motifs, les juges étant bruités sur ce long livrable : CA7 énumère les couples d'estimations dont la haute est au moins le double de la basse (pas de 0,5, jusqu'à 5 jours) et exige dans leur commentaire un renvoi `Hn`, `Qnn` ou à un risque ; il ne juge pas la qualité de l'explication.
-
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
