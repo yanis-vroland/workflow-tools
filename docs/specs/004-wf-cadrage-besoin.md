@@ -72,7 +72,7 @@ Couverts par CA5 à CA8, CA15 à CA23.
 
 ## Amendement 1 (validé)
 
-Précisions issues d'une revue de sécurité, à valider. Chacune complète le CA indiqué.
+Précisions issues d'une revue de sécurité, validées. Chacune complète le CA indiqué.
 
 - CA17 : un chemin de source (argument, ou source relue dans l'en-tête à la relance) qui contient un caractère refusé (`$`, accent grave, guillemet, barre oblique inverse ou caractère de contrôle) est écarté sans être ouvert et sans qu'aucune commande ne le contienne, avec la raison « nom de fichier refusé (caractère spécial), jamais lu » ; il est nommé dans le message, et dans « Points non déterminés » si un livrable est écrit.
 - CA17 : un chemin de source (argument, ou source relue dans l'en-tête à la relance) sur plusieurs lignes, ou qui contient le délimiteur d'un heredoc de l'outil (`WF_SOURCES_7c3e`, `WF_PDF_7c3e`), même sans autre caractère refusé, est écarté de la même façon : sinon, recopié dans le corps du heredoc, il le fermerait avant la fin et les lignes suivantes s'exécuteraient comme des commandes.
