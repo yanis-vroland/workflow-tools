@@ -66,9 +66,9 @@ Couverts par CA5, CA6, CA12, CA13, et CA18 à CA24.
 
 - Le plafond de 5 phrases pour la « Synthèse » (CA15) est une proposition, à ajuster après les premiers essais.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA3 : l'en-tête indique la période sous la forme « du <début> au <fin> (bornes incluses) » et liste les livrables `wf-` lus par leur chemin (le livrable de tickets s'il existe, chaque compte rendu de la période effectivement lu), ou « aucun ».
 - CA4 : la date de commit retenue est celle enregistrée dans le commit, dans le fuseau de son auteur ; un commit appartient à la période selon cette date, quel que soit le fuseau de la machine qui lance l'outil.
