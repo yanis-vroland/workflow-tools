@@ -58,7 +58,7 @@ La revue de l'heuristique de couverture a montré des noms de fichiers qu'elle t
 
 ## Amendement 2 (validé)
 
-Précisions issues d'une revue de sécurité et des evals, à valider. Chacune complète le CA indiqué.
+Précisions issues d'une revue de sécurité et des evals, validées. Chacune complète le CA indiqué.
 
 - CA3 : un nom de paquet lu dans un manifeste ou un lockfile qui n'est pas un nom valide de son registre (npm : minuscules, chiffres, `.`, `_`, `-`, sans `.` ni `_` en tête, portée `@…/` soumise à la même règle ; pub : minuscules, chiffres, `_`) n'est jamais écrit dans une commande ni interrogé ; il figure dans « Points non déterminés », sur la même ligne que ce nom, avec la mention « nom de paquet invalide, non vérifié ». Limite connue : les anciens noms npm à majuscules, encore publiés, sont traités comme invalides et ne sont pas interrogés.
 - CA3 : un nom de paquet valide n'est jamais recopié dans le texte d'une commande : il est transmis au shell par un heredoc à délimiteur entre apostrophes, vérifié à nouveau par le shell (un refus du shell vaut nom invalide), puis employé seulement comme variable. Le délimiteur étant public, un nom égal à une ligne de délimiteur (`WF_NPM_5e1a`, `WF_PUB_5e1a`) fermerait le heredoc avant la vérification du shell et ferait exécuter les lignes suivantes : il est refusé comme nom invalide avant l'écriture du heredoc. Les noms ne sont jamais transmis par une boucle `for` dont la liste est écrite dans la commande.
