@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: passation-ca15-relance
+description: >-
+  Spec 016 (wf-passation). FieldOps avec un livrable wf-doc-projet en fichier
+  unique et un dossier de passation précédent commité, dont des statuts de
+  checklist et des champs « à compléter » ont été renseignés à la main ; un
+  service (paiement) n'y figure pas encore. Couvre CA15, CA4 (fichier
+  unique), CA14 (nouvelle ligne « à faire »), CA16.
+tags: [wf-passation, spec-016, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

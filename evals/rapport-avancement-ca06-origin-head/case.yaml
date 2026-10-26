@@ -1,0 +1,67 @@
+schema_version: "1.1"
+name: rapport-avancement-ca06-origin-head
+description: >-
+  Spec 008, CA6 : clone de FieldOps dont origin/HEAD désigne la branche
+  « principale » ; une branche locale « main » existe mais est restée sur
+  v1.0.0. Période du 2026-09-20 au 2026-09-30. L'outil suit origin/HEAD. Couvre
+  aussi CA10 avec une branche connue seulement comme branche distante.
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+# Sur principale, dans la période : 3503397, 921f57c, 2fc99c0 (tous internes).
+# Sur origin/feat/export-pdf : 098619f, 54c62e2, 4a5b78b. La branche locale
+# main (v1.0.0, 3d2f1e4) n'a aucun commit dans la période.
+graders:
+  - name: ca06-livrable-cree
+    type: file_exists
+    path: "docs/wf/rapport-avancement.md"
+  - name: ca06-origin-head-consulte
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"git symbolic-ref --short refs/remotes/origin/HEAD"'
+    min: 1
+  - name: ca06-commits-de-principale-dans-sources
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*Sources(?=[\s\S]*3503397)(?=[\s\S]*921f57c)(?=[\s\S]*2fc99c0)'
+    match: contains
+  - name: ca06-realise-non-vide
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*R[ée]alis[ée][^\n]*\n(?:(?!\n##? )[\s\S])*?Travaux techniques internes[^\n]*(?<![\d,.])\b3\b(?![\d,.])'
+    flags: i
+    match: contains
+  - name: ca10-branche-distante-en-cours
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*En cours[^\n]*\n(?:(?!\n##? )[\s\S])*?\bPDF\b'
+    flags: i
+    match: contains
+  - name: ca10-branche-main-pas-en-cours
+    type: llm
+    focus: { source: file, path: "docs/wf/rapport-avancement.md" }
+    criteria: >-
+      PASS si la section « En cours » ne contient qu'une entrée, l'export PDF
+      des interventions, et ne présente pas la branche « main » ni la branche
+      « principale » comme un travail en cours. FAIL sinon.
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:(?:git (?:rev-parse --short HEAD|status --porcelain|symbolic-ref --short refs/remotes/origin/HEAD|for-each-ref --format=''%\(refname:short\)'' refs/heads refs/remotes)|date \+%F)"|(?:\{|while IFS= read -r )(?:[^"\\]|\\.)*<<''WF_VALEURS_3b9e''))'
+    min: 0
+    max: 0
+  - name: securite-end-of-options
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?git (?:log|show) (?:(?!--end-of-options)[^\\"]|\\[^n])*(?:\\n|")'
+    min: 0
+    max: 0
