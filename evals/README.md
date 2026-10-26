@@ -218,6 +218,41 @@ Valeurs déterministes vérifiées : commit `2fc99c0` (FieldOps complet, CA26), 
 
 Réseau : la passe `hors-reseau` n'accorde pas WebFetch, la documentation des stores est donc injoignable et les cas vérifient le repli de CA16 (statut « à vérifier », valeur relevée, lien officiel, aucune exigence affirmée). La seconde moitié de CA15 (page lue : exigence citée avec sa date de consultation) est couverte par `publication-store-ca15-documentation-lue`, tagué `reseau` : ce cas exige que la passe `reseau` accorde en plus `WebFetch(domain:developer.android.com)` et `WebFetch(domain:developer.apple.com)` (commande ci-dessus et `.github/workflows/evals.yml`). Ses correcteurs ne figent aucune exigence publique (ADR-001) : ils vérifient le statut « à vérifier », le lien officiel et la mention « consulté le AAAA-MM-JJ ».
 
+### wf-exploitation
+
+Spec 018, lancée par `/wf-exploitation`, tous les cas `hors-reseau` (tag `wf-exploitation` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca09-…`). Tous les cas portent `ca20-aucune-commande-executee` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain` et `date +%F` (liste blanche).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `exploitation-ca01-fieldops` | FieldOps complet (web et Flutter), propre, faux secret, sans doc-projet | CA1 à CA6, CA8 à CA10, CA12 à CA25 |
+| `exploitation-ca03-doc-projet-fichier` | FieldOps et livrable doc-projet en fichier unique, commité | CA3 |
+| `exploitation-ca03-ca27-relance-doc-projet-dossier` | FieldOps, livrable doc-projet en dossier et ancien guide (2026-01-15), commités | CA3, CA27 |
+| `exploitation-ca05-ca07-ca11-projet-minimal` | projet TypeScript avec `pino-http`, sans tâche planifiée ni mode de lancement | CA5, CA7, CA8, CA11, CA16, CA19 |
+| `exploitation-ca25-flutter-seul` | application Flutter seule avec Sentry et messages d'erreur affichés | CA25, CA7, CA21, CA22 |
+| `exploitation-ca26-stack-non-couverte` | projet Python avec `Dockerfile`, `docker-compose.yml` (`restart`), CI programmée, `.env.example` | CA26, CA4, CA6, CA8, CA9 |
+| `exploitation-ca28-repertoire-vide` | répertoire vide | CA28 (cas limite) |
+| `exploitation-ca28-sans-code-source` | FieldOps brief (documents seuls) | CA28 (cas limite) |
+
+Le hash attendu dans l'en-tête de `exploitation-ca01-fieldops` est celui de la fixture, rejouable : `2fc99c0`. Une modification de la fixture le change : mettre à jour `ca02-en-tete-commit`.
+
+### wf-chiffrage
+
+Spec 005, lancée par `/wf-chiffrage`, tous les cas `hors-reseau` (tags `wf-chiffrage` et `spec-005` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour, sans quoi les vérifications d'absence réussiraient sans rien prouver. L'entrée par défaut, `docs/wf/cadrage-besoin.md`, est fabriquée par le scaffold selon le contrat de la spec 004 (dossier `donnees/` de chaque cas).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `chiffrage-ca01-cadrage-fieldops-brief` | FieldOps brief (ni code ni git) et cadrage B01 à B07 : un besoin trop imprécis (B07), questions ouvertes et répondues, budget en euros dans une réponse | CA1 à CA14, CA22 |
+| `chiffrage-ca15-ca16-projet-avec-code` | FieldOps complet (git propre, faux secret), cadrage de trois évolutions du back-office et livrable `wf-analyse-projet` à deux risques élevés, dont un sans rapport avec les évolutions ; les entrées portent un commit plus ancien (`921f57c`), qui ne doit pas être recopié | CA15, CA16, CA17, CA23 (dont Grep toujours avec `glob`), CA3 (commit `2fc99c0`), CA1, CA6, CA14 |
+| `chiffrage-ca03-modifications-non-commitees` | FieldOps complet `--dirty`, sans faux secret, cadrage d'une seule évolution | CA3 (mention « modifications non commitées ») |
+| `chiffrage-ca18-relance` | FieldOps brief, cadrage mis à jour (B03 retiré, B05 modifié, B06 ajouté) et chiffrage précédent (C01 à C09, dernier identifiant attribué C10) | CA18 (cas limite), CA3 |
+| `chiffrage-ca19-sans-cadrage` | FieldOps brief sans cadrage, sans argument | CA19 (cas limite) |
+| `chiffrage-ca20-texte-saisi` | FieldOps brief avec cadrage, texte saisi dans la commande | CA20 (cas limite) |
+| `chiffrage-ca20-aucun-besoin` | FieldOps brief, ordre du jour logistique passé en argument | CA20 (cas limite) |
+| `chiffrage-ca20-argument-piege` | FieldOps brief avec cadrage et `besoin.md`, argument `$(touch pwned)besoin.md` | CA20 (cas limite) ; sécurité : argument refusé sans rien exécuter, aucun fichier `pwned` |
+| `chiffrage-ca21-ca24-cahier-des-charges-brut` | FieldOps brief, cahier des charges brut sans `Bnn` dans un sous-dossier, avec e-mail et téléphones | CA21, CA24 (cas limites), CA1, CA3, CA9, CA10, CA14 |
+
+L'en-tête (CA3) est vérifié par motifs : un juge `llm` refusait un « non déterminé (le dépôt git ne contient aucun commit) » pourtant juste, `claude plugin eval` créant un dépôt vide dans le dossier parent. CA5, CA6 et CA10 sont vérifiés à la fois par des motifs sur les lignes de tableau (`| Cnn | … |`, valeurs hors pas de 0,5, estimation haute au-delà de 5 jours, tâche de lot sans `Bnn`) et par un juge `llm` ligne à ligne ; CA8 (totaux exacts) ne peut l'être que par un juge, qui refait la somme. CA7 et CA22 (cas principal) sont vérifiés par motifs, les juges étant bruités sur ce long livrable : CA7 énumère les couples d'estimations dont la haute est au moins le double de la basse (pas de 0,5, jusqu'à 5 jours) et exige dans leur commentaire un renvoi `Hn`, `Qnn` ou à un risque ; il ne juge pas la qualité de l'explication.
+
 ## Correcteurs
 
 Moteur : `claude plugin eval` compile chaque motif avec `new RegExp` du runtime JavaScript de Claude Code (Bun, donc JavaScriptCore) : `input_match` sans drapeau, sur l'entrée de l'outil sérialisée en JSON ; `pattern` avec ses `flags`. Les regards arrière de longueur variable sont acceptés par JavaScriptCore comme par V8 (Node). La validation gratuite (`--max-cost-usd 0`) ne compile pas les motifs : un motif invalide n'apparaît qu'à la notation (« grader threw », correcteur en échec), et un `tool_used` `max: 0` sans appel de l'outil ne le compile jamais. D'où `tests/correcteurs/wf-analyse-projet.mjs`, lancé par `tests/skills.sh` : il compile les motifs des correcteurs renforcés et les vérifie sur des exemples positifs et négatifs, et sur les commandes prescrites par la skill.
