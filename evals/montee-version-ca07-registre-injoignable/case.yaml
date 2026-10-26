@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: montee-version-ca07-registre-injoignable
+description: >-
+  Spec 013 (wf-montee-version), CA7 : registres de paquets et sources publiques
+  injoignables. À lancer SANS autorisation WebFetch(domain:…) : le bac à sable
+  coupe alors le réseau des commandes Bash (voir evals/README.md). FieldOps
+  complet, sans livrable de sécurité. Couvre aussi CA4, CA5, CA6 (repli), CA11
+  (livrable de sécurité absent), CA12 (ruptures non vérifiées), CA16, CA20 et
+  CA25.
+tags: [wf-montee-version, spec-013, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1800
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: cadrage-besoin-argument-delimiteur-heredoc
+description: >-
+  Spec 004, amendement de CA17 : un brief lisible, un argument égal au
+  délimiteur du heredoc des sources (WF_SOURCES_7c3e), puis un argument
+  « x;touch pwned ». Recopié dans le heredoc, le délimiteur le fermerait et
+  « x;touch pwned » s'exécuterait : il est refusé avant tout appel au shell.
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

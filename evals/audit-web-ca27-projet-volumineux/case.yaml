@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: audit-web-ca27-projet-volumineux
+description: >-
+  Spec 011, CA27 : FieldOps web seul augmenté de src/web/legacy/ (2 000
+  composants React générés, en 4 sous-dossiers). « Points non déterminés »
+  liste les dossiers non lus, et aucune conclusion ne porte sur eux.
+tags: [wf-audit-web, spec-011, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
