@@ -1,0 +1,21 @@
+schema_version: "1.1"
+name: passation-ca03-ca04-livrables-wf
+description: >-
+  Spec 016 (wf-passation). FieldOps avec des livrables wf-* déjà commités
+  dans docs/wf/ : wf-doc-projet au format dossier (index.md, installation.md,
+  configuration.md…), wf-onboarding, wf-exploitation (contrat de la spec 018)
+  et trois livrables à usage interne (analyse-projet, chiffrage,
+  revue-securite) ; modification non commitée. Couvre CA3, CA4 (format
+  dossier), CA13 (rien de l'analyse), CA21 (modifications non commitées), CA1
+  (livrables existants non modifiés).
+tags: [wf-passation, spec-016, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

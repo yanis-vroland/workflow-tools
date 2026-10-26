@@ -65,3 +65,27 @@ Couverts par CA5, CA6, CA12, CA13, et CA18 à CA24.
 ## Questions ouvertes
 
 - Le plafond de 5 phrases pour la « Synthèse » (CA15) est une proposition, à ajuster après les premiers essais.
+
+## Amendement 1 (validé)
+
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
+
+- CA3 : l'en-tête indique la période sous la forme « du <début> au <fin> (bornes incluses) » et liste les livrables `wf-` lus par leur chemin (le livrable de tickets s'il existe, chaque compte rendu de la période effectivement lu), ou « aucun ».
+- CA4 : la date de commit retenue est celle enregistrée dans le commit, dans le fuseau de son auteur ; un commit appartient à la période selon cette date, quel que soit le fuseau de la machine qui lance l'outil.
+- CA5 : la date de fin du rapport précédent est lue sur sa ligne « Période » ; si elle est illisible, l'outil demande la période comme sans rapport précédent.
+- CA6 : quand `origin/HEAD` désigne une branche, l'outil utilise la branche locale de ce nom, même si elle est en retard sur la branche distante, et à défaut la branche distante elle-même.
+- CA6 : sans branche principale identifiable, l'outil n'écrit rien et demande la branche en citant les branches trouvées ; il n'en choisit jamais une lui-même.
+- CA7 : les commits sans type Conventional Commits, ou dont le type n'est pas listé en CA8, sont décrits d'après leur message, ou leur diff si le message ne suffit pas. Un ajout suivi de son annulation dans la période forme une seule entrée de « Réalisé » qui dit les deux.
+- CA8 : l'entrée « Travaux techniques internes » n'apparaît pas si la période ne contient aucun commit de ces types.
+- CA9 : un commit présent dans plusieurs branches non fusionnées n'est rattaché qu'à une seule entrée de « En cours ». Les entrées de « En cours » sont rattachées dans « Sources » au nom de leur branche, qui n'apparaît pas dans « En cours ».
+- CA10 : une branche locale et la branche distante de même nom sont une seule branche, donc une seule entrée ; sans branche en cours, la section le dit.
+- CA10 : une branche non fusionnée sans commit dans la période n'apparaît nulle part dans le rapport (ni « En cours », ni « Synthèse », ni « Sources »), même pour dire qu'elle n'a pas de commit.
+- CA11 : l'identifiant d'un ticket est cherché dans les messages de commit de toutes les branches connues localement (fusionnées ou non) et dans les noms des branches fusionnées dans la branche principale : un ticket mentionné sur une branche en cours n'est pas une prochaine étape. Si tous les tickets sont rapprochés, la section le dit, avant la mention du rapprochement approximatif.
+- CA12 et CA13 : sans livrable de tickets ou sans compte rendu dans la période, le rapport est d'abord écrit avec « non déterminé » ou « aucune identifiée », puis l'outil pose ses questions (prochaines étapes, décisions attendues), regroupées dans son message final ; si l'utilisateur répond, le rapport est mis à jour avec la source « réponse de l'utilisateur ». Seules l'absence de période et l'absence de branche principale bloquent l'écriture.
+- CA13 : une section « Questions en suspens » sans entrée, ou dont la seule entrée dit qu'il n'y en a aucune, est vide ; si toutes les sections lues sont vides, « Décisions attendues » indique « aucune identifiée ».
+- CA14 : un point de vigilance tiré d'un commit d'annulation dit ce qui a été annulé ; la section ne contient aucun jugement de qualité ni de dette, et indique « Aucun point identifié. » s'il n'y a rien.
+- CA21 : sont aussi des périodes invalides un nombre d'arguments autre que zéro ou deux, une date qui n'existe pas au calendrier, et une période calculée depuis le rapport précédent qui commencerait après la date du jour (rapport précédent couvrant déjà la date du jour). L'outil ne corrige ni n'inverse jamais les dates lui-même, et ne lit pas l'historique.
+- CA22 : un dépôt sans aucun commit (y compris un dépôt parent vide) est traité comme un projet qui n'est pas un dépôt git.
+- CA24 : un commit dont le diff ne contient que des fichiers binaires ou un contenu opaque est indescriptible. Les commits indescriptibles forment dans « Réalisé » une entrée « Modifications non décrites » qui indique leur nombre, rattachée à leurs commits dans « Sources », en plus de leur mention dans « Points non déterminés ».
+- Cas limite (sécurité) : les valeurs venues du projet ou de l'utilisateur (dates, noms de branches, identifiants de commits et de tickets) sont vérifiées contre un format strict avant tout appel git et ne sont jamais interprétées par le shell. Une valeur qui commence par un tiret n'est jamais transmise à git, qui la lirait comme une option. Une branche dont le nom est refusé n'est pas lue et figure dans « Points non déterminés » comme branche non lue, une ligne par branche qui cite son nom sous une forme échappée, sans description de son contenu.
+- Cas limite : l'outil n'utilise aucune recherche de contenu dans les fichiers du projet ; il lit l'historique par git, les livrables `wf-` par lecture directe, et n'affiche jamais le diff d'un fichier d'environnement.

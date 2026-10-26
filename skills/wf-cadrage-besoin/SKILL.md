@@ -18,20 +18,42 @@ Arguments de la commande (vide si aucun) : $ARGUMENTS
 - **Fichiers d'environnement** : un fichier dont le nom commence par `.env` (`.env`, `.env.local`, `.env.md`…), qu'il vienne des arguments ou de l'en-tête, est écarté sans être ouvert, quelle que soit son extension : ni Read, ni commande qui le lise. Seul `.env.example` pourrait être lu, mais ce n'est pas une source de demande : il est écarté comme les autres. Raison à indiquer : « fichier d'environnement, jamais lu ».
 - **Honnêteté** : toute affirmation s'appuie sur une source citée. Une information absente de toutes les sources n'est jamais affirmée ni devinée : elle est « non déterminé » ou fait l'objet d'une question. Ne propose ni solution technique, ni architecture, ni chiffrage.
 - **Données personnelles** : aucune adresse e-mail, aucun numéro de téléphone, aucun identifiant ni mot de passe dans le livrable, même dans une citation (coupe ou remplace par « […] »). Par précaution, ne reprends aucun nom de personne figurant dans les sources : désigne chacune par son rôle tel que la source le donne.
-- **Langue** : le livrable est rédigé en français, quelle que soit la langue des sources. Les citations restent dans leur langue d'origine, entre « », sans traduction à leur place.
-- **Désignation des sources** : dans la ligne « Sources lues » de l'en-tête, chaque source est désignée par son chemin relatif à la racine du projet, y compris si elle est hors du projet (`../briefs/brief.md`) ; jamais par un chemin absolu, qui exposerait l'arborescence de la machine. Un argument absolu est converti en chemin relatif à la racine du projet (répertoire courant), par exemple avec `python3 -c 'import os, sys; print(os.path.relpath(sys.argv[1]))' "<chemin>"`. Partout ailleurs dans le livrable, une source est désignée par son nom de fichier seul (`brief.md`), sans répertoire.
+- **Langue** : le livrable est entièrement rédigé en français, y compris son titre, les noms de rôles, les libellés des besoins, les questions et les hypothèses, quelle que soit la langue des sources. Un terme de la source n'y figure qu'entre « », comme citation. Les citations restent dans leur langue d'origine, sans traduction à leur place.
+- **Désignation des sources** : dans la ligne « Sources lues » de l'en-tête, chaque source est désignée par son chemin relatif à la racine du projet, y compris si elle est hors du projet (`../briefs/brief.md`) ; jamais par un chemin absolu, qui exposerait l'arborescence de la machine. Un argument absolu est converti en chemin relatif à la racine du projet (répertoire courant) par le bloc des sources de l'étape 1. Partout ailleurs dans le livrable, une source est désignée par son nom de fichier seul (`brief.md`), sans répertoire.
+- **Chemins de source et shell** : un chemin de source (argument, ou source de l'en-tête à la relance) n'est jamais recopié dans le texte d'une commande, ni entre guillemets doubles, ni entre apostrophes : bash l'analyserait avant toute vérification, et un nom piégé (`$(…)`, accent grave, apostrophe) s'exécuterait. Avant tout appel au shell, écarte sans l'ouvrir ni le citer dans aucune commande, avec la raison « nom de fichier refusé (caractère spécial), jamais lu » :
+  - un chemin qui contient `$`, un accent grave, un guillemet `"`, une barre oblique inverse ou un caractère de contrôle ;
+  - un chemin de source (argument ou en-tête) sur plusieurs lignes, ou qui contient le délimiteur d'un heredoc ci-dessous (`WF_SOURCES_7c3e`, `WF_PDF_7c3e`), même sans autre caractère refusé : recopié dans le corps du heredoc, il le fermerait avant la fin et les lignes suivantes s'exécuteraient comme des commandes.
+
+  Les autres chemins (une apostrophe ou un tiret initial sont admis) ne passent au shell que par le corps des heredocs ci-dessous, à délimiteur entre apostrophes, un chemin par ligne, tel quel : le shell les vérifie à nouveau (sortie « refusé » : source écartée pour la même raison), préfixe par `./` un chemin relatif (un nom qui commence par `-` n'est pas pris pour une option), puis ne les emploie qu'en variable entre guillemets doubles. Le fichier refusé est nommé dans le message, et dans « Points non déterminés » si un livrable est écrit ; il n'entre pas dans « Sources lues ».
 
 ## Étape 1 : déterminer les sources
 
 1. Vérifie avec Bash (`test -f`) si `docs/wf/cadrage-besoin.md` existe. S'il existe, lis-le avec Read : c'est une relance (étape 5).
-2. Analyse les arguments (un chemin contenant des espaces est entre guillemets). Un argument au nom de fichier d'environnement (`.env*`) est écarté d'emblée, sans test ni commande qui le cite ; il compte comme un chemin. Pour les autres :
+2. Analyse les arguments (un chemin contenant des espaces est entre guillemets). Un argument au nom de fichier d'environnement (`.env*`) est écarté d'emblée, sans test ni commande qui le cite ; il compte comme un chemin. Un argument au nom refusé (règle « Chemins de source et shell ») est écarté de même ; il compte comme un chemin. Pour les autres, en un seul appel de Bash (et de même pour les sources de l'en-tête à la relance), lance le bloc des sources ci-dessous, avec un chemin par ligne dans le corps du heredoc à la place de `<chemin>`. Recopie le bloc tel quel, **sans indentation** : chaque chemin et la ligne de fin `WF_SOURCES_7c3e` commencent en début de ligne (indentée, la ligne de fin ne fermerait pas le heredoc, et des espaces s'ajouteraient devant chaque chemin).
+
+```bash
+while IFS= read -r src; do
+  case $src in
+    '') continue ;;
+    *[\$\`\"\\]*|*[[:cntrl:]]*) printf 'refusé : %s\n' "$src"; continue ;;
+    /*|./*|../*) p=$src ;;
+    *) p=./$src ;;
+  esac
+  if [ -f "$p" ]; then printf 'fichier : '; python3 -I -c 'import os, sys; print(os.path.relpath(sys.argv[1]))' "$p"; else printf 'introuvable : %s\n' "$src"; fi
+done <<'WF_SOURCES_7c3e'
+<chemin>
+WF_SOURCES_7c3e
+```
+
+   La ligne `fichier :` donne le chemin relatif à la racine du projet, à reporter dans « Sources lues ». Puis :
    - **Aucun argument et aucun livrable** : indique la syntaxe attendue et arrête-toi sans rien écrire :
      `/wf-cadrage-besoin <fichier> [<fichier>…]` (brief, cahier des charges, notes ; Markdown `.md`, texte `.txt` ou PDF à texte extractible), lancée à la racine du projet.
-   - **Au moins un argument est un fichier existant** (`test -f`) : tous les arguments sont des chemins de fichiers ; ceux qui n'existent pas sont « fichier introuvable ».
+   - **Au moins un argument est un fichier existant** (ligne `fichier :`) : tous les arguments sont des chemins de fichiers ; ceux qui n'existent pas sont « fichier introuvable ».
    - **Aucun argument n'est un fichier existant** : si aucun ne ressemble à un chemin (ni `/`, ni extension de fichier), c'est un texte saisi : réponds que seules des sources sous forme de fichier (Markdown, texte ou PDF) sont acceptées, que le texte saisi n'est pas pris comme source, rappelle la syntaxe ci-dessus, et arrête-toi sans rien écrire. Sinon, chaque argument est un chemin, introuvable.
 3. Liste des sources à lire : les arguments, plus, en cas de relance, les sources de la ligne « Sources lues » de l'en-tête (y compris celles marquées « (introuvable) »). Une source de l'en-tête est cherchée à son chemin relatif enregistré, depuis la racine du projet, uniquement, sans aucune recherche ailleurs dans le projet : si ce fichier n'existe pas, elle est introuvable. Un argument qui porte le même nom de fichier qu'une source de l'en-tête la remplace, avec son nouveau chemin (relatif).
 4. Écarte, en notant la raison pour chacune :
    - un nom de fichier d'environnement (`.env*`, voir les règles permanentes), sans l'ouvrir ;
+   - un nom refusé (« nom de fichier refusé (caractère spécial), jamais lu », voir les règles permanentes), sans l'ouvrir ;
    - un chemin qui n'existe pas (« fichier introuvable ») ;
    - une extension autre que `.md`, `.markdown`, `.txt` ou `.pdf` (ex. `.docx`, `.eml`) : « format non pris en charge, à convertir en Markdown, texte ou PDF ». N'ouvre pas ce fichier et n'en exploite rien ;
    - un PDF sans texte extractible (étape 2) ;
@@ -41,9 +63,25 @@ Arguments de la commande (vide si aucun) : $ARGUMENTS
 ## Étape 2 : lire les sources
 
 - Markdown et texte : Read. Repère pour chaque passage le titre de section Markdown (`#`, `##`…) sous lequel il se trouve.
-- PDF : jamais avec Read (il montrerait les pages en images). Avec Bash uniquement :
-  1. `pdfinfo "<fichier>"` : nombre de pages (ligne `Pages:`) ;
-  2. pour chaque page N, `pdftotext -f N -l N "<fichier>" -` : texte de la page N. Une page est « sans texte » si cette sortie est vide ou ne contient que des espaces.
+- PDF : jamais avec Read (il montrerait les pages en images). Avec Bash uniquement, un appel par PDF, son chemin seul dans le corps du heredoc : le bloc donne le nombre de pages (`pdfinfo`, ligne `Pages:`), puis le texte de chaque page N sous la ligne `--- page N ---` (`pdftotext -f N -l N`). Une page est « sans texte » si son texte est vide ou ne contient que des espaces. La sortie « poppler absent » signifie que poppler n'est pas installé. Recopie le bloc PDF ci-dessous tel quel, **sans indentation** (le chemin et la ligne de fin `WF_PDF_7c3e` en début de ligne), le chemin à la place de `<chemin>`.
+
+```bash
+IFS= read -r src <<'WF_PDF_7c3e'
+<chemin>
+WF_PDF_7c3e
+case $src in
+  ''|*[\$\`\"\\]*|*[[:cntrl:]]*) echo "nom de fichier refusé (caractère spécial), jamais lu" ;;
+  *)
+    case $src in /*|./*|../*) p=$src ;; *) p=./$src ;; esac
+    if ! command -v pdfinfo >/dev/null || ! command -v pdftotext >/dev/null; then echo "poppler absent (pdfinfo ou pdftotext introuvable)"
+    else
+      n=$(pdfinfo "$p" | awk '/^Pages:/ { print $2 }'); echo "Pages: ${n:-0}"
+      i=1; while [ "$i" -le "${n:-0}" ]; do echo "--- page $i ---"; pdftotext -f "$i" -l "$i" "$p" -; i=$((i + 1)); done
+    fi ;;
+esac
+```
+
+- PDF, suite :
   - Si toutes les pages sont sans texte, le PDF n'a pas de texte extractible (document scanné, par exemple) : écarte-le, sans chercher à voir ni à transcrire ce que montrent ses pages.
   - Sinon, exploite le texte des pages qui en ont, et cite chaque passage avec le numéro de la page dont pdftotext l'a extrait. Les pages sans texte sont signalées dans « Points non déterminés ».
 - Une source se cite ainsi : `nom.md, « Titre de section »` ; `nom.pdf, page N` ; `nom.txt` (ou `nom.md` sans titre de section s'il n'en a pas) ; `réponse saisie à la question Qnn` pour une réponse au client.

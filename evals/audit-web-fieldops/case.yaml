@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: audit-web-fieldops
+description: >-
+  Spec 011 (wf-audit-web) sur la fixture FieldOps complète, sans URL (mode code
+  seul) : monorepo avec le back-office web React (src/web/) et l'application
+  Flutter (mobile/), arbre propre, faux fichier d'environnement, image de 259
+  523 octets ajoutée dans public/img/. Couvre CA1 à CA13, CA21, CA25, CA28 et
+  le hors-périmètre sécurité.
+tags: [wf-audit-web, spec-011, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

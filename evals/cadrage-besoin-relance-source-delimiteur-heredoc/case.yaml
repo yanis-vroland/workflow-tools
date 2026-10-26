@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: cadrage-besoin-relance-source-delimiteur-heredoc
+description: >-
+  Spec 004, amendement de CA17 : relance sans argument sur un livrable dont la
+  ligne « Sources lues » contient le délimiteur du heredoc des sources
+  (WF_SOURCES_7c3e) puis « x;touch pwned ». La source au nom refusé est écartée
+  avant tout appel au shell, rien n'est exécuté, et le livrable est réécrit.
+tags: [wf-cadrage-besoin, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
