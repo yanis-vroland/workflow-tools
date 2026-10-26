@@ -71,9 +71,9 @@ Seuils à ajuster après les premiers essais sur de vrais projets :
 - Taille maximale d'une tâche : 5 jours en estimation haute (CA6).
 - Écart à justifier : estimation haute au moins double de l'estimation basse (CA7).
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA1 : l'existence du livrable, de l'entrée par défaut et d'un fichier passé en argument est vérifiée sans exécuter de commande shell ; l'outil n'exécute que la lecture de la date, du commit et de l'état git, l'extraction de texte d'un PDF et l'addition des estimations (expression limitée aux chiffres, points et signes plus).
 - CA2 : les huit sections sont toujours présentes ; une section sans élément contient « Aucun élément. » ; les deux tableaux de tâches gardent leur ligne d'en-tête même vides ; les tâches de « Détail par lot » sont regroupées en sous-sections « Lot <n> : <nom> ».
