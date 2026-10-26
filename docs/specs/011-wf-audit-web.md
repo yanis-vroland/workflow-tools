@@ -59,9 +59,9 @@ Couverts par CA11, CA16 à CA22, et CA25 à CA28.
 
 - Le seuil de 200 Ko par image (CA10) est une proposition, à ajuster après les premiers essais sur de vrais projets.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA2 : une section sans constat contient « Aucun constat. » ; en mode « code seul », « Bonnes pratiques » ne contient aucun constat, cette section ne reprenant que les audits « Best Practices » de Lighthouse en mode « code + URL ».
 - CA3 : en mode URL, « Périmètre et méthode » cite toujours l'URL demandée et l'URL finalement auditée, même identiques, ainsi que la cause d'une mesure impossible.
