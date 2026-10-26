@@ -63,9 +63,9 @@ Couverts par CA7, CA9, CA10, CA14, CA15 et CA19 à CA26.
 
 - Aucune.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA1 : l'outil ne lit aucun fichier du projet autre que le livrable ; tout ce qu'il établit (commits, diffs, manifeste) vient de l'historique git.
 - CA2 : le livrable commence par le titre `# Notes de version`, suivi de l'en-tête.
