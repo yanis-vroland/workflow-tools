@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: chiffrage-ca21-ca24-cahier-des-charges-brut
+description: >-
+  Spec 005, CA21 et CA24 : un cahier des charges brut, sans identifiants Bnn,
+  passé en argument depuis un sous-dossier, avec adresse e-mail et numéros de
+  téléphone. L'outil attribue lui-même les Bnn avec leur source, recommande
+  /wf-cadrage-besoin, et ne recopie aucune coordonnée. Couvre aussi CA1, CA3
+  (fichier d'entrée par son nom seul et date de son en-tête), CA9 et CA10.
+tags: [wf-chiffrage, spec-005, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

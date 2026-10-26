@@ -1,0 +1,67 @@
+schema_version: "1.1"
+name: rapport-avancement-ca19-ca06-sans-commit-master
+description: >-
+  Spec 008, CA19 et CA6 (repli sur master) : FieldOps complet dont la branche
+  principale s'appelle « master ». Période du 2026-10-01 au 2026-10-05, sans
+  aucun commit (ni sur master, ni sur la branche non fusionnée). Le livrable est
+  produit, « Réalisé » et la « Synthèse » disent qu'aucune modification n'a été
+  intégrée.
+tags: [wf-rapport-avancement, spec-008, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca19-livrable-cree
+    type: file_exists
+    path: "docs/wf/rapport-avancement.md"
+  - name: ca19-realise-aucune-modification
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*R[ée]alis[ée][^\n]*\n(?:(?!\n##? )[\s\S])*?Aucune modification int[ée]gr[ée]e sur la p[ée]riode'
+    flags: i
+    match: contains
+  - name: ca19-synthese-le-dit
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*Synth[èe]se[^\n]*\n(?:(?!\n##? )[\s\S])*?aucune (?:modification|nouvelle)'
+    flags: i
+    match: contains
+  - name: ca19-aucun-travail-invente
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '\n##? [^\n]*En cours[^\n]*\n(?:(?!\n##? )[\s\S])*?\bPDF\b'
+    flags: i
+    match: not_contains
+  # Repli sur master : seule branche longue du dépôt, le rapport n'est produit
+  # que si elle a été retenue (sans branche trouvée, l'outil demande et n'écrit
+  # rien, cas ca06-branche-introuvable). L'historique de master est lu :
+  - name: ca06-repli-sur-master
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*<<''WF_VALEURS_3b9e''(?:[^"\\]|\\.)*\\nmaster\\n'
+    min: 1
+  - name: ca03-en-tete-periode
+    type: regex
+    target: { source: file, path: "docs/wf/rapport-avancement.md" }
+    pattern: '^(?:(?!\n##? [^\n]*Synth)[\s\S])*?2026-10-01(?:(?!\n##? [^\n]*Synth)[\s\S])*?2026-10-05'
+    match: contains
+  - name: ca01-bash-commandes-autorisees
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:(?:git (?:rev-parse --short HEAD|status --porcelain|symbolic-ref --short refs/remotes/origin/HEAD|for-each-ref --format=''%\(refname:short\)'' refs/heads refs/remotes)|date \+%F)"|(?:\{|while IFS= read -r )(?:[^"\\]|\\.)*<<''WF_VALEURS_3b9e''))'
+    min: 0
+    max: 0
+  - name: securite-end-of-options
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*?git (?:log|show) (?:(?!--end-of-options)[^\\"]|\\[^n])*(?:\\n|")'
+    min: 0
+    max: 0

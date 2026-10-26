@@ -1,0 +1,136 @@
+schema_version: "1.1"
+name: publication-store-ca24-ca25-deux-applications
+description: >-
+  Spec 015 (wf-publication-store) sur un projet hors git qui contient deux
+  applications Flutter : apps/technicien (iOS et Android, 1.2.0+14) et
+  apps/superviseur (Android seul, 0.4.0+3). Couvre CA24 (plateforme absente),
+  CA25 (une sous-section et un verdict par application), CA6 (seconde
+  application) et CA26 (en-tête « hors git »).
+tags: [wf-publication-store, spec-015, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: temoin-livrable-cree
+    type: file_exists
+    path: "docs/wf/publication-store.md"
+  - name: ca01-aucune-ecriture-hors-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/publication-store\.md")'
+    min: 0
+    max: 0
+  - name: ca01-bash-liste-blanche
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git ls-files -- ''\*key\.properties'' ''\*\.jks'' ''\*\.keystore'' ''\*\.p12'' ''\*\.p8'')")'
+    min: 0
+    max: 0
+  - name: ca02-sections-dans-l-ordre
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Synthèse[\s\S]*\n## [^\n]*Identité de l.application[\s\S]*\n## [^\n]*Checklist iOS[\s\S]*\n## [^\n]*Checklist Android[\s\S]*\n## [^\n]*Fiches store[\s\S]*\n## [^\n]*Étapes hors projet[\s\S]*\n## [^\n]*Points non déterminés'
+
+  # --- CA25 : une sous-section par application --------------------------------------
+  - name: ca25-identite-deux-sous-sections
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Identité de l.application[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*technicien)(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*superviseur)'
+    flags: i
+  - name: ca25-checklist-ios-deux-sous-sections
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*technicien)(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*superviseur)'
+    flags: i
+  - name: ca25-checklist-android-deux-sous-sections
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist Android[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*technicien)(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*superviseur)'
+    flags: i
+  - name: ca25-fiches-store-deux-sous-sections
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Fiches store[^\n]*\n(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*technicien)(?=(?:(?!\n## )[\s\S])*?\n### [^\n]*superviseur)'
+    flags: i
+  - name: ca25-verdict-par-application
+    type: llm
+    focus: { source: file, path: "docs/wf/publication-store.md" }
+    criteria: >-
+      Le projet contient deux applications Flutter : apps/technicien et
+      apps/superviseur. PASS si la section « Synthèse » donne un verdict
+      distinct pour chacune (« prêt à soumettre » ou « non prêt »), chacun
+      suivi de ses décomptes d'éléments bloquants « à faire » et d'éléments
+      « à vérifier » par plateforme, et si le verdict de apps/technicien est
+      « non prêt » (description d'usage de la caméra vide, signature release
+      avec la configuration debug, icônes absentes). FAIL s'il n'y a qu'un
+      verdict global ou si une application n'a pas de verdict.
+
+  # CA17 : apps/superviseur n'a aucun élément bloquant « à faire » (icônes
+  # présentes, permission INTERNET seule, signature release par key.properties)
+  - name: ca17-superviseur-pret-a-soumettre
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Synthèse[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)[^\n]*(?=[^\n]*prêt à soumettre)(?=[^\n]*superviseur)'
+  - name: ca17-technicien-non-pret
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Synthèse[^\n]*\n(?:(?!\n## )[\s\S])*?(?<=\n)[^\n]*(?=[^\n]*non prêt)(?=[^\n]*technicien)'
+
+  # --- CA24 : application Android seule ----------------------------------------------
+  - name: ca24-ios-non-applicable-pour-superviseur
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Checklist iOS[^\n]*\n(?:(?!\n## )[\s\S])*?\n### [^\n]*superviseur[^\n]*\n(?:(?!\n##)[\s\S])*?non applicable'
+    flags: i
+  - name: ca24-sans-erreur-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/publication-store.md" }
+    criteria: >-
+      apps/superviseur n'a pas de dossier ios/. PASS si, pour cette application,
+      la checklist iOS indique « non applicable » sans lister d'élément iOS
+      « à faire » ni d'erreur, l'identité iOS est « non applicable » (pas
+      d'identifiant iOS inventé), sa checklist Android est établie (icônes
+      mipmap présentes, permission INTERNET, minSdk 24, targetSdk 34,
+      signature release), et son décompte iOS dans la Synthèse ne compte aucun
+      élément bloquant. FAIL sinon.
+
+  # --- CA6 : identité de la seconde application -------------------------------------
+  - name: ca06-superviseur-version-et-source
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Identité de l.application[^\n]*\n(?:(?!\n## )[\s\S])*?0\.4\.0\b[^|\n]*apps/superviseur/(?:pubspec\.yaml|android/app/build\.gradle)'
+  - name: ca06-superviseur-identifiant-android
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Identité de l.application[^\n]*\n(?:(?!\n## )[\s\S])*?com\.example\.fieldops\.superviseur[^|\n]*build\.gradle'
+
+  # --- CA26 : en-tête hors git ----------------------------------------------------
+  - name: ca26-entete-hors-git
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?hors git'
+  # La mention est interdite dans l'en-tête (avant le premier titre ##), là où
+  # CA26 la place ; une phrase qui en parle ailleurs n'est pas une mention.
+  - name: ca26-hors-git-sans-mention-de-modifications
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?modifications non commitées'
+    flags: i
+    match: not_contains
+  # Hors git (le dépôt parent créé par `claude plugin eval` n'a aucun commit),
+  # ni `git status` ni `git ls-files` ne sont lancés : leur sortie listerait le
+  # projet entier comme non suivi.
+  - name: ca26-hors-git-ni-status-ni-ls-files
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"git (?:status|ls-files)'
+    min: 0
+    max: 0
