@@ -56,7 +56,7 @@ La revue de l'heuristique de couverture a montré des noms de fichiers qu'elle t
 - CA5 : le nom d'un fichier source ou de test est pris littéralement, quels que soient les caractères qu'il contient (parenthèses, crochets, points, tiret initial…). Un fichier importé par un test reste couvert même si son nom contient un caractère spécial ; un fichier de test dont le nom commence par un tiret est lu comme un fichier, jamais comme une option de commande ; un point du nom ne correspond qu'à un point.
 - CA10 : un fichier `.env*` est exclu de l'inventaire des fichiers source même si son nom finit par une extension de code (ex. `.env.test.js`, qui ressemble à un fichier de test) : il n'est donc jamais lu, ni par la recherche des imports de la couverture, ni par aucune autre étape.
 
-## Amendement 2 (proposé)
+## Amendement 2 (validé)
 
 Précisions issues d'une revue de sécurité et des evals, à valider. Chacune complète le CA indiqué.
 
