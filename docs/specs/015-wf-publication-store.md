@@ -69,9 +69,9 @@ Couverts par CA4, CA5, CA6 (valeur introuvable), CA10, CA11, CA13, CA14, CA16, C
 
 - Aucune.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA1 : l'outil n'exécute aucune commande du projet ni de son outillage (build, signature, outils Flutter, Xcode, Gradle, fastlane) ; Bash ne sert qu'à quatre commandes fixes, sans texte venu du projet : `git rev-parse --short HEAD`, `git status --porcelain`, `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'` et `date +%F`.
 - CA3 : une application Flutter est un dossier dont le `pubspec.yaml` déclare la dépendance `flutter` et qui contient un dossier `ios/` ou `android/` ; un paquet ou un plugin sans ces dossiers n'est pas analysé.
