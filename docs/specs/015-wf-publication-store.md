@@ -68,3 +68,35 @@ Couverts par CA4, CA5, CA6 (valeur introuvable), CA10, CA11, CA13, CA14, CA16, C
 ## Questions ouvertes
 
 - Aucune.
+
+## Amendement 1 (validé)
+
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
+
+- CA1 : l'outil n'exécute aucune commande du projet ni de son outillage (build, signature, outils Flutter, Xcode, Gradle, fastlane) ; Bash ne sert qu'à quatre commandes fixes, sans texte venu du projet : `git rev-parse --short HEAD`, `git status --porcelain`, `git ls-files -- '*key.properties' '*.jks' '*.keystore' '*.p12' '*.p8'` et `date +%F`.
+- CA3 : une application Flutter est un dossier dont le `pubspec.yaml` déclare la dépendance `flutter` et qui contient un dossier `ios/` ou `android/` ; un paquet ou un plugin sans ces dossiers n'est pas analysé.
+- CA3 : chaque application est nommée par le champ `name` de son `pubspec.yaml`, suivi de son dossier.
+- CA4 : le framework est reconnu par ses fichiers et nommé « Expo » (dépendance `expo`, prioritaire), « React Native » (dépendance `react-native` sans `expo`), « iOS natif (Swift/Xcode) » (projet Xcode sans Flutter ni JavaScript) ou « Android natif (Kotlin/Gradle) » (module `com.android.application` sans Flutter ni JavaScript) ; le message est « <framework> non couvert en v1 : aucun livrable n'a été écrit. ».
+- CA4 : un projet qui contient à la fois une application Flutter et une application mobile d'une autre technologie est analysé pour la partie Flutter, et « Points non déterminés » cite l'autre comme « <framework> non couvert en v1 », avec son dossier.
+- CA5 : le message est « Aucune application mobile trouvée dans ce projet : aucun livrable n'a été écrit. ».
+- CA6 : quand les fichiers natifs renvoient aux variables du build Flutter, la version et le build viennent du `pubspec.yaml` ; une valeur écrite en dur dans un fichier natif prime pour sa plateforme, ce fichier est cité et l'écart avec le `pubspec.yaml` figure dans « Points non déterminés ».
+- CA6 : une plateforme absente porte « non applicable » dans l'identité.
+- CA7 : la colonne Bloquant vaut « oui » (l'élément empêche la soumission ou entraîne un rejet tant qu'il n'est pas réglé) ou « non » ; la colonne Fichier n'est jamais vide.
+- CA8 : une fonctionnalité protégée (appareil photo, photothèque, localisation, micro, contacts…) utilisée par le code ou un plugin sans sa clé `NS*UsageDescription` dans l'`Info.plist` donne une ligne « à faire », bloquante, qui cite le fichier et la ligne d'usage.
+- CA8 : statuts des éléments iOS : icône 1024×1024 absente « à faire », bloquant ; manifeste de confidentialité absent « à faire », bloquant ; cible de déploiement introuvable « à vérifier », non bloquant ; équipe de signature « à faire », bloquant, si `project.pbxproj` est lu sans `DEVELOPMENT_TEAM`, et « à vérifier », bloquant, si `project.pbxproj` est absent ; l'identifiant d'équipe n'est pas recopié.
+- CA9 : une ligne par permission déclarée ; une permission sensible (localisation, appareil photo, micro, contacts, stockage, SMS, journal d'appels…) porte « à vérifier », non bloquant, à déclarer dans Data safety ; une permission normale porte « OK ».
+- CA9 : icônes de lanceur absentes : « à faire », bloquant ; `minSdk` fixé par le SDK Flutter : « à vérifier », non déterminé.
+- CA9 : un type de build `release` signé par une configuration dédiée qui lit ses valeurs dans `key.properties` ou des variables porte « OK », et la présence de `key.properties` est indiquée sans le lire.
+- CA11 : le détail de l'élément « configuration de signature » cite la ligne et nomme le cas (configuration `debug` ou aucune configuration).
+- CA12 : `firebase_options.dart` (configuration FlutterFire) rejoint la liste des fichiers sensibles ; aucun des fichiers sensibles de CA12, fichiers de configuration compris, n'est ouvert : leur présence est repérée par leur nom seul.
+- CA12 : la recherche dans le code se fait par nom de fichier (sans afficher de contenu), limitée aux fichiers de code et de build, puis seuls les fichiers non sensibles sont lus.
+- CA12 : chaque checklist contient une ligne « Fichiers sensibles » quand il y en a pour sa plateforme : présence de chacun, « OK », non bloquant, ou « à faire », non bloquant, pour un fichier de clés suivi par git.
+- CA13 : seuls les fichiers de clés (`key.properties`, `*.jks`, `*.keystore`, `*.p12`, `*.p8`) déclenchent l'alerte ; l'alerte invite à retirer le fichier du dépôt.
+- CA14 : un mot de passe en clair porte « à faire », non bloquant si la signature est par ailleurs correcte (il n'empêche pas la soumission), bloquant si la signature relève aussi de CA11 ; les fichiers de build examinés sont `build.gradle`, `build.gradle.kts` et `gradle.properties`.
+- CA15 : les éléments d'exigence évolutive (niveau de `targetSdk` et SDK iOS ou Xcode de build) sont bloquants ; la valeur iOS relevée vient d'un fichier `.xcode-version` ou de la CI, sinon « non déterminé » ; seules les deux pages officielles sont consultées, sans rien envoyer du projet, et la date s'écrit « consulté le AAAA-MM-JJ ».
+- CA17 : les décomptes portent sur les lignes des checklists seulement, hors « Étapes hors projet » ; une plateforme absente s'écrit « non applicable » dans le décompte.
+- CA18 : les métadonnées reprises sont celles de fastlane en français (`fr-FR`, `fr-CA` ou `fr`), dans le dossier de l'application ou dans ses dossiers `ios/` et `android/` ; un champ dont le fichier manque porte « non déterminé » avec le chemin cherché, sans brouillon mêlé, et figure dans « Points non déterminés » ; un brouillon n'invente aucune fonctionnalité absente de ses sources.
+- CA22 : le décompte compte tous les caractères, espaces, ponctuation et retours à la ligne compris, sans le retour à la ligne final du fichier.
+- CA23 : le compte de démonstration figure toujours, au statut « à vérifier » ; sans connexion repérée, l'outil l'écrit.
+- CA25 : chaque sous-section par application s'intitule « <nom> (`<dossier>`) », dans le même ordre dans toutes les sections ; avec une seule application, pas de sous-section.
+- CA26 : hors dépôt git ou dans un dépôt sans commit, l'en-tête indique « hors git », sans mention « modifications non commitées » ; une modification qui ne concerne que le livrable lui-même ne déclenche pas cette mention.

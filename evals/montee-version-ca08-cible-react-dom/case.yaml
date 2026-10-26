@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: montee-version-ca08-cible-react-dom
+description: >-
+  Spec 013 (wf-montee-version), CA8 : argument désignant une cible
+  (`react-dom 19`), sur FieldOps complet. react-dom 19 exige react 19 en
+  dépendance pair (CA14) et supprime ReactDOM.render, utilisé dans
+  src/web/main.tsx ligne 5 (CA13). Couvre aussi CA9 (version partielle
+  résolue), CA12, CA15, CA20, CA24 et CA25. Nécessite l'accès au registre npm.
+tags: [wf-montee-version, spec-013, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

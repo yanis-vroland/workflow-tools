@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: audit-web-ca24-relance
+description: >-
+  Spec 011, CA24 : FieldOps web seul avec un audit précédent commité (W1 à W4,
+  dernier identifiant attribué W6), puis correction de W2 (lang ajouté). La
+  relance met à jour le livrable : W1, W3 et W4 gardent leur identifiant, W2
+  est retiré, les nouveaux constats prennent W7 et au-delà.
+tags: [wf-audit-web, spec-011, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+context:
+  scaffold_script: scaffold.sh

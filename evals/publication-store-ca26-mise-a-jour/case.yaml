@@ -1,0 +1,78 @@
+schema_version: "1.1"
+name: publication-store-ca26-mise-a-jour
+description: >-
+  Spec 015 (wf-publication-store), CA26 : FieldOps complet avec une
+  modification non commitée et un livrable docs/wf/publication-store.md déjà
+  commité, périmé (version 1.1.0, build 9, date 2026-09-01). La relance met à
+  jour ce livrable au lieu d'en créer un autre, corrige ce qui a changé et
+  ajoute la mention « modifications non commitées ».
+tags: [wf-publication-store, spec-015, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh
+
+graders:
+  - name: ca26-livrable-reecrit
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*docs/wf/publication-store\.md"'
+    min: 1
+  - name: ca26-aucun-doublon
+    type: regex
+    target: files
+    pattern: 'publication-store'
+    flags: i
+    match: not_contains
+  - name: ca26-aucune-ecriture-hors-livrable
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"(?![^"]*docs/wf/publication-store\.md")'
+    min: 0
+    max: 0
+  - name: ca26-bash-liste-blanche
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?!(?:git rev-parse --short HEAD|git status --porcelain|date \+%F|git ls-files -- ''\*key\.properties'' ''\*\.jks'' ''\*\.keystore'' ''\*\.p12'' ''\*\.p8'')")'
+    min: 0
+    max: 0
+  - name: ca26-un-seul-livrable-dans-le-fichier
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Synthèse[\s\S]*\n## [^\n]*Synthèse'
+    match: not_contains
+  - name: ca26-date-mise-a-jour
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?Date : (?!2026-09-01)\d{4}-\d{2}-\d{2}'
+  - name: ca26-commit-mis-a-jour
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '0000000'
+    match: not_contains
+  - name: ca26-modifications-non-commitees
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '^(?:(?!\n## )[\s\S])*?modifications non commitées'
+  - name: ca26-version-corrigee
+    type: regex
+    target: { source: file, path: "docs/wf/publication-store.md" }
+    pattern: '\n## [^\n]*Identité de l.application[^\n]*\n(?=(?:(?!\n## )[\s\S])*?1\.2\.0\b[^|\n]*pubspec\.yaml)(?!(?:(?!\n## )[\s\S])*?1\.1\.0)'
+  - name: ca26-contenu-mis-a-jour-selon-le-correcteur
+    type: llm
+    focus: { source: file, path: "docs/wf/publication-store.md" }
+    criteria: >-
+      Le livrable précédent (daté du 2026-09-01) indiquait la version 1.1.0 et
+      le build 9, et ses checklists ne contenaient qu'un élément chacune.
+      PASS si le livrable mis à jour contient un seul document (pas l'ancien
+      suivi du nouveau), indique la version 1.2.0 et le build 14 tirés de
+      mobile/pubspec.yaml, ne mentionne plus 1.1.0 ni le build 9, et contient
+      des checklists iOS et Android complètes (au moins les icônes, les
+      descriptions d'usage ou permissions, la cible minimale, la signature,
+      le manifeste de confidentialité iOS, minSdk et targetSdk). FAIL sinon.

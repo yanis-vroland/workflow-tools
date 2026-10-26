@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: montee-version-ca18-cible-deja-atteinte
+description: >-
+  Spec 013 (wf-montee-version), CA18 : argument désignant une cible déjà à la
+  version visée (`express 4.18.2`, version installée d'après
+  package-lock.json). « Synthèse » l'indique et « Plan de montée » ne contient
+  aucune étape. Couvre aussi CA8 et CA24. Nécessite le registre npm (CA9 :
+  existence de la version).
+tags: [wf-montee-version, spec-013, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

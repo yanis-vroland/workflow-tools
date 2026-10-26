@@ -70,3 +70,29 @@ Seuils à ajuster après les premiers essais sur de vrais projets :
 
 - Taille maximale d'une tâche : 5 jours en estimation haute (CA6).
 - Écart à justifier : estimation haute au moins double de l'estimation basse (CA7).
+
+## Amendement 1 (validé)
+
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
+
+- CA1 : l'existence du livrable, de l'entrée par défaut et d'un fichier passé en argument est vérifiée sans exécuter de commande shell ; l'outil n'exécute que la lecture de la date, du commit et de l'état git, l'extraction de texte d'un PDF et l'addition des estimations (expression limitée aux chiffres, points et signes plus).
+- CA2 : les huit sections sont toujours présentes ; une section sans élément contient « Aucun élément. » ; les deux tableaux de tâches gardent leur ligne d'en-tête même vides ; les tâches de « Détail par lot » sont regroupées en sous-sections « Lot <n> : <nom> ».
+- CA3 : l'en-tête porte une ligne « Fichier d'entrée : <nom de fichier seul> (en-tête daté du <date>) », avec « date non déterminée » si l'en-tête du fichier d'entrée n'a pas de date.
+- CA3 : le commit indiqué est celui du projet au lancement, jamais celui d'un livrable lu en entrée ; sans aucun commit (pas de dépôt git, ou dépôt vide), il est « non déterminé (aucun commit git) », sans la mention « modifications non commitées ».
+- CA5 : les estimations sont écrites avec une virgule décimale, sans unité dans la cellule ; l'unité (j) figure dans l'en-tête des colonnes.
+- CA8 : les totaux sont la somme exacte calculée, sans arrondi ni marge ajoutée.
+- CA9 : chaque élément de la section « Hors périmètre » de l'entrée figure dans « Exclusions », avec sa raison et sa source.
+- CA13 : les hypothèses sont numérotées `H1`, `H2`… ; les commentaires des tâches peuvent y renvoyer pour justifier une incertitude (CA7).
+- CA14 : un montant présent dans le fichier d'entrée n'est ni recopié ni commenté ; le livrable ne mentionne pas non plus les notions de montant ou de taux.
+- CA15 : les dossiers lus et non lus sont listés aux deux premiers niveaux de l'arborescence du code ; un même dossier n'est jamais dans les deux listes.
+- CA15 : quand le projet contient du code, chaque tâche de « Détail par lot » cite au moins un fichier existant ; une tâche qui n'en touche aucun le dit explicitement et nomme le fichier à créer, présenté comme nouveau.
+- CA16 : un risque élevé repris de l'analyse affecte chaque tâche qui touche un fichier qu'il cite ; les tâches affectées et l'inclusion dans l'estimation haute (CA17) figurent sur la ligne du risque.
+- CA18 : l'en-tête porte une ligne « Dernier identifiant attribué : Cnn », le plus grand identifiant de tâche jamais attribué, y compris retiré ; les nouvelles tâches reçoivent les identifiants suivants.
+- CA18 : un besoin est inchangé s'il a le même identifiant et le même libellé que dans « Périmètre chiffré » du livrable précédent ; un besoin modifié garde l'identifiant de ses tâches, qui peuvent être réestimées avec un commentaire qui le signale ; les tâches d'un besoin retiré sont supprimées.
+- CA18 : une activité transverse garde son identifiant tant qu'elle reste justifiée ; ses estimations sont conservées si son périmètre n'a pas changé, réévaluées sinon avec un commentaire qui dit ce qui a changé ; elle est supprimée si elle n'est plus justifiée.
+- CA20 : un argument qui contient une apostrophe, un guillemet, un accent grave, un dollar, une barre oblique inverse ou un retour à la ligne est refusé sans rien exécuter ni lire, sans repli sur l'entrée par défaut, et aucun livrable n'est écrit.
+- CA20 : un chemin passé en argument qui n'existe pas donne le message « fichier introuvable », et aucun livrable n'est écrit.
+- CA20 : seuls les fichiers Markdown, texte et PDF à texte extractible sont lus ; pour un autre format, l'outil demande une conversion sans ouvrir le fichier ; un PDF sans texte extractible ne contient aucun besoin identifiable ; si l'outil d'extraction PDF (poppler) est absent, l'outil l'indique ; dans ces cas, aucun livrable n'est écrit.
+- CA21 : la source d'un besoin issu d'un PDF est citée avec son numéro de page.
+- CA23 : un fichier passé en argument dont le nom commence par `.env` est écarté sans être ouvert, et aucun livrable n'est écrit ; toute recherche dans le code est limitée à des extensions de code.
+- CA24 : le livrable ne contient pas non plus d'identifiant, de mot de passe ni de nom de personne (les personnes sont désignées par leur rôle).
