@@ -123,9 +123,9 @@ L'outil lit `docs/wf/cadrage-besoin.md` (spec 004) : sa section « Besoins fonct
 
 - Après la v1 : mesure chiffrée de la qualité du modèle sur 3 à 5 briefs fictifs dont le schéma attendu est connu.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA1 : l'outil ne supprime, ne déplace ni ne renomme aucun fichier, même dans `docs/wf/modele-donnees/`, et ne crée aucun fichier temporaire.
 - CA2 : l'en-tête de `index.md` comporte, en plus de l'outil, de la date et du commit, les lignes « Niveau atteint » (A, B ou C, avec la mention « forcé par --niveau » le cas échéant), « Sources lues », « Derniers identifiants attribués » et « Exécution ».
