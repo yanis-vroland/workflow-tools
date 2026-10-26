@@ -5,7 +5,8 @@ description: >-
   réponse à Q01 et la décision D01 ont été saisies à la main, dont la question
   bloquante Q03 reste vide, et dont des identifiants ont été retirés (E03, E06,
   RG03, RG06, Q02, D02). Les saisies sont conservées et citées comme sources,
-  les identifiants conservés et jamais réattribués.
+  les identifiants conservés et jamais réattribués. CA20 : Q03 vide, le niveau
+  A est mis à jour, aucun schéma n'est écrit, la Synthèse liste ce qui manque.
 tags: [wf-modele-donnees, spec-017, hors-reseau]
 runs: 1
 

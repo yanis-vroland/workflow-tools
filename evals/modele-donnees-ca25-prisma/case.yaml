@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: modele-donnees-ca25-prisma
+description: >-
+  Spec 017, CA25 : projet web qui dépend de Prisma, sans schéma encore écrit ;
+  relance sans argument d'un livrable au niveau A rempli. Le niveau B produit
+  le schéma et la première migration au format de Prisma et de Prisma Migrate,
+  et non en SQL PostgreSQL. Couvre aussi CA16 et CA15.
+tags: [wf-modele-donnees, spec-017, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1800
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
