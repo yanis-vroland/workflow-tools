@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: audit-web-ca17-ca19-url-sans-lighthouse
+description: >-
+  Spec 011, mode URL sans mesure possible : FieldOps web seul lancé avec
+  https://fieldops.example.invalid/interventions (domaine .invalid, jamais
+  résolu), Lighthouse absent du poste et réseau coupé par le bac à sable.
+  Couvre CA17 (pas d'installation, audit du code seul, commande d'installation
+  indiquée), CA19 (aucune autre page chargée), CA3 en mode URL et CA11 (aucune
+  mesure, donc aucun score).
+tags: [wf-audit-web, spec-011, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 80
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh
