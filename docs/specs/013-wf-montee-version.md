@@ -60,9 +60,9 @@ Couverts par CA7, CA9, CA11 (livrable de sécurité absent), CA17 à CA19, et CA
 
 - Aucune.
 
-## Amendement 1 (proposé)
+## Amendement 1 (validé)
 
-Précisions issues de l'implémentation, à valider. Chacune complète le CA indiqué.
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
 
 - CA1 : l'en-tête indique « hors git » quand le répertoire n'est pas dans un dépôt ou que le dépôt n'a aucun commit ; la mention « modifications non commitées » ignore le livrable lui-même.
 - CA3 : un nom de paquet npm est conforme s'il respecte la forme `(@portée/)nom` du registre, majuscules des anciens noms comprises ; un nom pub est conforme s'il ne contient que des minuscules, des chiffres et `_`.
