@@ -196,6 +196,23 @@ Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` me
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
+### wf-exploitation
+
+Spec 018, lancée par `/wf-exploitation`, tous les cas `hors-reseau` (tag `wf-exploitation` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca09-…`). Tous les cas portent `ca20-aucune-commande-executee` : Bash ne sert qu'à `git rev-parse --short HEAD`, `git status --porcelain` et `date +%F` (liste blanche).
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `exploitation-ca01-fieldops` | FieldOps complet (web et Flutter), propre, faux secret, sans doc-projet | CA1 à CA6, CA8 à CA10, CA12 à CA25 |
+| `exploitation-ca03-doc-projet-fichier` | FieldOps et livrable doc-projet en fichier unique, commité | CA3 |
+| `exploitation-ca03-ca27-relance-doc-projet-dossier` | FieldOps, livrable doc-projet en dossier et ancien guide (2026-01-15), commités | CA3, CA27 |
+| `exploitation-ca05-ca07-ca11-projet-minimal` | projet TypeScript avec `pino-http`, sans tâche planifiée ni mode de lancement | CA5, CA7, CA8, CA11, CA16, CA19 |
+| `exploitation-ca25-flutter-seul` | application Flutter seule avec Sentry et messages d'erreur affichés | CA25, CA7, CA21, CA22 |
+| `exploitation-ca26-stack-non-couverte` | projet Python avec `Dockerfile`, `docker-compose.yml` (`restart`), CI programmée, `.env.example` | CA26, CA4, CA6, CA8, CA9 |
+| `exploitation-ca28-repertoire-vide` | répertoire vide | CA28 (cas limite) |
+| `exploitation-ca28-sans-code-source` | FieldOps brief (documents seuls) | CA28 (cas limite) |
+
+Le hash attendu dans l'en-tête de `exploitation-ca01-fieldops` est celui de la fixture, rejouable : `2fc99c0`. Une modification de la fixture le change : mettre à jour `ca02-en-tete-commit`.
+
 ### wf-chiffrage
 
 Spec 005, lancée par `/wf-chiffrage`, tous les cas `hors-reseau` (tags `wf-chiffrage` et `spec-005` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca04-…`) ; un grader « témoin » vérifie que le livrable a bien été écrit ou mis à jour, sans quoi les vérifications d'absence réussiraient sans rien prouver. L'entrée par défaut, `docs/wf/cadrage-besoin.md`, est fabriquée par le scaffold selon le contrat de la spec 004 (dossier `donnees/` de chaque cas).
