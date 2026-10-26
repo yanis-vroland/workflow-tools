@@ -122,3 +122,39 @@ L'outil lit `docs/wf/cadrage-besoin.md` (spec 004) : sa section « Besoins fonct
 ## Questions ouvertes
 
 - Après la v1 : mesure chiffrée de la qualité du modèle sur 3 à 5 briefs fictifs dont le schéma attendu est connu.
+
+## Amendement 1 (validé)
+
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
+
+- CA1 : l'outil ne supprime, ne déplace ni ne renomme aucun fichier, même dans `docs/wf/modele-donnees/`, et ne crée aucun fichier temporaire.
+- CA2 : l'en-tête de `index.md` comporte, en plus de l'outil, de la date et du commit, les lignes « Niveau atteint » (A, B ou C, avec la mention « forcé par --niveau » le cas échéant), « Sources lues », « Derniers identifiants attribués » et « Exécution ».
+- CA4 : une source se cite sous la forme « phrase » (fichier, « titre de section ») pour un fichier Markdown ou texte, « phrase » (fichier, page N) pour un PDF, l'identifiant `Bnn` pour un besoin du cadrage, « réponse saisie à la question `Qnn` » ou « décision saisie en `Dnn` » pour une saisie.
+- CA4 : un élément sans source n'est ajouté comme « supposé » que s'il est indispensable à l'entité qui le porte.
+- CA4 : chaque relation porte sa propre source (phrase citée, identifiant de besoin ou saisie) ou la marque « supposé », même quand la règle dont découlent ses cardinalités est elle-même sourcée.
+- CA5 : les noms d'entités du diagramme sont en majuscules, sans accent ni espace.
+- CA7 : chaque relation indique la règle `RGnn` dont découlent ses cardinalités.
+- CA8 : chaque question se termine par « Bloquante : oui » ou « Bloquante : non » ; une question est bloquante si sa réponse change une table, une colonne, une clé, une cardinalité ou une contrainte du schéma physique.
+- CA9 : chaque élément du modèle qui dépend d'un encadré non décidé (entité, attribut, ligne du dictionnaire, relation, règle), y compris celui que le modèle représente faute de décision, porte la mention « provisoire, voir `Dnn` » ; chaque encadré est ainsi renvoyé par au moins un élément, et une fois la décision saisie la mention devient « décision saisie en `Dnn` ».
+- CA10 : un champ « Réponse : » vide n'est rempli que si une source nouvelle donne explicitement la réponse, suivie de cette source ; un champ « Décision : » n'est jamais rempli par l'outil. Si le contexte d'un encadré décidé a changé, la décision est conservée et le changement signalé sous l'encadré.
+- CA11 : les entités portent un identifiant `Enn`. La ligne d'en-tête « Derniers identifiants attribués » donne les plus grands `Enn`, `RGnn`, `Qnn` et `Dnn` jamais attribués, y compris retirés ; un nouvel élément reçoit le plus grand identifiant connu (ligne d'en-tête ou livrable) plus un.
+- CA12 : sont aussi des données personnelles la photo d'une personne ou d'un domicile et l'identifiant de compte ; au niveau C, les champs personnels du schéma existant sont listés comme ceux du modèle.
+- CA13 : une personne citée par les sources est désignée par son rôle ; un exemple d'adresse e-mail, s'il en faut un, est inventé dans un domaine réservé aux tests.
+- CA14 : « Revue du modèle » comporte les sous-sections « Données personnelles », « Éléments supposés » et « Nommage incohérent », plus au niveau B « Relations n-n sans table de jointure » et « Défauts du schéma », et au niveau C « Écarts aux conventions ».
+- CA15 : Bash ne sert qu'à lire la date, le commit et l'état git, à extraire le texte d'un PDF, à calculer un chemin relatif (chemin passé par l'entrée standard, jamais dans la ligne de commande) et à créer les dossiers du livrable ; toute recherche dans le projet passe par les outils de lecture, jamais par Bash.
+- CA16 : le commentaire d'en-tête d'un fichier non Markdown est « Généré par wf-modele-donnees : voir index.md (fichier non exécuté). » ; les fichiers sont listés dans un tableau « Fichier | Rôle ».
+- CA18 : sans argument, seul `docs/wf/cadrage-besoin.md` est lu, pas les fichiers qu'il cite ; ses besoins se citent par leur identifiant.
+- CA19 et CA20 : le passage au niveau B se décide sur les champs du livrable existant, avant sa mise à jour ; une relance sans argument d'un livrable au niveau B reste au niveau B.
+- CA21 : au niveau B forcé, chaque point non tranché reçoit l'hypothèse la plus simple compatible avec les sources, sans être présentée comme recommandée, et l'élément porte en commentaire « supposé : voir `Qnn` » (ou `Dnn`) dans le schéma.
+- CA22 : les tables sont nommées au pluriel ; chaque index est précédé d'un commentaire « Justification : » qui cite une requête `Rnn` ou une règle `RGnn` ; le schéma est en troisième forme normale, toute dérogation justifiée en commentaire.
+- CA23 : chaque requête de `requetes.sql` est en lecture seule, identifiée `Rnn` et précédée d'un commentaire qui nomme le besoin et sa source.
+- CA25 : fichiers produits par ORM : Prisma, `schema.prisma` et `migrations/<horodatage>_init/migration.sql` ; TypeORM, `entities/<nom>.entity.ts` et `migrations/<horodatage>-Init.ts` ; Drift, `tables.dart` et `database.dart` ; sqflite, `local_database.dart` ; données de test et requêtes dans le dialecte de la base. Avec plusieurs ORM couverts, les fichiers de chacun vont dans un sous-dossier nommé d'après l'ORM. L'ORM est détecté par les dépendances des manifestes du projet.
+- CA26 : « Évolution » présente les schémas détectés dans un tableau « Schéma | Base ou ORM | Outil de migration » ; la migration d'une base sqflite est écrite dans `migration-sqflite.dart`, celle d'une base Drift dans `migration-drift.dart`, celle d'un dossier de migrations SQL numérotées sous le numéro suivant, selon la même convention ; la détection de schéma ignore `docs/wf/`, les dépendances installées et les dossiers de build.
+- CA26 : une relance sans argument d'un livrable au niveau C reste au niveau C tant qu'un schéma est détecté.
+- CA30 : une suppression non confirmée n'apparaît nulle part dans la migration, pas même en commentaire ; « Évolution » la présente « en attente de `Dnn` ».
+- CA31 : chaque fichier cité est trouvé par une recherche du nom de la table ou de la colonne limitée aux fichiers de code, puis lu ; aucun fichier d'environnement n'est ouvert.
+- CA35 : l'existence d'un fichier se vérifie sans commande shell ; un PDF dont le chemin contient une apostrophe, ou un argument écrit sur plusieurs lignes, est écarté sans commande avec sa raison ; un chemin relatif passé à l'extraction PDF est préfixé par `./`.
+- CA36 : les ORM non couverts reconnus sont au moins Sequelize, Knex, Drizzle, Mongoose, MikroORM, Objection, Isar, Hive, Floor et ObjectBox ; au niveau B, le niveau atteint reste B, avec la mention « ORM non couvert ».
+- CA37 : un fichier sans objet est signalé dans « Points non déterminés » comme n'ayant plus lieu d'être, sans être réécrit.
+- CA38 : la recherche dans le projet n'affiche jamais le contenu d'un fichier avant de savoir s'il est un fichier d'environnement (recherche par liste de fichiers, puis lecture des seuls fichiers autorisés) ; `.env.example` n'est pas une source d'analyse ; un fichier Prisma nomme la variable de connexion, jamais sa valeur.
+- Cas limite : en relance, une source de l'en-tête située hors du projet n'est pas relue sans être repassée en argument ; elle reste dans « Sources lues », est signalée dans « Points non déterminés », et les éléments qui en dépendaient sont conservés.
