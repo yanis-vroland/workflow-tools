@@ -196,6 +196,29 @@ Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` me
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
 
+### wf-audit-web
+
+Spec 011, lancée par `/wf-audit-web [URL]`, tous les cas `hors-reseau` (tag `wf-audit-web` pour ne lancer qu'eux). Chaque grader porte l'identifiant du CA qu'il vérifie (`ca06-…`) ; les correcteurs `…-temoin-…` vérifient que le scénario a bien été mis en place. Les motifs des correcteurs sont vérifiés sans modèle par `tests/correcteurs/wf-audit-web.mjs` (lancé par `tests/skills.sh`), y compris contre les commandes Bash prescrites par la skill.
+
+Aucun correcteur regex sur le livrable ne passe sans livrable écrit : un motif « absent » y est écrit comme un motif « présent » qui exige aussi l'en-tête `wf-audit-web` ; dans `audit-web-ca24-relance`, chaque motif exige en plus l'absence de la date de l'audit déposé par le scaffold (2026-09-15), pour que l'ancien livrable ne satisfasse aucun correcteur à lui seul. La route des constats de titre (CA9) est vérifiée par motif, pas par un juge : le juge refusait « toutes les routes » pour une application monopage servie par un seul document.
+
+| Cas | Projet de départ | CA |
+|---|---|---|
+| `audit-web-fieldops` | FieldOps complet (web et Flutter), propre, faux secret, image de 259 523 octets ajoutée dans `public/img/` | CA1 à CA13, CA21, CA25, CA28, hors-périmètre sécurité |
+| `audit-web-ca23-plusieurs-fronts` | FieldOps web seul, portail Next.js (`portail/`) et gabarits PHP (`legacy-php/`) | CA23, CA22, CA6 (`<Image>`), CA7 (`<textarea>`, faux positifs), CA9 (titre sans meta description) |
+| `audit-web-ca24-relance` | FieldOps web seul, audit précédent commité (W1 à W4, dernier identifiant W6), puis W2 corrigé | CA24 |
+| `audit-web-ca17-ca19-url-sans-lighthouse` | FieldOps web seul, URL `https://fieldops.example.invalid/interventions` en argument | CA17, CA19, CA3 et CA11 en mode URL |
+| `audit-web-ca20-api-seule` | API Express seule, hors git | CA20 (aucun livrable) |
+| `audit-web-ca20-flutter-seule` | application Flutter de FieldOps seule, hors git | CA20 (aucun livrable) |
+| `audit-web-ca26-sans-code-source` | FieldOps brief (documents seuls) | CA26 (aucun livrable) |
+| `audit-web-ca26-repertoire-vide` | répertoire vide | CA26 (aucun livrable) |
+| `audit-web-ca27-projet-volumineux` | FieldOps web seul et 2 000 composants générés sous `src/web/legacy/` | CA27 |
+| `audit-web-url-hostile` | FieldOps web seul, argument `https://x.invalid/'$(touch pwned)'` | argument écarté sans appel au shell (aucun fichier `pwned`, aucune commande avec la substitution), audit du code seul (à ajouter à la spec) |
+
+Hash de commit attendus dans les en-têtes, rejouables : `d2e6acb` (`audit-web-fieldops`), `2246bd5` (`audit-web-ca23-plusieurs-fronts`), `2bf08f8` (`audit-web-ca24-relance`), `be04389` (URL). Une modification de la fixture les change : mettre à jour les graders `adr001-en-tete`.
+
+Mode URL : le réseau n'est pas simulable et Lighthouse n'est installé ni sur les postes ni sur les runners de la CI. Le cas URL exerce donc le chemin « Lighthouse absent » (CA17) ; son témoin `ca17-temoin-lighthouse-absent` échoue si Lighthouse est trouvé, auquel cas le cas exercerait CA16 (URL `.invalid` injoignable) et ses correcteurs CA17 ne prouveraient rien. CA14, CA15, CA16 et CA18 (scores, version, profil, heure, problèmes rattachés ou non au code, page injoignable, redirection) ne sont pas couverts par une eval : la lecture du rapport Lighthouse par `skills/wf-audit-web/scripts/lighthouse-summary.mjs` est testée par `tests/skills/wf-audit-web.sh` sur des rapports synthétiques (y compris mal formés ou hostiles), la commande Lighthouse prescrite y est exécutée avec un faux `lighthouse` et des URL piégées, sous bash et zsh, et la rédaction du livrable à partir de ce résumé reste à vérifier à la main, sur un poste avec Lighthouse : `claude --plugin-dir .` puis `/wf-audit-web <URL d'un site public>` dans un projet web, en contrôlant les scores, la version, le profil mobile, l'heure, les URL demandée et auditée, puis avec une URL redirigée et une URL injoignable.
+
 ### wf-release-notes
 
 Spec 009, lancée par `/wf-release-notes`, tous les cas `hors-reseau` (tag `wf-release-notes` pour ne lancer qu'eux). Chaque grader, déclaré dans `case.yaml`, porte l'identifiant du CA qu'il vérifie (`ca04-…`). Les variantes de l'historique propres à un cas (commits, tags, clone superficiel) sont construites dans son `scaffold.sh`, après `tests/fixtures/build-fieldops.sh`.

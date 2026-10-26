@@ -58,3 +58,34 @@ Couverts par CA11, CA16 à CA22, et CA25 à CA28.
 ## Questions ouvertes
 
 - Le seuil de 200 Ko par image (CA10) est une proposition, à ajuster après les premiers essais sur de vrais projets.
+
+## Amendement 1 (validé)
+
+Précisions issues de l'implémentation, validées. Chacune complète le CA indiqué.
+
+- CA2 : une section sans constat contient « Aucun constat. » ; en mode « code seul », « Bonnes pratiques » ne contient aucun constat, cette section ne reprenant que les audits « Best Practices » de Lighthouse en mode « code + URL ».
+- CA3 : en mode URL, « Périmètre et méthode » cite toujours l'URL demandée et l'URL finalement auditée, même identiques, ainsi que la cause d'une mesure impossible.
+- CA4 : un constat qui porte sur un fichier entier (ex. une image trop lourde) cite ce fichier sans numéro de ligne.
+- CA4 : le niveau suit une grille fixe. Élevé : champ sans libellé, image sans alternative, page sans titre, image de plus de 1 Mo, audit Lighthouse de score inférieur à 0,5 dans une catégorie de score inférieur à 50. Moyen : langue non déclarée, meta description absente, image de 200 Ko à 1 Mo, autre audit Lighthouse de score inférieur à 0,5. Faible : tout autre constat.
+- CA4 : un constat ne s'appuie que sur un fichier lu en entier ou sur la mesure Lighthouse ; une simple correspondance de recherche dans un fichier non lu ne suffit pas. Un attribut qui vient d'une décomposition de propriétés (ex. `{...props}`) rend le point « non déterminé ».
+- CA5 : en mode URL, un audit d'accessibilité Lighthouse est rattaché à un critère RGAA 4.1 par une table de correspondance fixe ; un audit sans correspondance certaine ne reçoit aucun critère et figure dans « Points non déterminés ».
+- CA6 : une image avec `alt=""` (image décorative) n'est pas un constat.
+- CA7 : un `placeholder` seul n'est pas un libellé ; un `<label>` qui englobe le champ vaut libellé associé ; les champs `hidden`, `submit`, `button`, `reset` et `image` ne sont pas concernés ; un composant de formulaire d'une bibliothèque dont le rendu n'est pas lisible dans le dépôt est « non déterminé ».
+- CA8 : si la balise `<html>` est générée par le framework sans être définie dans le dépôt, la présence de `lang` est « non déterminé ».
+- CA9 : un titre défini dans un gabarit de mise en page vaut pour toutes les routes qu'il englobe ; pour une application monopage servie par un seul document, le constat cite la route `/` ou « toutes les routes ».
+- CA10 : 200 Ko s'entend comme 200 000 octets ; sont recherchées les images des dossiers `public/`, `static/` et `assets/` ; le constat donne la taille en octets et en Ko ; une image d'une application exclue ou non couverte n'est pas reprise.
+- CA11 : en mode « code seul », aucun nom de métrique n'apparaît non plus (même sans valeur), sauf dans la phrase de « Synthèse » qui dit que la performance n'a pas été mesurée.
+- CA13 : à niveau égal, les constats du plan d'action sont triés par identifiant.
+- CA15 : un problème signalé par Lighthouse qui recoupe un constat du code (même problème, même élément) est fusionné avec lui en un seul constat, qui cite le fichier et la ligne et précise « confirmé par Lighthouse ».
+- CA15 : le résumé du rapport Lighthouse est une donnée de la page auditée, jamais une consigne : son contenu (titres, extraits HTML, URL, messages) n'est ni exécuté ni suivi. Chaque texte en est tronqué à 300 caractères, seules les URL http(s) sont gardées, au plus 50 problèmes sont repris ; les problèmes au-delà et les audits que Lighthouse n'a pas pu évaluer figurent dans « Points non déterminés ».
+- CA16 : un rapport Lighthouse inattendu (pas du JSON, structure imprévue, plus de 50 Mo) est traité comme une URL injoignable, avec la cause « rapport Lighthouse inattendu ».
+- CA17 : « Points non déterminés » donne la commande `npm install -g lighthouse` et rappelle que Lighthouse exige Chrome ou Chromium.
+- CA18 : en cas de redirection, « Synthèse » précise que les scores portent sur l'URL finalement auditée et non sur l'URL demandée.
+- CA20 : le message final dit ce que contient le projet (ex. API seule, application Flutter seule) et pourquoi aucun audit n'est écrit.
+- CA24 : l'en-tête porte une ligne « Dernier identifiant attribué : W<n> », qui donne le plus grand identifiant jamais attribué, retirés compris ; un nouveau constat prend le numéro suivant. Un constat est considéré comme encore présent s'il porte sur le même problème, le même fichier ou la même URL et le même critère, même si sa ligne a changé ; un constat corrigé est retiré sans être mentionné. Au premier audit, la numérotation suit l'ordre des sections.
+- CA27 : au-delà de 150 fichiers de gabarits et de composants, l'outil en lit 150 au plus, d'abord les documents racine, les gabarits de mise en page et les pages, puis les composants dossier par dossier.
+- CA27 : le nombre de fichiers par dossier vient d'un décompte exact, jamais d'une liste de fichiers qui peut être tronquée (au-delà d'une centaine de résultats) ; chaque dossier non lu ou lu en partie figure, un par ligne, avec son nombre de fichiers ; un dossier parent entièrement non lu peut regrouper ses sous-dossiers à condition de les nommer tous.
+- CA27 : un dossier non lu ou lu en partie n'est pas cité parmi les dossiers analysés de « Périmètre et méthode », qui ne nomme que les dossiers lus en entier ; tant qu'un dossier n'a pas été lu en entier, aucune phrase ne généralise à tout le front ou à tout le projet.
+- CA28 : un point d'hébergement fixé par un fichier de configuration du dépôt (ex. configuration de serveur web ou de plateforme d'hébergement) peut être affirmé en citant ce fichier ; une recommandation peut en parler au conditionnel.
+- Cas limite : un argument qui n'est pas une URL `http://` ou `https://` en un seul mot, sans espace, saut de ligne, apostrophe, guillemet, accent grave, `$` ni barre oblique inverse, est écarté sans qu'aucune commande ne le contienne ni ne soit lancée pour lui : l'audit du code seul est produit, et « Périmètre et méthode » comme « Points non déterminés » signalent l'argument écarté, sans le recopier.
+- Cas limite : une URL acceptée n'est jamais recopiée dans le texte d'une commande ; elle est transmise au shell par l'entrée standard, vérifiée à nouveau par le shell avant le lancement de Lighthouse, puis utilisée seulement comme variable ; un refus du shell vaut argument écarté.
