@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: chiffrage-ca15-ca16-projet-avec-code
+description: >-
+  Spec 005, évolution d'une application existante : wf-chiffrage lancé sans
+  argument dans la fixture FieldOps (code web et Flutter, historique git, faux
+  secret), avec un cadrage de trois évolutions du back-office et le livrable de
+  wf-analyse-projet (deux risques élevés, dont un sans rapport avec les
+  évolutions). Couvre CA15, CA16, CA17, CA23, et CA3 dans un dépôt git propre.
+tags: [wf-chiffrage, spec-005, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh

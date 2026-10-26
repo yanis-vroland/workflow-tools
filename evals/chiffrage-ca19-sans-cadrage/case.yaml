@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: chiffrage-ca19-sans-cadrage
+description: >-
+  Spec 005, CA19 : lancé sans argument dans la fixture FieldOps brief, qui ne
+  contient pas de docs/wf/cadrage-besoin.md (mais un brief lisible), l'outil
+  indique qu'il faut d'abord lancer /wf-cadrage-besoin ou fournir un fichier de
+  besoin, et n'écrit aucun livrable.
+tags: [wf-chiffrage, spec-005, hors-reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Bash]
+
+context:
+  scaffold_script: scaffold.sh
