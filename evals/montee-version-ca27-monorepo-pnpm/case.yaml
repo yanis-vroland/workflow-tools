@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: montee-version-ca27-monorepo-pnpm
+description: >-
+  Spec 013 (wf-montee-version), CA27 : monorepo pnpm (apps/web, apps/admin)
+  où react est installé en 17.0.2 et en 18.2.0. Couvre aussi CA3
+  (pnpm-lock.yaml), CA4 (.node-version), CA15 (commandes pnpm) et CA16
+  (scripts des applications). Nécessite le registre npm.
+tags: [wf-montee-version, spec-013, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 100
+  timeout_seconds: 1800
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

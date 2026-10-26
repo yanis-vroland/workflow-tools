@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: montee-version-ca09-version-inexistante
+description: >-
+  Spec 013 (wf-montee-version), CA9 : argument désignant une version
+  inexistante dans le registre (`react 99.0.0`). L'outil l'indique, cite la
+  dernière version publiée de react et n'écrit aucun livrable.
+tags: [wf-montee-version, spec-013, reseau]
+runs: 1
+
+execution:
+  model: claude-sonnet-5-5
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Bash, Skill, WebFetch]
+
+context:
+  scaffold_script: scaffold.sh

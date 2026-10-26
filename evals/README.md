@@ -9,7 +9,7 @@ Les cas se lancent en deux passes, selon leur tag réseau (voir « Réseau ») :
 ```bash
 # Registres joignables (tag reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag reseau \
-  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)" "WebFetch(domain:developer.android.com)" "WebFetch(domain:developer.apple.com)"
+  --allow-tools Write Bash "WebFetch(domain:registry.npmjs.org)" "WebFetch(domain:pub.dev)" "WebFetch(domain:api.osv.dev)" "WebFetch(domain:endoflife.date)" "WebFetch(domain:storage.googleapis.com)" "WebFetch(domain:developer.android.com)" "WebFetch(domain:developer.apple.com)"
 
 # Aucun réseau (tag hors-reseau)
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet --ablation none --tag hors-reseau \
@@ -28,7 +28,7 @@ claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 
 Dès que `Bash` est accordé, ses commandes tournent dans le bac à sable de Claude Code, dont l'accès réseau est limité aux domaines accordés par `--allow-tools "WebFetch(domain:…)"`. Sans ces autorisations, aucun registre n'est joignable. D'où deux passes :
 
-- tag `reseau` : le cas a besoin des registres (npm, pub.dev), de la base d'avis OSV.dev (`api.osv.dev`) ou de la documentation officielle des stores (developer.android.com, developer.apple.com) ;
+- tag `reseau` : le cas a besoin des registres (npm, pub.dev), de la base d'avis OSV.dev (`api.osv.dev`), des calendriers de versions (endoflife.date, versions publiées de Flutter sur `storage.googleapis.com`), de la documentation officielle des stores (developer.android.com ou developer.apple.com) ;
 - tag `hors-reseau` : le cas tourne sans aucun réseau, y compris ceux qui exigent un registre injoignable.
 
 Chaque cas porte exactement un de ces deux tags ; `.github/scripts/verifier-tags-evals.sh` le vérifie en CI, sinon le cas ne serait jamais lancé.
@@ -200,6 +200,31 @@ Valeur déterministe : commit `2fc99c0` dans `compte-rendu-ca03-ca04-index-exist
 Tous les cas accordent `Edit` : les correcteurs `tool_used: Edit` à `max: 0` mesurent ainsi un refus réel. Les interdictions de lecture couvrent Read, Bash (motif sur la commande) et Glob. `tests/correcteurs/wf-compte-rendu.mjs`, lancé par `tests/skills/wf-compte-rendu.sh`, compile tous les motifs, les essaie sur des exemples positifs et négatifs, vérifie que les commandes prescrites par la skill ne déclenchent aucune interdiction, et que la commande du nom de fichier donne les noms attendus.
 
 Limite : une eval n'a qu'un tour. Pour CA2 (sans argument), CA15 et CA17, on vérifie que la question est posée et que rien n'est écrit. La suite de CA17 est couverte en donnant la réponse d'avance après le chemin (`/wf-compte-rendu <notes> nouvelle réunion`, comportement de la skill à ajouter à la spec) ; la reprise après une réponse dans un second message (texte collé de CA2, date de CA15) n'est pas couverte par les evals. Les notes collées sont couvertes par un texte fourni directement après la commande (amendement 1 de l'ADR-001).
+
+### wf-montee-version
+
+Spec 013, lancée par `/wf-montee-version [argument]` (tags `wf-montee-version` et `spec-013`). Chaque correcteur porte dans son nom le critère qu'il vérifie (`ca14-…`) ; les motifs sont compilés et vérifiés sur des exemples positifs et négatifs, et sur des livrables d'exemple, par `tests/correcteurs/wf-montee-version.mjs` (lancé par `tests/skills.sh`).
+
+| Cas | Projet de départ | Tag | CA |
+|---|---|---|---|
+| `montee-version-ca10-fieldops-sans-argument` | FieldOps complet, faux secret, `docs/wf/revue-securite.md` commité (S3 : express 4.18.2, corrigé en 4.19.2) | `reseau` | CA1 à CA6, CA10 à CA16, CA20, CA21, CA25, CA27 (une sous-section par application) |
+| `montee-version-ca07-registre-injoignable` | FieldOps complet, réseau coupé, `.npmrc` vers un registre injoignable | `hors-reseau` | CA7, CA4 à CA6 (repli), CA11 (livrable de sécurité absent), CA12 (non vérifiée), CA16, CA20, CA25 |
+| `montee-version-ca08-cible-react-dom` | FieldOps complet, argument `react-dom 19` | `reseau` | CA8, CA9 (version partielle résolue), CA12 à CA15, CA24 |
+| `montee-version-ca09-paquet-absent` | FieldOps complet, argument `lodash 4` | `reseau` | CA9 (paquet absent, aucun livrable) |
+| `montee-version-ca09-version-inexistante` | FieldOps complet, argument `react 99.0.0` | `reseau` | CA9 (version inexistante, aucun livrable) |
+| `montee-version-ca18-cible-deja-atteinte` | FieldOps complet, argument `express 4.18.2` | `reseau` | CA18, CA8, CA24 |
+| `montee-version-ca19-ca22-projet-mixte-sans-lockfile` | projet fictif hors git : JS/TS sans lockfile ni script, PHP (`composer.json`) | `reseau` | CA19, CA17, CA22, CA13 (`_.pluck`, deux occurrences) |
+| `montee-version-ca27-monorepo-pnpm` | monorepo pnpm fictif, react 17.0.2 (`apps/web`) et 18.2.0 (`apps/admin`), `.node-version` | `reseau` | CA27, CA3, CA4, CA15 (pnpm), CA16 |
+| `montee-version-ca23-relance` | FieldOps et ancien livrable commité, périmé (react 16.14.0) | `hors-reseau` | CA23 |
+| `montee-version-ca26-sans-manifeste` | FieldOps brief (documents seuls) | `hors-reseau` | CA26 |
+
+Tous les cas portent `ca20-ni-installation-ni-execution`, `ca20-ni-branche-ni-commit`, `ca01-aucune-modification-par-bash` et `ca01-curl-sans-ecriture` (motifs repris de `evals/analyse-projet/`).
+
+Réseau : la passe `reseau` autorise `registry.npmjs.org`, `pub.dev`, `endoflife.date` et `storage.googleapis.com` (versions publiées de Flutter), mais aucun domaine de documentation : les notes de version hors pub.dev y sont injoignables. Les correcteurs acceptent donc « non vérifiée » pour les ruptures, et « non déterminé » pour la dernière LTS, la dernière stable et la fin de support si ces sources ne répondent pas, et `ca12-sources-effectivement-consultees` vérifie qu'aucune URL n'est donnée comme source sans avoir été consultée. Les valeurs publiques ne sont jamais figées : dernière version « 18 ou plus » pour react, date de fin de support de Node.js 18 (2025-04-30) acceptée seulement si endoflife.date a répondu.
+
+Hash attendus dans les en-têtes, rejouables : `18776c7` (FieldOps et livrable de sécurité), `2fc99c0` (FieldOps seul), `822183b` (monorepo pnpm), `7863f6e` (relance). Une modification de la fixture ou d'un scaffold les change : mettre à jour les correcteurs `adr001-en-tete-…`, `ca24-argument-en-tete` et `ca23-en-tete-commit-actualise`.
+
+Limites : CA28 (impacts partiels d'un projet volumineux) et les variantes `.fvm/fvm_config.json` (CA5), yarn (CA15) et pub sans lockfile (CA19) ne sont vérifiés que par les tests structurels. `file_exists` ne voyant que les fichiers créés pendant l'exécution, la relance (CA23) est vérifiée par la réécriture observée (`Write`) et le contenu du livrable.
 
 ### wf-audit-web
 
