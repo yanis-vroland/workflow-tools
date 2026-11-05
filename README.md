@@ -2,7 +2,7 @@
 
 Plugin Claude Code : des outils de workflow pour le quotidien d'un chef de projet et développeur freelance web et mobile. Chaque outil est une skill (`/wf-doc-projet`, `/wf-analyse-projet`…) qu'on lance dans le projet cible, et qui y produit un livrable utilisable tel quel.
 
-> **Statut : version 0.1.0, avant la v1.** Les 18 outils ci-dessous sont livrés, chacun avec sa spec validée et ses evals. Le dépôt deviendra public à la v1.
+> **Statut : version 0.1.0, avant la v1.** Les 18 outils ci-dessous sont livrés, chacun avec sa spec validée et ses evals.
 
 ## Fonctionnement
 
